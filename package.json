@@ -12,7 +12,7 @@
   },
   "author": "zhu_echen",
   "license": "ISC",
-  "dependencies": {
-    "nodemon": "^2.0.15"
+  "devDependencies": {
+    "nodemon": "^2.0.20"
   }
 }
