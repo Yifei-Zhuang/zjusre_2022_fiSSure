@@ -30,12 +30,14 @@ When creating pull request:
 
 1.  Please create the request to **master** branch.
 
-2.  If the PR has a corresponding issue, name it with [ISSUE #{num}] **.
+2.  If it is a big bug fix or new feature, add a new issue to this repo. If it is a tiny change, you can just pull request without a issue.
 
-3.  If your PR contains large changes, e.g. component refactor or new components, please write detailed documents about its design and usage.
+3.  If the PR has a corresponding issue, name it with [ISSUE #{issue_id}] **.
 
-4.  Note that a single PR should not be too large. If heavy changes are required, it's better to separate the changes to a few individual PRs.
+4.  If your PR contains large changes, e.g. component refactor or new components, please write detailed documents about its design and usage.
 
-5.  **Before merging a PR, squash any fix review feedback, typo, merged and rebased sorts of commits. The final commit message should be clear and concise.**
+5.  Note that a single PR should not be too large. If heavy changes are required, it's better to separate the changes to a few individual PRs.
+
+6.  **Before merging a PR, squash any fix review feedback, typo, merged and rebased sorts of commits. The final commit message should be clear and concise.**
 
 If your PR contains large changes, e.g. component refactor or new components, please write detailed documents about its design and usage.
