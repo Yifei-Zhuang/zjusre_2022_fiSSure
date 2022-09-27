@@ -5,7 +5,7 @@ const ObjectId = require("mongodb").ObjectId;
 const dotenv = require('dotenv')
 const { Octokit } = require("@octokit/core");
 const res = require("express/lib/response");
-const config = require("./config");
+const config = require("../config");
 const octokit = new Octokit({
   auth: process.env.GITHUB_ACCESS_TOKEN || config.GITHUB_ACCESS_TOKEN,
 });
