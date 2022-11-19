@@ -13,7 +13,6 @@ const octokit = new Octokit({
 dotenv.config('../env')
 const GetMessage = async (req, res) => {
   try { 
-    console.log(octokit.auth())
     const repoMessage = await octokit.request("GET /repos/{owner}/{repo}", {
       owner: req.body.owner,
       repo: req.body.repoName,
