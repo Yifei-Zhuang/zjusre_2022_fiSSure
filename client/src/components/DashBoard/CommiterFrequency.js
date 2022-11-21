@@ -1,5 +1,4 @@
 import { merge } from "lodash";
-import moment from "moment";
 import ReactApexChart from "react-apexcharts";
 // material
 import { Card, CardHeader, Box } from "@mui/material";
@@ -8,7 +7,7 @@ import BaseOptionChart from "./BaseOptionChart";
 
 // ----------------------------------------------------------------------
 
-const CommitFrequency = (data) => {
+const CommiterFrequency = (data) => {
   var labels = [],
     number = [];
   for (var interval in data) {
@@ -17,7 +16,7 @@ const CommitFrequency = (data) => {
   }
   const CHART_DATA = [
     {
-      name: "commit times",
+      name: "commiter count",
       type: "area",
       data: number,
     },
@@ -44,7 +43,7 @@ const CommitFrequency = (data) => {
 
   return (
     <Card>
-      <CardHeader title="Commit frequency" />
+      <CardHeader title="Commiter change" />
       <Box sx={{ p: 3, pb: 1 }} dir="ltr">
         <ReactApexChart
           type="line"
@@ -57,4 +56,4 @@ const CommitFrequency = (data) => {
   );
 };
 
-export default CommitFrequency;
+export default CommiterFrequency;
