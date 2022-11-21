@@ -7,12 +7,12 @@ const links = [
     path: "/",
     icon: <Icon icon="octicon:repo-16" />,
   },
-  {
-    id: 2,
-    text: "profile",
-    path: "profile",
-    icon: <Icon icon="icomoon-free:profile" />,
-  },
+//   {
+//     id: 2,
+//     text: "profile",
+//     path: "profile",
+//     icon: <Icon icon="icomoon-free:profile" />,
+//   },
 ];
 
 export default links;
