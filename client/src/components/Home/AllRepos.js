@@ -24,7 +24,7 @@ const AllRepos = () => {
   }, [page, viewMyRepos]);
 
   if (isLoading) {
-    return <Loading center />;
+    return <Loading center leaveTop />;
   }
   if (viewMyRepos) repos = repos.filter((repo) => repo.uploader === user);
   if (repos.length === 0 && search === "") {
