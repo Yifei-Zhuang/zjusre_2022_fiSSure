@@ -2,20 +2,20 @@ const PullSchema = require('../models/pull');
 const {Octokit} = require('@octokit/core');
 const config = require('../config');
 const {default: mongoose} = require('mongoose');
+const {createCustomError} = require('../errors/custom-error');
 const octokit = new Octokit({
   auth: process.env.GITHUB_ACCESS_TOKEN || config.GITHUB_ACCESS_TOKEN,
 });
+
 const {YearCounter, MonthCounter, DayCounter} = require('../utils/index');
 /**
  * @brief 获取指定仓库的pull记录（最多10000条）
  * @method post
- * @param {*} req
- * @param {*} res
+ * @param {*} owner
+ * @param {*} repo
  */
-const GetPullInfo = async (req, res) => {
+const GetPullInfo = async (owner, repo) => {
   try {
-    const owner = req.body.owner;
-    const repo = req.body.repo;
     // 检查repo是否存在
     const repoResponse = await octokit.request('GET /repos/{owner}/{repo}', {
       owner: owner,
@@ -23,6 +23,7 @@ const GetPullInfo = async (req, res) => {
     });
     let page_num = 1;
     const per_page = 100;
+
     while (1) {
       const pullMessage = await octokit.request(
         'GET /repos/{owner}/{repo}/pulls',
@@ -37,8 +38,8 @@ const GetPullInfo = async (req, res) => {
           ).toString(),
         },
       );
-      if (page_num > 100 || pullMessage.data.length == 0) {
-        // 最多10000条
+      if (page_num > 50 || pullMessage.data.length == 0) {
+        // 最多5000条
         console.log(`fetch pull msg finish! total ${page_num} pages`);
         break;
       }
@@ -63,7 +64,9 @@ const GetPullInfo = async (req, res) => {
               state: pull.state,
               title: pull.title,
               isLocked: pull.locked,
+              // 存储body等待时间非常长，所以这里先填一个空值
               body: pull.body ? pull.body : 'test',
+              // body: ' ',
               created_at: pull.created_at,
               updated_at: pull.updated_at,
               closed_at: pull.closed_at ? pull.closed_at : undefined,
@@ -91,14 +94,8 @@ const GetPullInfo = async (req, res) => {
       }
       page_num++;
     }
-    res.status(200).json({
-      msg: 'success',
-    });
   } catch (err) {
-    res.status(500).json({
-      msg: 'fail',
-      err: err,
-    });
+    throw createCustomError(err, 500);
   }
 };
 /**
@@ -107,19 +104,14 @@ const GetPullInfo = async (req, res) => {
  * @param {*} req
  * @param {*} res
  */
-const GetAllPullOfRepo = async (req, res) => {
+const GetAllPullOfRepo = async (owner, repo) => {
   try {
-    const owner = req.body.owner;
-    const repo = req.body.repo;
-    const pulls = await RepoPullTimeFilter(owner, repo);
-    res.status(200).json({
-      pulls,
-    });
+    return await PullSchema.find({
+      repo_owner: owner,
+      repo_name: repo,
+    }).sort([['created_at', 1]]);
   } catch (e) {
-    res.status(500).json({
-      msg: 'fail',
-      err: e,
-    });
+    throw createCustomError(e, 500);
   }
 };
 /**
@@ -136,24 +128,17 @@ const GetAllPullOfRepo = async (req, res) => {
  * @param {*} res
  * @attention 第一年和最后一年独立成年
  */
-const GetRepoPullUpdateFrequencyByYear = async (req, res) => {
+const GetRepoPullUpdateFrequencyByYear = async (owner, repo) => {
   try {
-    const owner = req.body.owner;
-    const repo = req.body.repo;
-    const tail = req.body.tail;
-    const begin = req.body.begin;
-    if (!owner || !repo || !tail || !begin) {
+    if (!owner || !repo) {
       throw 'missing body data';
     }
-    const PullInRange = await RepoPullTimeFilter(owner, repo, begin, tail);
-    const arr = await YearCounter(PullInRange, 'updated_at', begin, tail);
-    res.status(200).json({
-      arr,
-    });
+
+    const PullInRange = await GetAllPullOfRepo(owner, repo);
+    const begin = PullInRange[0].created_at;
+    return await YearCounter(PullInRange, 'updated_at', begin);
   } catch (e) {
-    res.status(400).json({
-      e,
-    });
+    throw createCustomError(e, 500);
   }
 };
 /**
@@ -170,24 +155,16 @@ const GetRepoPullUpdateFrequencyByYear = async (req, res) => {
  * @param {*} res
  * @attention 第一年和最后一年独立成年
  */
-const GetRepoPullCloseFrequencyByYear = async (req, res) => {
+const GetRepoPullCloseFrequencyByYear = async (owner, repo) => {
   try {
-    const owner = req.body.owner;
-    const repo = req.body.repo;
-    const tail = req.body.tail;
-    const begin = req.body.begin;
-    if (!owner || !repo || !tail || !begin) {
+    if (!owner || !repo) {
       throw 'missing body data';
     }
-    const PullInRange = await RepoPullTimeFilter(owner, repo, begin, tail);
-    const arr = await YearCounter(PullInRange, 'closed_at', begin, tail);
-    res.status(200).json({
-      arr,
-    });
+    const PullInRange = await GetAllPullOfRepo(owner, repo);
+    const begin = PullInRange[0].created_at;
+    return await YearCounter(PullInRange, 'closed_at', begin);
   } catch (e) {
-    res.status(400).json({
-      e,
-    });
+    throw createCustomError(e, 500);
   }
 };
 /**
@@ -204,24 +181,16 @@ const GetRepoPullCloseFrequencyByYear = async (req, res) => {
  * @param {*} res
  * @attention 第一年和最后一年独立成年
  */
-const GetRepoPullCreateFrequencyByYear = async (req, res) => {
+const GetRepoPullCreateFrequencyByYear = async (owner, repo) => {
   try {
-    const owner = req.body.owner;
-    const repo = req.body.repo;
-    const tail = req.body.tail;
-    const begin = req.body.begin;
-    if (!owner || !repo || !tail || !begin) {
+    if (!owner || !repo) {
       throw 'missing body data';
     }
-    const PullInRange = await RepoPullTimeFilter(owner, repo, begin, tail);
-    const arr = await YearCounter(PullInRange, 'created_at', begin, tail);
-    res.status(200).json({
-      arr,
-    });
+    const PullInRange = await GetAllPullOfRepo(owner, repo);
+    const begin = PullInRange[0].created_at;
+    return await YearCounter(PullInRange, 'created_at', begin);
   } catch (e) {
-    res.status(400).json({
-      e,
-    });
+    throw createCustomError(e, 500);
   }
 };
 /**
@@ -238,44 +207,28 @@ const GetRepoPullCreateFrequencyByYear = async (req, res) => {
  * @param {*} res
  * @attention 第一月和最后一月独立成月
  */
-const GetRepoPullUpdateFrequencyByMonth = async (req, res) => {
+const GetRepoPullUpdateFrequencyByMonth = async (owner, repo) => {
   try {
-    const owner = req.body.owner;
-    const repo = req.body.repo;
-    const tail = req.body.tail;
-    const begin = req.body.begin;
-    if (!owner || !repo || !tail || !begin) {
+    if (!owner || !repo) {
       throw 'missing body data';
     }
-    const PullInRange = await RepoPullTimeFilter(owner, repo, begin, tail);
-    const arr = await MonthCounter(PullInRange, 'updated_at', begin, tail);
-    res.status(200).json({
-      arr,
-    });
+    const PullInRange = await GetAllPullOfRepo(owner, repo);
+    const begin = PullInRange[0].created_at;
+    return await MonthCounter(PullInRange, 'updated_at', begin);
   } catch (e) {
-    res.status(400).json({
-      e,
-    });
+    throw createCustomError(e, 500);
   }
 };
-const GetRepoPullCloseFrequencyByMonth = async (req, res) => {
+const GetRepoPullCloseFrequencyByMonth = async (owner, repo) => {
   try {
-    const owner = req.body.owner;
-    const repo = req.body.repo;
-    const tail = req.body.tail;
-    const begin = req.body.begin;
-    if (!owner || !repo || !tail || !begin) {
+    if (!owner || !repo) {
       throw 'missing body data';
     }
-    const PullInRange = await RepoPullTimeFilter(owner, repo, begin, tail);
-    const arr = await MonthCounter(PullInRange, 'closed_at', begin, tail);
-    res.status(200).json({
-      arr,
-    });
+    const PullInRange = await GetAllPullOfRepo(owner, repo);
+    const begin = PullInRange[0].created_at;
+    return await MonthCounter(PullInRange, 'closed_at', begin);
   } catch (e) {
-    res.status(400).json({
-      e,
-    });
+    throw createCustomError(e, 500);
   }
 };
 /**
@@ -292,24 +245,16 @@ const GetRepoPullCloseFrequencyByMonth = async (req, res) => {
  * @param {*} res
  * @attention 第一月和最后一月独立成月
  */
-const GetRepoPullCreateFrequencyByMonth = async (req, res) => {
+const GetRepoPullCreateFrequencyByMonth = async (owner, repo) => {
   try {
-    const owner = req.body.owner;
-    const repo = req.body.repo;
-    const tail = req.body.tail;
-    const begin = req.body.begin;
-    if (!owner || !repo || !tail || !begin) {
+    if (!owner || !repo) {
       throw 'missing body data';
     }
-    const PullInRange = await RepoPullTimeFilter(owner, repo, begin, tail);
-    const arr = await MonthCounter(PullInRange, 'created_at', begin, tail);
-    res.status(200).json({
-      arr,
-    });
+    const PullInRange = await GetAllPullOfRepo(owner, repo);
+    const begin = PullInRange[0].created_at;
+    return await MonthCounter(PullInRange, 'created_at', begin);
   } catch (e) {
-    res.status(400).json({
-      e,
-    });
+    throw createCustomError(e, 500);
   }
 };
 /**
@@ -326,24 +271,16 @@ const GetRepoPullCreateFrequencyByMonth = async (req, res) => {
  * @param {*} res
  * @attention 第一月和最后一月独立成月
  */
-const GetRepoPullUpdateFrequencyByDay = async (req, res) => {
+const GetRepoPullUpdateFrequencyByDay = async (owner, repo) => {
   try {
-    const owner = req.body.owner;
-    const repo = req.body.repo;
-    const tail = req.body.tail;
-    const begin = req.body.begin;
-    if (!owner || !repo || !tail || !begin) {
+    if (!owner || !repo) {
       throw 'missing body data';
     }
-    const PullInRange = await RepoPullTimeFilter(owner, repo, begin, tail);
-    const arr = await DayCounter(PullInRange, 'updated_at', begin, tail);
-    res.status(200).json({
-      arr,
-    });
+    const PullInRange = await GetAllPullOfRepo(owner, repo);
+    const begin = PullInRange[0].created_at;
+    return await DayCounter(PullInRange, 'updated_at', begin);
   } catch (e) {
-    res.status(400).json({
-      e,
-    });
+    throw createCustomError(e, 500);
   }
 };
 /**
@@ -360,24 +297,16 @@ const GetRepoPullUpdateFrequencyByDay = async (req, res) => {
  * @param {*} res
  * @attention 第一月和最后一月独立成月
  */
-const GetRepoPullCloseFrequencyByDay = async (req, res) => {
+const GetRepoPullCloseFrequencyByDay = async (owner, repo) => {
   try {
-    const owner = req.body.owner;
-    const repo = req.body.repo;
-    const tail = req.body.tail;
-    const begin = req.body.begin;
-    if (!owner || !repo || !tail || !begin) {
+    if (!owner || !repo) {
       throw 'missing body data';
     }
-    const PullInRange = await RepoPullTimeFilter(owner, repo, begin, tail);
-    const arr = await DayCounter(PullInRange, 'closed_at', begin, tail);
-    res.status(200).json({
-      arr,
-    });
+    const PullInRange = await GetAllPullOfRepo(owner, repo);
+    const begin = PullInRange[0].created_at;
+    return await DayCounter(PullInRange, 'closed_at', begin);
   } catch (e) {
-    res.status(400).json({
-      e,
-    });
+    throw createCustomError(e, 500);
   }
 };
 /**
@@ -394,56 +323,17 @@ const GetRepoPullCloseFrequencyByDay = async (req, res) => {
  * @param {*} res
  * @attention 第一月和最后一月独立成月
  */
-const GetRepoPullCreateFrequencyByDay = async (req, res) => {
+const GetRepoPullCreateFrequencyByDay = async (owner, repo) => {
   try {
-    const owner = req.body.owner;
-    const repo = req.body.repo;
-    const tail = req.body.tail;
-    const begin = req.body.begin;
-    if (!owner || !repo || !tail || !begin) {
+    if (!owner || !repo) {
       throw 'missing body data';
     }
-    const PullInRange = await RepoPullTimeFilter(owner, repo, begin, tail);
-    const arr = await DayCounter(PullInRange, 'created_at', begin, tail);
-    res.status(200).json({
-      arr,
-    });
+    const PullInRange = await GetAllPullOfRepo(owner, repo);
+    const begin = PullInRange[0].created_at;
+    return await DayCounter(PullInRange, 'created_at', begin);
   } catch (e) {
-    res.status(400).json({
-      e,
-    });
+    throw createCustomError(e, 500);
   }
-};
-/**
- * @brief  获得从begin到tail时间段中的所有commit记录
- * @param {*} owner 仓库拥有者
- * @param {*} repo 仓库名
- * @param {*} begin 查询的开始时间，格式请参照 ‘2016-11-12’
- * @param {*} tail 查询的截止时间，格式请参照 ‘2016-11-12’
- */
-const RepoPullTimeFilter = async (
-  owner,
-  repo,
-  begin = '1970-01-01',
-  tail = '2023-01-01',
-) => {
-  const AllPullsOfRepo = await PullSchema.find({
-    repo_owner: owner,
-    repo_name: repo,
-  });
-  const FullBeginTime = begin + 'T00:00:00.000Z';
-  const FullTailTime = tail + 'T00:00:00.000Z';
-
-  AllPullsOfRepo.filter(pull => {
-    return (
-      Date.parse(FullTailTime) >= Date.parse(pull.updated_at) &&
-      Date.parse(FullBeginTime) <= Date.parse(pull.updated_at)
-    );
-  });
-  if (AllPullsOfRepo.length == 0) {
-    return {2022: '0', 2021: '0', 2020: '0', 2019: '0'};
-  }
-  return AllPullsOfRepo;
 };
 /**
  * @brief 获取指定日子之间的累计pullers数量
@@ -458,26 +348,19 @@ const RepoPullTimeFilter = async (
  * }
  * @param {*} res
  */
-const GetPullersCountInRange = async (req, res) => {
+const GetPullersCountInRange = async (owner, repo) => {
   try {
-    const owner = req.body.owner;
-    const repo = req.body.repo;
-    const tail = req.body.tail;
-    const begin = req.body.begin;
-    if (!owner || !repo || !tail || !begin) {
+    if (!owner || !repo) {
       throw 'missing body data';
     }
-    const PullInRange = await RepoPullTimeFilter(owner, repo, begin, tail);
-    const BaseYear = begin.split('-')[0];
-    const BaseMonth = begin.split('-')[1];
-    const LastYear = tail.split('-')[0];
-    const LastMonth = tail.split('-')[1];
+    const PullInRange = await GetAllPullOfRepo(owner, repo);
+    const begin = PullInRange[0].created_at;
+    const BaseYear = begin ? begin.split('-')[0] : '2008';
+    const BaseMonth = begin ? begin.split('-')[1] : '3';
+    const LastYear = new Date().getUTCFullYear();
+    const LastMonth = new Date().toISOString().split('-')[1];
     const set = new Set();
-    const arr = [
-      {
-        count: 0,
-      },
-    ];
+    const arr = {base: 0};
     for (let i = parseInt(BaseYear); i <= parseInt(LastYear); i++) {
       for (
         let j = i == BaseYear ? parseInt(BaseMonth) : 1;
@@ -506,23 +389,22 @@ const GetPullersCountInRange = async (req, res) => {
             set.add(pull.user_id, true);
           }
         });
-        arr.push({
-          year: i,
-          month: j,
-          count: arr.at(-1).count + count,
-        });
+        let key;
+        if (j < 10) {
+          key = `${i}-0${j}-01`;
+        } else {
+          key = `${i}-${j}-01`;
+        }
+        arr[key] = arr[Object.keys(arr)[Object.keys(arr).length - 1]] + count;
       }
     }
-    arr.shift();
-    res.status(200).json(arr);
+    delete arr.base;
+    return arr;
   } catch (e) {
-    console.log(e);
-    res.status(500).json({
-      e,
-    });
+    throw createCustomError(e, 500);
   }
 };
-module.exports = {
+const PullUtil = {
   GetPullInfo,
   GetAllPullOfRepo,
   GetRepoPullUpdateFrequencyByYear,
@@ -536,3 +418,4 @@ module.exports = {
   GetRepoPullCreateFrequencyByDay,
   GetPullersCountInRange,
 };
+module.exports = PullUtil;

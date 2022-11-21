@@ -1,21 +1,21 @@
 const CommitSchema = require('../models/commit');
 const {Octokit} = require('@octokit/core');
 const config = require('../config');
-const {default: mongoose} = require('mongoose');
 const octokit = new Octokit({
   auth: process.env.GITHUB_ACCESS_TOKEN || config.GITHUB_ACCESS_TOKEN,
 });
-const {YearCounter, MonthCounter, DayCounter} = require('../utils/index');
+const {createCustomError} = require('../errors/custom-error');
+
+const {YearCounter, MonthCounter, DayCounter} = require('./index');
 /**
- * @brief 获取指定仓库的commit记录（最多10000条）
+ * @brief 获取指定仓库的所有commit（debug使用）
  * @method post
- * @param {*} req
- * @param {*} res
+ * @param {*} owner 仓库拥有者
+ * @param {*} repo 仓库名称
+ *
  */
-const GetCommitInfo = async (req, res) => {
+const GetCommitInfo = async (owner, repo) => {
   try {
-    const owner = req.body.owner;
-    const repo = req.body.repo;
     // 检查repo是否存在
     const repoResponse = await octokit.request('GET /repos/{owner}/{repo}', {
       owner: owner,
@@ -23,6 +23,7 @@ const GetCommitInfo = async (req, res) => {
     });
     let page_num = 1;
     const per_page = 100;
+
     while (1) {
       const commitMessage = await octokit.request(
         'GET /repos/{owner}/{repo}/commits',
@@ -34,7 +35,7 @@ const GetCommitInfo = async (req, res) => {
         },
       );
 
-      if (page_num > 100 || commitMessage.data.length == 0) {
+      if (page_num > 250 || commitMessage.data.length == 0) {
         // 最多10000条
         console.log(`fetch commit msg finish! total ${page_num} pages`);
         break;
@@ -81,35 +82,8 @@ const GetCommitInfo = async (req, res) => {
       }
       page_num++;
     }
-    res.status(200).json({
-      msg: 'success',
-    });
   } catch (err) {
-    res.status(500).json({
-      msg: 'fail',
-      err: err,
-    });
-  }
-};
-/**
- * @brief 获取指定仓库的所有commit（debug使用）
- * @method post
- * @param {*} req
- * @param {*} res
- */
-const GetAllCommitsOfRepo = async (req, res) => {
-  try {
-    const owner = req.body.owner;
-    const repo = req.body.repo;
-    const commits = await RepoCommitTimeFilter(owner, repo);
-    res.status(200).json({
-      commits,
-    });
-  } catch (e) {
-    res.status(500).json({
-      msg: 'fail',
-      err: e,
-    });
+    throw createCustomError(err, 500);
   }
 };
 /**
@@ -126,24 +100,20 @@ const GetAllCommitsOfRepo = async (req, res) => {
  * @param {*} res
  * @attention 第一年和最后一年独立成年
  */
-const GetRepoCommitFrequencyByYear = async (req, res) => {
+const GetRepoCommitFrequencyByYear = async (owner, repo) => {
   try {
-    const owner = req.body.owner;
-    const repo = req.body.repo;
-    const tail = req.body.tail;
-    const begin = req.body.begin;
-    if (!owner || !repo || !tail || !begin) {
+    if (!owner || !repo) {
       throw 'missing body data';
     }
-    const CommitInRange = await RepoCommitTimeFilter(owner, repo, begin, tail);
-    const arr = await YearCounter(CommitInRange, 'updated_at', begin, tail);
-    res.status(200).json({
-      arr,
-    });
+
+    const CommitInRange = await CommitSchema.find({
+      repo_owner: owner,
+      repo_name: repo,
+    }).sort([['updated_at', 1]]);
+    const begin = CommitInRange[0].updated_at;
+    return await YearCounter(CommitInRange, 'updated_at', begin);
   } catch (e) {
-    res.status(400).json({
-      e,
-    });
+    throw createCustomError(e, 400);
   }
 };
 /**
@@ -160,24 +130,19 @@ const GetRepoCommitFrequencyByYear = async (req, res) => {
  * @param {*} res
  * @attention 第一月和最后一月独立成月
  */
-const GetRepoCommitFrequencyByMonth = async (req, res) => {
+const GetRepoCommitFrequencyByMonth = async (owner, repo) => {
   try {
-    const owner = req.body.owner;
-    const repo = req.body.repo;
-    const tail = req.body.tail;
-    const begin = req.body.begin;
-    if (!owner || !repo || !tail || !begin) {
+    if (!owner || !repo) {
       throw 'missing body data';
     }
-    const CommitInRange = await RepoCommitTimeFilter(owner, repo, begin, tail);
-    const arr = await MonthCounter(CommitInRange, begin, 'updated_at', tail);
-    res.status(200).json({
-      arr,
-    });
+    const CommitInRange = await CommitSchema.find({
+      repo_owner: owner,
+      repo_name: repo,
+    }).sort([['updated_at', 1]]);
+    const begin = CommitInRange[0].updated_at;
+    return await MonthCounter(CommitInRange, 'updated_at', begin);
   } catch (e) {
-    res.status(400).json({
-      e,
-    });
+    throw createCustomError(e, 500);
   }
 };
 /**
@@ -193,24 +158,19 @@ const GetRepoCommitFrequencyByMonth = async (req, res) => {
  * }
  * @param {*} res
  */
-const GetRepoCommitFrequencyByDay = async (req, res) => {
+const GetRepoCommitFrequencyByDay = async (owner, repo) => {
   try {
-    const owner = req.body.owner;
-    const repo = req.body.repo;
-    const tail = req.body.tail;
-    const begin = req.body.begin;
-    if (!owner || !repo || !tail || !begin) {
+    if (!owner || !repo) {
       throw 'missing body data';
     }
-    const CommitInRange = await RepoCommitTimeFilter(owner, repo, begin, tail);
-    const arr = await DayCounter(CommitInRange, 'updated_at', begin, tail);
-    res.status(200).json({
-      arr,
-    });
+    const CommitInRange = await CommitSchema.find({
+      repo_owner: owner,
+      repo_name: repo,
+    }).sort([['updated_at', 1]]);
+    const begin = CommitInRange[0].updated_at;
+    return await DayCounter(CommitInRange, 'updated_at', begin);
   } catch (e) {
-    res.status(400).json({
-      e,
-    });
+    throw createCustomError(e, 500);
   }
 };
 /**
@@ -226,26 +186,23 @@ const GetRepoCommitFrequencyByDay = async (req, res) => {
  * }
  * @param {*} res
  */
-const GetCommitersCountInRange = async (req, res) => {
+const GetCommitersCountInRange = async (owner, repo) => {
   try {
-    const owner = req.body.owner;
-    const repo = req.body.repo;
-    const tail = req.body.tail;
-    const begin = req.body.begin;
-    if (!owner || !repo || !tail || !begin) {
+    if (!owner || !repo) {
       throw 'missing body data';
     }
-    const CommitInRange = await RepoCommitTimeFilter(owner, repo, begin, tail);
-    const BaseYear = begin.split('-')[0];
-    const BaseMonth = begin.split('-')[1];
-    const LastYear = tail.split('-')[0];
-    const LastMonth = tail.split('-')[1];
+    const CommitInRange = await CommitSchema.find({
+      repo_owner: owner,
+      repo_name: repo,
+    }).sort([['updated_at', 1]]);
+    const begin = CommitInRange[0].updated_at;
+    const BaseYear = begin ? begin.split('-')[0] : '2008';
+    const BaseMonth = begin ? begin.split('-')[1] : '3';
+    const LastYear = new Date().getUTCFullYear();
+    const LastMonth = new Date().toISOString().split('-')[1];
     const set = new Set();
-    const arr = [
-      {
-        count: 0,
-      },
-    ];
+    const arr = {base: 0};
+
     for (let i = parseInt(BaseYear); i <= parseInt(LastYear); i++) {
       for (
         let j = i == BaseYear ? parseInt(BaseMonth) : 1;
@@ -274,58 +231,28 @@ const GetCommitersCountInRange = async (req, res) => {
             set.add(commit.author_name, true);
           }
         });
-        arr.push({
-          year: i,
-          month: j,
-          count: arr.at(-1).count + count,
-        });
+        let key;
+        if (j < 10) {
+          key = `${i}-0${j}-01`;
+        } else {
+          key = `${i}-${j}-01`;
+        }
+        arr[key] = arr[Object.keys(arr)[Object.keys(arr).length - 1]] + count;
       }
     }
-    arr.shift();
-    res.status(200).json(arr);
-  } catch (e) {
-    console.log(e);
-    res.status(500).json({
-      e,
-    });
-  }
-};
-/**
- * @brief  获得从begin到tail时间段中的所有commit记录
- * @param {*} owner 仓库拥有者
- * @param {*} repo 仓库名
- * @param {*} begin 查询的开始时间，格式请参照 ‘2016-11-12’
- * @param {*} tail 查询的截止时间，格式请参照 ‘2016-11-12’
- */
-const RepoCommitTimeFilter = async (
-  owner,
-  repo,
-  begin = '1970-01-01',
-  tail = '2023-01-01',
-) => {
-  const AllCommitsOfRepo = await CommitSchema.find({
-    repo_owner: owner,
-    repo_name: repo,
-  });
-  const FullBeginTime = begin + 'T00:00:00.000Z';
-  const FullTailTime = tail + 'T00:00:00.000Z';
+    delete arr.base;
 
-  AllCommitsOfRepo.filter(commit => {
-    return (
-      Date.parse(FullTailTime) >= Date.parse(commit.updated_at) &&
-      Date.parse(FullBeginTime) <= Date.parse(commit.updated_at)
-    );
-  });
-  if (AllCommitsOfRepo.length == 0) {
-    return {2022: '0', 2021: '0', 2020: '0', 2019: '0'};
+    return arr;
+  } catch (e) {
+    throw createCustomError(e, 500);
   }
-  return AllCommitsOfRepo;
 };
-module.exports = {
+
+const CommitUtil = {
   GetCommitInfo,
-  GetAllCommitsOfRepo,
   GetRepoCommitFrequencyByYear,
   GetRepoCommitFrequencyByMonth,
   GetRepoCommitFrequencyByDay,
   GetCommitersCountInRange,
 };
+module.exports = CommitUtil;
