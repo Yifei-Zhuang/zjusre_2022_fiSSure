@@ -12,6 +12,7 @@ import {
     Language,
     Contribute,
     CommitFrequency,
+    CommiterFrequency,
     IssueFrequency,
     ContributorList,
 } from "../components/DashBoard";
@@ -36,6 +37,7 @@ export default function DashboardApp() {
         timeline,
         language,
         commit_frequency,
+        commiter_frequency,
         issue_frequency,
         contributors,
     } = detail;
@@ -84,18 +86,22 @@ export default function DashboardApp() {
                     </Grid>
                 </Box>
 
-                <Box sx={{ pb: 5 }}>
+
+                <Box sx={{ paddingTop:3 , paddingBottom:1}}>
                     <Typography variant="h4">Commit</Typography>
                 </Box>
                 <Box>
                     <Grid container spacing={3}>
-                        <Grid item xs={12} sm={6} md={6}>
+                        <Grid item xs={12} sm={12} md={12}>
                             <CommitFrequency {...commit_frequency} />
+                        </Grid>
+                        <Grid item xs={12} sm={12} md={12}>
+                            <CommiterFrequency {...commiter_frequency} />
                         </Grid>
                     </Grid>
                 </Box>
 
-                <Box sx={{ pb: 5 }}>
+                <Box sx={{ paddingTop:3 , paddingBottom:1 }}>
                     <Typography variant="h4">issue</Typography>
                 </Box>
                 <Box>
@@ -106,7 +112,7 @@ export default function DashboardApp() {
                     </Grid>
                 </Box>
 
-                <Box sx={{ pb: 5 }}>
+                <Box sx={{ paddingTop:3 , paddingBottom:1 }}>
                     <Typography variant="h4">pull request</Typography>
                 </Box>
                 <Box>
@@ -115,7 +121,7 @@ export default function DashboardApp() {
                     </Grid>
                 </Box>
 
-                <Box sx={{ pb: 5 }}>
+                <Box sx={{ paddingTop:3 , paddingBottom:1 }}>
                     <Typography variant="h4">contribute</Typography>
                 </Box>
                 <Box>
@@ -131,7 +137,7 @@ export default function DashboardApp() {
                     </Grid>
                 </Box>
 
-                <Box sx={{ pb: 5 }}>
+                <Box sx={{ paddingTop:3 , paddingBottom:1 }}>
                     <Typography variant="h4">Design</Typography>
                 </Box>
                 <Box>

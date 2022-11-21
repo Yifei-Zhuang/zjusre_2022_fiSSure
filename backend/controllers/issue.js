@@ -142,7 +142,7 @@ const GetRepoIssueUpdateFrequencyByYear = async (req, res) => {
       throw 'missing body data';
     }
     const IssueInRange = await RepoIssueTimeFilter(owner, repo, begin, tail);
-    const arr = await YearCounter(IssueInRange, begin, tail, 'updated_at');
+    const arr = await YearCounter(IssueInRange, 'updated_at', begin, tail);
     res.status(200).json({
       arr,
     });
@@ -176,7 +176,7 @@ const GetRepoIssueCreateFrequencyByYear = async (req, res) => {
       throw 'missing body data';
     }
     const IssueInRange = await RepoIssueTimeFilter(owner, repo, begin, tail);
-    const arr = await YearCounter(IssueInRange, begin, tail, 'created_at');
+    const arr = await YearCounter(IssueInRange, 'created_at', begin, tail);
     res.status(200).json({
       arr,
     });
@@ -210,7 +210,7 @@ const GetRepoIssueCloseFrequencyByYear = async (req, res) => {
       throw 'missing body data';
     }
     const IssueInRange = await RepoIssueTimeFilter(owner, repo, begin, tail);
-    const arr = await YearCounter(IssueInRange, begin, tail, 'closed_at');
+    const arr = await YearCounter(IssueInRange, 'closed_at', begin, tail);
     res.status(200).json({
       arr,
     });
@@ -244,7 +244,7 @@ const GetRepoIssueUpdateFrequencyByMonth = async (req, res) => {
       throw 'missing body data';
     }
     const IssueInRange = await RepoIssueTimeFilter(owner, repo, begin, tail);
-    const arr = await MonthCounter(IssueInRange, begin, tail, 'updated_at');
+    const arr = await MonthCounter(IssueInRange, 'updated_at', begin, tail);
     res.status(200).json({
       arr,
     });
@@ -278,7 +278,7 @@ const GetRepoIssueCreateFrequencyByMonth = async (req, res) => {
       throw 'missing body data';
     }
     const IssueInRange = await RepoIssueTimeFilter(owner, repo, begin, tail);
-    const arr = await MonthCounter(IssueInRange, begin, tail, 'created_at');
+    const arr = await MonthCounter(IssueInRange, 'created_at', begin, tail);
     res.status(200).json({
       arr,
     });
@@ -312,7 +312,7 @@ const GetRepoIssueCloseFrequencyByMonth = async (req, res) => {
       throw 'missing body data';
     }
     const IssueInRange = await RepoIssueTimeFilter(owner, repo, begin, tail);
-    const arr = await MonthCounter(IssueInRange, begin, tail, 'closed_at');
+    const arr = await MonthCounter(IssueInRange, 'closed_at', begin, tail);
     res.status(200).json({
       arr,
     });
@@ -345,7 +345,7 @@ const GetRepoIssueUpdateFrequencyByDay = async (req, res) => {
       throw 'missing body data';
     }
     const IssueInRange = await RepoIssueTimeFilter(owner, repo, begin, tail);
-    const arr = await DayCounter(IssueInRange, begin, tail, 'updated_at');
+    const arr = await DayCounter(IssueInRange, 'updated_at', begin, tail);
     res.status(200).json({
       arr,
     });
@@ -378,7 +378,7 @@ const GetRepoIssueCreateFrequencyByDay = async (req, res) => {
       throw 'missing body data';
     }
     const IssueInRange = await RepoIssueTimeFilter(owner, repo, begin, tail);
-    const arr = await DayCounter(IssueInRange, begin, tail, 'created_at');
+    const arr = await DayCounter(IssueInRange, 'created_at', begin, tail);
     res.status(200).json({
       arr,
     });
@@ -411,7 +411,7 @@ const GetRepoIssueCloseFrequencyByDay = async (req, res) => {
       throw 'missing body data';
     }
     const IssueInRange = await RepoIssueTimeFilter(owner, repo, begin, tail);
-    const arr = await DayCounter(IssueInRange, begin, tail, 'closed_at');
+    const arr = await DayCounter(IssueInRange, 'closed_at', begin, tail);
     res.status(200).json({
       arr,
     });

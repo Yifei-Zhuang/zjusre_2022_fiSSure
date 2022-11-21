@@ -1,59 +1,106 @@
-const asyncWrapper = require("../middleware/async");
-const { createCustomError } = require("../errors/custom-error");
-const RepoSchema = require("../models/repo");
-const ObjectId = require("mongodb").ObjectId;
-const dotenv = require('dotenv')
-const { Octokit } = require("@octokit/core");
-const res = require("express/lib/response");
-const config = require("../config");
+const asyncWrapper = require('../middleware/async');
+const {createCustomError} = require('../errors/custom-error');
+const RepoSchema = require('../models/repo');
+const ObjectId = require('mongodb').ObjectId;
+const dotenv = require('dotenv');
+const {Octokit} = require('@octokit/core');
+const res = require('express/lib/response');
+const config = require('../config');
+const CommitSchema = require('../models/commit');
+const IssueSchema = require('../models/issue');
+const CommitUtil = require('../utils/commit');
+const IssueUtil = require('../utils/issue');
+const PullUtil = require('../utils/pull');
 const octokit = new Octokit({
   auth: process.env.GITHUB_ACCESS_TOKEN || config.GITHUB_ACCESS_TOKEN,
 });
 
-dotenv.config('../env')
+dotenv.config('../env');
 const GetMessage = async (req, res) => {
-  try { 
-    const repoMessage = await octokit.request("GET /repos/{owner}/{repo}", {
-      owner: req.body.owner,
-      repo: req.body.repoName,
-    }).catch(err=>{
-      console.log(err)
-    })
+  try {
+    const owner = req.body.owner;
+    const repo = req.body.repoName;
+    const repoMessage = await octokit
+      .request('GET /repos/{owner}/{repo}', {
+        owner: req.body.owner,
+        repo: req.body.repoName,
+      })
+      .catch(err => {
+        console.log(err);
+      });
 
-    const CreateRepo = await RepoSchema.create({
-      name: repoMessage.data.name,
-      owner: repoMessage.data.owner.login,
-      uploader: req.body.user,
-      forks: repoMessage.data.forks,
-      stars: repoMessage.data.watchers,
-      open_issues: repoMessage.data.open_issues,
-      commit_frequency: await RepoGetCommitFrequency(
-        repoMessage.data.owner.login,
-        repoMessage.data.name
-      ),
-      issue_frequency: await RepoGetIssueFrequency(
-        repoMessage.data.owner.login,
-        repoMessage.data.name
-      ),
-      contributors: await RepoGetContributors(
-        repoMessage.data.owner.login,
-        repoMessage.data.name
-      ),
-      timeline: {
-        created_at: repoMessage.data.created_at,
-        updated_at: repoMessage.data.updated_at,
-        pushed_at: repoMessage.data.pushed_at,
-        recent_released_at: await RepoGetReleaseTime(
+    // 获取仓库的commit，issue，pull信息
+    // await Promise.all([
+    //   CommitUtil.GetCommitInfo(owner, repo),
+    //   PullUtil.GetPullInfo(owner, repo),
+    //   IssueUtil.GetIssueInfo(owner, repo),
+    // ]);
+
+    let commit_frequency;
+
+    let issue_frequency;
+
+    let contributors;
+
+    let recent_released_at;
+
+    let language;
+    await Promise.all([
+      (async () => {
+        commit_frequency = await RepoGetCommitFrequency(
           repoMessage.data.owner.login,
-          repoMessage.data.name
-        ),
-      },
-      language: await RepoGetLanguage(
-        repoMessage.data.owner.login,
-        repoMessage.data.name
-      ),
-    });
-    res.status(201).json({ status: "success!" });
+          repoMessage.data.name,
+        );
+      })(),
+      (async () => {
+        issue_frequency = await RepoGetIssueFrequency(
+          repoMessage.data.owner.login,
+          repoMessage.data.name,
+        );
+      })(),
+      (async () => {
+        contributors = await RepoGetContributors(
+          repoMessage.data.owner.login,
+          repoMessage.data.name,
+        );
+      })(),
+      (async () => {
+        recent_released_at = await RepoGetReleaseTime(
+          repoMessage.data.owner.login,
+          repoMessage.data.name,
+        );
+      })(),
+      (async () => {
+        language = await RepoGetLanguage(
+          repoMessage.data.owner.login,
+          repoMessage.data.name,
+        );
+      })(),
+    ]);
+    try {
+      const CreateRepo = await RepoSchema.create({
+        name: repoMessage.data.name,
+        owner: repoMessage.data.owner.login,
+        uploader: req.body.user,
+        forks: repoMessage.data.forks,
+        stars: repoMessage.data.watchers,
+        open_issues: repoMessage.data.open_issues,
+        commit_frequency: commit_frequency,
+        issue_frequency: issue_frequency,
+        contributors: contributors,
+        timeline: {
+          created_at: repoMessage.data.created_at,
+          updated_at: repoMessage.data.updated_at,
+          pushed_at: repoMessage.data.pushed_at,
+          recent_released_at: recent_released_at,
+        },
+        language: language,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+
+    res.status(201).json({status: 'success!'});
   } catch (err) {
     res.status(404).json(err);
   }
@@ -62,11 +109,11 @@ const GetMessage = async (req, res) => {
 const SearchRepoName = async (req, res) => {
   try {
     const SearchKey = req.body.search.trim();
-    if (SearchKey == "") {
+    if (SearchKey == '') {
       var search = await RepoSchema.find({});
     } else
       search = await RepoSchema.find({
-        name: { $regex: SearchKey, $options: "$i" },
+        name: {$regex: SearchKey, $options: '$i'},
       });
     var repos = [];
     for (var i in search) {
@@ -81,7 +128,7 @@ const SearchRepoName = async (req, res) => {
       repos.push(eachRepo);
     }
     console.log(repos);
-    return res.status(201).json({ repos });
+    return res.status(201).json({repos});
   } catch (err) {
     res.status(404).json(err);
   }
@@ -89,8 +136,110 @@ const SearchRepoName = async (req, res) => {
 
 const GetDashboard = async (req, res) => {
   try {
-    const detail = await RepoSchema.findOne({ _id: ObjectId(req.body.id) });
-    res.status(201).json({ detail });
+    let getDayS = req.body.getDay ? true : false;
+    let detail;
+    try {
+      detail = await RepoSchema.findOne({_id: ObjectId(req.body.id)});
+    } catch (e) {
+      console.log('detail fetch error');
+      throw e;
+    }
+    let owner = detail.owner;
+    let repo = detail.name;
+    let commit_frequency;
+    let pull_frequency;
+    let issue_frequency;
+    await Promise.all([
+      (async () => {
+        try {
+          commit_frequency = {
+            commit_year_frequency:
+              await CommitUtil.GetRepoCommitFrequencyByYear(owner, repo),
+            commit_month_frequency:
+              await CommitUtil.GetRepoCommitFrequencyByMonth(owner, repo),
+            commit_day_frequency: getDayS
+              ? await CommitUtil.GetRepoCommitFrequencyByDay(owner, repo)
+              : {},
+            commiter_count: await CommitUtil.GetCommitersCountInRange(
+              owner,
+              repo,
+            ),
+          };
+        } catch (e) {
+          console.log('commit fetch error');
+          throw e;
+        }
+      })(),
+      (async () => {
+        try {
+          pull_frequency = {
+            pull_year_create_frequency:
+              await PullUtil.GetRepoPullCreateFrequencyByYear(owner, repo),
+            pull_year_create_frequency:
+              await PullUtil.GetRepoPullCloseFrequencyByYear(owner, repo),
+            pull_year_close_frequency:
+              await PullUtil.GetRepoPullUpdateFrequencyByYear(owner, repo),
+            pull_month_create_frequency:
+              await PullUtil.GetRepoPullCreateFrequencyByMonth(owner, repo),
+            pull_month_create_frequency:
+              await PullUtil.GetRepoPullCloseFrequencyByMonth(owner, repo),
+            pull_month_close_frequency:
+              await PullUtil.GetRepoPullUpdateFrequencyByMonth(owner, repo),
+            pull_day_create_frequency: getDayS
+              ? await PullUtil.GetRepoPullCreateFrequencyByDay(owner, repo)
+              : {},
+            pull_day_create_frequency: getDayS
+              ? await PullUtil.GetRepoPullCloseFrequencyByDay(owner, repo)
+              : {},
+            pull_day_close_frequency: getDayS
+              ? await PullUtil.GetRepoPullUpdateFrequencyByDay(owner, repo)
+              : {},
+            puller_count: await PullUtil.GetPullersCountInRange(owner, repo),
+          };
+        } catch (e) {
+          console.log('pull fetch error');
+          throw e;
+        }
+      })(),
+      (async () => {
+        try {
+          issue_frequency = {
+            issue_year_create_frequency:
+              await IssueUtil.GetRepoIssueCreateFrequencyByYear(owner, repo),
+            Issue_year_create_frequency:
+              await IssueUtil.GetRepoIssueCloseFrequencyByYear(owner, repo),
+            Issue_year_close_frequency:
+              await IssueUtil.GetRepoIssueUpdateFrequencyByYear(owner, repo),
+            Issue_month_create_frequency:
+              await IssueUtil.GetRepoIssueCreateFrequencyByMonth(owner, repo),
+            Issue_month_create_frequency:
+              await IssueUtil.GetRepoIssueCloseFrequencyByMonth(owner, repo),
+            Issue_month_close_frequency:
+              await IssueUtil.GetRepoIssueUpdateFrequencyByMonth(owner, repo),
+            Issue_day_create_frequency: getDayS
+              ? await IssueUtil.GetRepoIssueCreateFrequencyByDay(owner, repo)
+              : {},
+            Issue_day_create_frequency: getDayS
+              ? await IssueUtil.GetRepoIssueCloseFrequencyByDay(owner, repo)
+              : {},
+            Issue_day_close_frequency: getDayS
+              ? await IssueUtil.GetRepoIssueUpdateFrequencyByDay(owner, repo)
+              : {},
+            Issuer_count: await IssueUtil.GetIssuersCountInRange(owner, repo),
+          };
+        } catch (e) {
+          console.log('issue fetch error');
+          throw e;
+        }
+      })(),
+    ]);
+    detail = {
+      ...detail._doc,
+      ...commit_frequency,
+      ...pull_frequency,
+      ...issue_frequency,
+    };
+    res.status(201).json({detail});
   } catch (err) {
     res.status(404).json(err);
   }
@@ -98,42 +247,27 @@ const GetDashboard = async (req, res) => {
 
 const DeleteRepo = async (req, res) => {
   try {
-    const test = await RepoSchema.deleteOne({ _id: ObjectId(req.body.id) });
-    res.status(201).json({ msg: "success!" });
+    const test = await RepoSchema.deleteOne({_id: ObjectId(req.body.id)});
+    res.status(201).json({msg: 'success!'});
   } catch (err) {
     res.status(404).json(err);
   }
 };
 
 const RepoGetCommitFrequency = async (owner, name) => {
-  const repoMessage = await octokit.request(
-    "GET /repos/{owner}/{repo}/commits",
-    {
-      owner: owner,
-      repo: name,
-      per_page: 100,
-      page: 1,
-    }
-  );
+  const repoMessage = {
+    data: [
+      ...(await CommitSchema.find({
+        repo_owner: owner,
+        repo_name: name,
+      })
+        .sort([['updated_at', -1]])
+        .limit(50)),
+    ],
+  };
 
-  if (repoMessage.data.length == 0) return { 2021: "0", 2020: "0", 2019: "0" };
-  for (var i = 2; i <= 5; i++) {
-    const NextRepoMessage = await octokit.request(
-      "GET /repos/{owner}/{repo}/commits",
-      {
-        owner: owner,
-        repo: name,
-        per_page: 100,
-        page: i,
-      }
-    );
-    if (NextRepoMessage.data.length == 0) break;
-    else repoMessage.data = repoMessage.data.concat(NextRepoMessage.data);
-  }
-
-  const x1 = repoMessage.data[0].commit.committer.date;
-  const x2 =
-    repoMessage.data[repoMessage.data.length - 1].commit.committer.date;
+  const x1 = repoMessage.data[0].updated_at;
+  const x2 = repoMessage.data[repoMessage.data.length - 1].updated_at;
   const t1 = TransDate(x1);
   const t2 = TransDate(x2);
   var frequency = {};
@@ -150,12 +284,12 @@ const RepoGetCommitFrequency = async (owner, name) => {
   return frequency;
 };
 
-const CountDayCommit = (Msg) => {
+const CountDayCommit = Msg => {
   var order = {};
   var result = {};
 
   for (var i in Msg.data) {
-    var t = Msg.data[i].commit.committer.date.substring(0, 10);
+    var t = Msg.data[i].updated_at.substring(0, 10);
     formalLength = Object.keys(order).length;
     if (!(t in result)) {
       order[formalLength.toString()] = t;
@@ -185,31 +319,16 @@ const CountDayCommit = (Msg) => {
 };
 
 const RepoGetIssueFrequency = async (owner, name) => {
-  const repoMessage = await octokit.request(
-    "GET /repos/{owner}/{repo}/issues",
-    {
-      owner: owner,
-      repo: name,
-      per_page: 100,
-      page: 1,
-    }
-  );
-
-  if (repoMessage.data.length == 0) return { 2021: "0", 2020: "0", 2019: "0" };
-  for (var i = 2; i <= 5; i++) {
-    const NextRepoMessage = await octokit.request(
-      "GET /repos/{owner}/{repo}/issues",
-      {
-        owner: owner,
-        repo: name,
-        per_page: 100,
-        page: i,
-      }
-    );
-    if (NextRepoMessage.data.length == 0) break;
-    else repoMessage.data = repoMessage.data.concat(NextRepoMessage.data);
-  }
-
+  const repoMessage = {
+    data: [
+      ...(await IssueSchema.find({
+        owner_name: owner,
+        repo_name: name,
+      })
+        .sort([['created_at', -1]])
+        .limit(50)),
+    ],
+  };
   const x1 = repoMessage.data[0].created_at;
   const x2 = repoMessage.data[repoMessage.data.length - 1].created_at;
   const t1 = TransDate(x1);
@@ -228,7 +347,7 @@ const RepoGetIssueFrequency = async (owner, name) => {
   return frequency;
 };
 
-const CountDayIssue = (Msg) => {
+const CountDayIssue = Msg => {
   var order = {};
   var result = {};
 
@@ -262,7 +381,7 @@ const CountDayIssue = (Msg) => {
   return answer;
 };
 
-const TransDate = (date) => {
+const TransDate = date => {
   year = date.substring(0, 4);
   month = date.substring(5, 7);
   year1 = parseInt(year, 10);
@@ -272,15 +391,15 @@ const TransDate = (date) => {
 
 const CountYearCommit = (year1, year2, commitmsg) => {
   var countNum = new Array(year1 - year2 + 1).fill(0);
-  commitmsg.map((x) => {
-    year0 = Math.floor(TransDate(x.commit.committer.date) / 12);
+  commitmsg.map(x => {
+    year0 = Math.floor(TransDate(x.updated_at) / 12);
     countNum[year1 - year0] += 1;
   });
 
   var obj = {};
   for (var i = year1; i >= year2; i--) {
     nn = i + 2000;
-    cc = nn + "";
+    cc = nn + '';
     obj[cc] = countNum[year1 - i];
   }
   return obj;
@@ -288,14 +407,14 @@ const CountYearCommit = (year1, year2, commitmsg) => {
 
 const CountYearIssue = (year1, year2, commitmsg) => {
   var countNum = new Array(year1 - year2 + 1).fill(0);
-  commitmsg.map((x) => {
+  commitmsg.map(x => {
     year0 = Math.floor(TransDate(x.created_at) / 12);
     countNum[year1 - year0] += 1;
   });
   var obj = {};
   for (var i = year1; i >= year2; i--) {
     nn = i + 2000;
-    cc = nn + "";
+    cc = nn + '';
     obj[cc] = countNum[year1 - i];
   }
   return obj;
@@ -303,8 +422,8 @@ const CountYearIssue = (year1, year2, commitmsg) => {
 
 const CountMonthCommit = (t1, t2, commitmsg) => {
   var countNum = new Array(t1 - t2 + 1).fill(0);
-  commitmsg.map((x) => {
-    t = TransDate(x.commit.committer.date);
+  commitmsg.map(x => {
+    t = TransDate(x.updated_at);
     countNum[t1 - t] += 1;
   });
 
@@ -312,7 +431,7 @@ const CountMonthCommit = (t1, t2, commitmsg) => {
   for (var i = t1; i >= t2; i--) {
     mm = (i % 12) + 1;
     nn = (i - mm + 1) / 12 + 2000;
-    cc = mm > 9 ? nn + "-" + mm : nn + "-0" + mm;
+    cc = mm > 9 ? nn + '-' + mm : nn + '-0' + mm;
     obj[cc] = countNum[t1 - i];
   }
   return obj;
@@ -320,7 +439,7 @@ const CountMonthCommit = (t1, t2, commitmsg) => {
 
 const CountMonthIssue = (t1, t2, commitmsg) => {
   var countNum = new Array(t1 - t2 + 1).fill(0);
-  commitmsg.map((x) => {
+  commitmsg.map(x => {
     t = TransDate(x.created_at);
     countNum[t1 - t] += 1;
   });
@@ -329,7 +448,7 @@ const CountMonthIssue = (t1, t2, commitmsg) => {
   for (var i = t1; i >= t2; i--) {
     mm = (i % 12) + 1;
     nn = (i - mm + 1) / 12 + 2000;
-    cc = mm > 9 ? nn + "-" + mm : nn + "-0" + mm;
+    cc = mm > 9 ? nn + '-' + mm : nn + '-0' + mm;
     obj[cc] = countNum[t1 - i];
   }
   return obj;
@@ -337,11 +456,11 @@ const CountMonthIssue = (t1, t2, commitmsg) => {
 
 const RepoGetContributors = async (owner, name) => {
   const repoMessage = await octokit.request(
-    "GET /repos/{owner}/{repo}/contributors",
+    'GET /repos/{owner}/{repo}/contributors',
     {
       owner: owner,
       repo: name,
-    }
+    },
   );
 
   var result = [];
@@ -350,7 +469,7 @@ const RepoGetContributors = async (owner, name) => {
     i < (repoMessage.data.length < 5 ? repoMessage.data.length : 5);
     i++
   ) {
-    const userMessage = await octokit.request("GET /users/{username}", {
+    const userMessage = await octokit.request('GET /users/{username}', {
       username: repoMessage.data[i].login,
     });
     var ss = {
@@ -370,23 +489,23 @@ const RepoGetContributors = async (owner, name) => {
 
 const RepoGetReleaseTime = async (owner, name) => {
   const repoMessage = await octokit.request(
-    "GET /repos/{owner}/{repo}/releases",
+    'GET /repos/{owner}/{repo}/releases',
     {
       owner: owner,
       repo: name,
-    }
+    },
   );
-  if (!repoMessage.data.length) return "not published yet!";
+  if (!repoMessage.data.length) return 'not published yet!';
   return repoMessage.data[0].published_at;
 };
 
 const RepoGetLanguage = async (owner, name) => {
   const repoMessage = await octokit.request(
-    "GET /repos/{owner}/{repo}/languages",
+    'GET /repos/{owner}/{repo}/languages',
     {
       owner: owner,
       repo: name,
-    }
+    },
   );
   return repoMessage.data;
 };
