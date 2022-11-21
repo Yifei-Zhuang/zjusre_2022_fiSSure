@@ -15,13 +15,20 @@ import {
     IssueFrequency,
     ContributorList,
 } from "../components/DashBoard";
+import detail from "../context/staticData"
 
 export default function DashboardApp() {
     useEffect(() => {
         getDashBoard(id);
     }, []);
     const { id } = useParams();
-    const { isLoading, detail, getDashBoard } = useAppContext();
+
+    // 使用请求的detail数据
+    // const { isLoading, detail, getDashBoard } = useAppContext();
+
+    //使用死数据
+    const { isLoading, getDashBoard } = useAppContext();
+
     const {
         forks,
         stars,
