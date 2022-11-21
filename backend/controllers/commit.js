@@ -136,7 +136,7 @@ const GetRepoCommitFrequencyByYear = async (req, res) => {
       throw 'missing body data';
     }
     const CommitInRange = await RepoCommitTimeFilter(owner, repo, begin, tail);
-    const arr = await YearCounter(CommitInRange, 'updated_at', begin, tail);
+    const arr = await YearCounter(CommitInRange, begin, tail, 'updated_at');
     res.status(200).json({
       arr,
     });
@@ -170,7 +170,9 @@ const GetRepoCommitFrequencyByMonth = async (req, res) => {
       throw 'missing body data';
     }
     const CommitInRange = await RepoCommitTimeFilter(owner, repo, begin, tail);
+
     const arr = await MonthCounter(CommitInRange, 'updated_at', begin, tail);
+
     res.status(200).json({
       arr,
     });
@@ -203,7 +205,7 @@ const GetRepoCommitFrequencyByDay = async (req, res) => {
       throw 'missing body data';
     }
     const CommitInRange = await RepoCommitTimeFilter(owner, repo, begin, tail);
-    const arr = await DayCounter(CommitInRange, 'updated_at', begin, tail);
+    const arr = await DayCounter(CommitInRange, begin, tail, 'updated_at');
     res.status(200).json({
       arr,
     });
