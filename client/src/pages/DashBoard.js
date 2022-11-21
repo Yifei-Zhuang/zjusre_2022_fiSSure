@@ -84,18 +84,18 @@ export default function DashboardApp() {
                     </Grid>
                 </Box>
 
-                <Box sx={{ pb: 5 }}>
+                <Box sx={{ mt: 3 }}>
                     <Typography variant="h4">Commit</Typography>
                 </Box>
                 <Box>
                     <Grid container spacing={3}>
-                        <Grid item xs={12} sm={6} md={6}>
+                        <Grid item xs={12} sm={12} md={12}>
                             <CommitFrequency {...commit_frequency} />
                         </Grid>
                     </Grid>
                 </Box>
 
-                <Box sx={{ pb: 5 }}>
+                <Box sx={{ mt: 5 }}>
                     <Typography variant="h4">issue</Typography>
                 </Box>
                 <Box>
@@ -106,7 +106,7 @@ export default function DashboardApp() {
                     </Grid>
                 </Box>
 
-                <Box sx={{ pb: 5 }}>
+                <Box sx={{ mt: 5 }}>
                     <Typography variant="h4">pull request</Typography>
                 </Box>
                 <Box>
@@ -115,7 +115,7 @@ export default function DashboardApp() {
                     </Grid>
                 </Box>
 
-                <Box sx={{ pb: 5 }}>
+                <Box sx={{ mt: 5 }}>
                     <Typography variant="h4">contribute</Typography>
                 </Box>
                 <Box>
@@ -131,7 +131,7 @@ export default function DashboardApp() {
                     </Grid>
                 </Box>
 
-                <Box sx={{ pb: 5 }}>
+                <Box sx={{ mt: 5 }}>
                     <Typography variant="h4">Design</Typography>
                 </Box>
                 <Box>
