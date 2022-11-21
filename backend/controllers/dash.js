@@ -29,12 +29,12 @@ const GetMessage = async (req, res) => {
         console.log(err);
       });
 
-    // 获取仓库的commit，issue，pull信息
-    // await Promise.all([
-    //   CommitUtil.GetCommitInfo(owner, repo),
-    //   PullUtil.GetPullInfo(owner, repo),
-    //   IssueUtil.GetIssueInfo(owner, repo),
-    // ]);
+    //      获取仓库的commit，issue，pull信息
+    await Promise.all([
+      CommitUtil.GetCommitInfo(owner, repo),
+      PullUtil.GetPullInfo(owner, repo),
+      IssueUtil.GetIssueInfo(owner, repo),
+    ]);
 
     let commit_frequency;
 
