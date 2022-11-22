@@ -3,6 +3,8 @@ const {Octokit} = require('@octokit/core');
 const config = require('../config');
 const {default: mongoose} = require('mongoose');
 const {RepoCommitTimeFilter} = require('./commit');
+const {AsyncFunctionWrapper} = require('../utils');
+const {Mutex} = require('async-mutex');
 
 const octokit = new Octokit({
   auth: process.env.GITHUB_ACCESS_TOKEN || config.GITHUB_ACCESS_TOKEN,
@@ -67,7 +69,9 @@ const GetCoreContributorByYear = async (req, res) => {
         index += 1;
       }
       // console.log("finally");
-      let contributorCompany = await GetContributorCompanyDistribution(coreContributor);
+      let contributorCompany = await GetContributorCompanyDistribution(
+        coreContributor,
+      );
       // console.log(contributorCompany);
       let contributorCompanyArray = [];
       contributorCompany.forEach((value, key) => {
@@ -97,37 +101,84 @@ const GetCoreContributorByYear = async (req, res) => {
   }
 };
 
-// TODO：同步的公司分析，速度比较缓慢，考虑使用异步
-const GetContributorCompanyDistribution = async (coreContributor) => {
-  let contributorCompany = new Map();
-  for (contributor of coreContributor) {
+let contributorIndexMutex = new Mutex();
+let CONTRIBUTOR_INDEX = 0;
+const GetContributorIndex = async maxIndex => {
+  let release = await contributorIndexMutex.acquire();
+  let returnVal = CONTRIBUTOR_INDEX;
+  CONTRIBUTOR_INDEX++;
+  release();
+  if (returnVal > maxIndex) {
+    return null;
+  }
+  return returnVal;
+};
+let mapMutex = new Mutex();
+// !一把大锁加上，应该不会死锁
+class ConcurrentMap extends Map {
+  has = async value => {
+    let release = await mapMutex.acquire();
+    let returnVal = super.has(value);
+    release();
+    return returnVal;
+  };
+  get = async value => {
+    let release = await mapMutex.acquire();
+    let returnVal = super.get(value);
+    release();
+    return returnVal;
+  };
+  set = async (key, value) => {
+    let release = await mapMutex.acquire();
+    super.set(key, value);
+    release();
+  };
+}
+
+const AsyncFetchUserInfo = async (coreContributor, contributorCompanyMap) => {
+  let maxIndex = coreContributor.length - 1;
+  while (1) {
+    let index = await GetContributorIndex(maxIndex);
+    if (!index) {
+      return;
+    }
     let company = null;
     try {
       const userInfo = await octokit.request('GET /users/{username}', {
-        username: contributor.contributor,
+        username: coreContributor[index].contributor,
       });
       // console.log(userInfo);
       company = userInfo.data.company;
     } catch (e) {
-      console.log(e);
+      // console.log(e);
     } finally {
       if (company == null || company == '') {
         company = 'other';
       }
       // console.log(company);
-      if (contributorCompany.has(company)) {
-        contributorCompany.set(
+      if (await contributorCompanyMap.has(company)) {
+        await contributorCompanyMap.set(
           company,
-          contributorCompany.get(company) + 1,
+          (await contributorCompanyMap.get(company)) + 1,
         );
       } else {
-        contributorCompany.set(company, 1);
+        await contributorCompanyMap.set(company, 1);
       }
+      // console.log(contributorCompanyMap.size);
       // console.log(contributorCompany);
     }
   }
+};
+// TODO：同步的公司分析，速度比较缓慢，考虑使用异步
+const GetContributorCompanyDistribution = async coreContributor => {
+  let contributorCompany = new ConcurrentMap();
+  await AsyncFunctionWrapper(
+    AsyncFetchUserInfo,
+    coreContributor,
+    contributorCompany,
+  );
   return contributorCompany;
-}
+};
 
 module.exports = {
   GetCoreContributorByYear,
