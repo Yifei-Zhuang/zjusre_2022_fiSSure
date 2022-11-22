@@ -4,6 +4,10 @@ const config = require('../config');
 const {default: mongoose} = require('mongoose');
 const {RepoCommitTimeFilter} = require('./commit');
 
+const octokit = new Octokit({
+  auth: process.env.GITHUB_ACCESS_TOKEN || config.GITHUB_ACCESS_TOKEN,
+});
+
 /**
  * @brief 获取指定仓库的 2019-2022 每年的核心贡献者
  * @method post
@@ -20,7 +24,12 @@ const GetCoreContributorByYear = async (req, res) => {
       let start = i + '-01-01';
       let end = i + 1 + '-01-01';
       let contributorCommitNumber = new Map();
-      let allCommitsOfRepo = await RepoCommitTimeFilter(owner, repo, start, end);
+      let allCommitsOfRepo = await RepoCommitTimeFilter(
+        owner,
+        repo,
+        start,
+        end,
+      );
       // console.log(allCommitsOfRepo);
       const totalCommits = allCommitsOfRepo.length;
       allCommitsOfRepo.forEach(commit => {
@@ -57,9 +66,23 @@ const GetCoreContributorByYear = async (req, res) => {
         nowCommits += sortedContributor[index].commit;
         index += 1;
       }
+      // console.log("finally");
+      let contributorCompany = await GetContributorCompanyDistribution(coreContributor);
+      // console.log(contributorCompany);
+      let contributorCompanyArray = [];
+      contributorCompany.forEach((value, key) => {
+        contributorCompanyArray.push({
+          company: key,
+          coreContributors: value,
+        });
+      });
+      contributorCompanyArray.sort(
+        (a, b) => b.coreContributors - a.coreContributors,
+      );
       coreContributorByYear.push({
         year: i,
         coreContributor: coreContributor,
+        coreContributorCompany: contributorCompanyArray,
       });
     }
     return res.status(200).json({
@@ -73,6 +96,38 @@ const GetCoreContributorByYear = async (req, res) => {
     });
   }
 };
+
+// TODO：同步的公司分析，速度比较缓慢，考虑使用异步
+const GetContributorCompanyDistribution = async (coreContributor) => {
+  let contributorCompany = new Map();
+  for (contributor of coreContributor) {
+    let company = null;
+    try {
+      const userInfo = await octokit.request('GET /users/{username}', {
+        username: contributor.contributor,
+      });
+      // console.log(userInfo);
+      company = userInfo.data.company;
+    } catch (e) {
+      console.log(e);
+    } finally {
+      if (company == null || company == '') {
+        company = 'other';
+      }
+      // console.log(company);
+      if (contributorCompany.has(company)) {
+        contributorCompany.set(
+          company,
+          contributorCompany.get(company) + 1,
+        );
+      } else {
+        contributorCompany.set(company, 1);
+      }
+      // console.log(contributorCompany);
+    }
+  }
+  return contributorCompany;
+}
 
 module.exports = {
   GetCoreContributorByYear,

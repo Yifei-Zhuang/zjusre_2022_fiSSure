@@ -2938,7 +2938,7 @@
 
 ### 4.1
 
-> 获取 2019-2022 四年间每年的核心贡献者（定义为贡献了 80% 的 commits 的人群）。
+> 获取 2019-2022 四年间每年的核心贡献者（定义为贡献了 80% 的 commits 的人群）及其公司分布，未在个人资料中标记公司的，记为 `other` 。
 >
 > url: "/GetCoreContributorByYear"
 >
@@ -3004,6 +3004,24 @@
 >                     "contributor": "determ1ne",
 >                     "commit": 6
 >                 }
+>             ],
+>             "coreContributorCompany": [
+>                 {
+>                     "company": "other",
+>                     "coreContributors": 5
+>                 },
+>                 {
+>                     "company": "Zhejiang University",
+>                     "coreContributors": 3
+>                 },
+>                 {
+>                     "company": "Hangzhou University",
+>                     "coreContributors": 1
+>                 },
+>                 {
+>                     "company": "@QSCTech",
+>                     "coreContributors": 1
+>                 }
 >             ]
 >         },
 >         {
@@ -3053,6 +3071,20 @@
 >                     "contributor": "Shaw Haines",
 >                     "commit": 9
 >                 }
+>             ],
+>             "coreContributorCompany": [
+>                 {
+>                     "company": "other",
+>                     "coreContributors": 6
+>                 },
+>                 {
+>                     "company": "Zhejiang University",
+>                     "coreContributors": 4
+>                 },
+>                 {
+>                     "company": "Tencent Games",
+>                     "coreContributors": 1
+>                 }
 >             ]
 >         },
 >         {
@@ -3089,6 +3121,20 @@
 >                 {
 >                     "contributor": "NonoHh",
 >                     "commit": 12
+>                 }
+>             ],
+>             "coreContributorCompany": [
+>                 {
+>                     "company": "Zhejiang University",
+>                     "coreContributors": 4
+>                 },
+>                 {
+>                     "company": "other",
+>                     "coreContributors": 3
+>                 },
+>                 {
+>                     "company": "UC Santa Barbara",
+>                     "coreContributors": 1
 >                 }
 >             ]
 >         },
@@ -3135,12 +3181,23 @@
 >                     "contributor": "NonoHh",
 >                     "commit": 6
 >                 }
+>             ],
+>             "coreContributorCompany": [
+>                 {
+>                     "company": "Zhejiang University",
+>                     "coreContributors": 4
+>                 },
+>                 {
+>                     "company": "other",
+>                     "coreContributors": 4
+>                 },
+>                 {
+>                     "company": "ZJU",
+>                     "coreContributors": 2
+>                 }
 >             ]
 >         }
 >     ]
 > }
 > ```
 >
-> 
->
-> 
