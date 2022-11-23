@@ -2,100 +2,11 @@ const IssueSchema = require('../models/issue');
 const {Octokit} = require('@octokit/core');
 const config = require('../config');
 const {default: mongoose} = require('mongoose');
-const {
-  YearCounter,
-  MonthCounter,
-  DayCounter,
-  AsyncFunctionWrapper,
-} = require('./index');
+const {YearCounter, MonthCounter, DayCounter} = require('../utils/index');
 const {createCustomError} = require('../errors/custom-error');
 const octokit = new Octokit({
   auth: process.env.GITHUB_ACCESS_TOKEN || config.GITHUB_ACCESS_TOKEN,
 });
-const {Mutex} = require('async-mutex');
-
-let PageMutex = new Mutex();
-let PAGE_NUM = 0;
-const GetPageNum = async () => {
-  let release = await PageMutex.acquire();
-  let returnVal = PAGE_NUM;
-  PAGE_NUM++;
-  release();
-  return returnVal;
-};
-const AsyncFetchIssueInfo = async (owner, repo) => {
-  // 检查repo是否存在
-  const repoResponse = await octokit.request('GET /repos/{owner}/{repo}', {
-    owner: owner,
-    repo: repo,
-  });
-  while (1) {
-    const page_num = await GetPageNum();
-    const per_page = 100;
-    const issueMessage = await octokit.request(
-      'GET /repos/{owner}/{repo}/issues',
-      {
-        owner: owner,
-        repo: repo,
-        state: 'all',
-        page: page_num,
-        per_page: per_page,
-        since: new Date(
-          new Date().getTime() - 365 * 24 * 60 * 60 * 1000,
-        ).toString(),
-      },
-    );
-
-    // if (page_num > 600 || issueMessage.data.length == 0) {
-    if (issueMessage.data.length == 0) {
-      // 最多60000条
-      console.log(`fetch issue msg finish! total ${page_num} pages`);
-      break;
-    }
-
-    for (const issue of issueMessage.data) {
-      let issueObject;
-      try {
-        issueObject = await IssueSchema.findOne({
-          id: issue.id,
-        });
-      } catch (error) {
-        console.log(error);
-      }
-      if (!issueObject) {
-        try {
-          // console.log(pull);
-          // break;
-          const newIssue = {
-            id: issue.id,
-            url: issue.html_url,
-            number: issue.number,
-            state: issue.state,
-            title: issue.title,
-            isLocked: issue.locked,
-            body: issue.body ? issue.body : 'test',
-            created_at: issue.created_at,
-            updated_at: issue.updated_at,
-            closed_at: issue.closed_at ? issue.closed_at : undefined,
-            repos_id: repoResponse.data.id,
-            user_id: issue.user ? issue.user.id : 65600975,
-            user_name: issue.user ? issue.user.login : 'pytorch',
-            repo_owner: issue.html_url.split('/')[3],
-            repo_name: issue.html_url.split('/')[4],
-          };
-          const CreateIssue = await IssueSchema.create(newIssue);
-        } catch (e) {
-          console.log(e);
-        }
-      } else {
-        issueObject.state = issue.state;
-        issueObject.updated_at = issue.updated_at;
-        issueObject.closed_at = issue.closed_at ? issue.closed_at : undefined;
-        await issueObject.save();
-      }
-    }
-  }
-};
 /**
  * @brief 获取指定仓库的issue记录（最多10000条）
  * @method post
@@ -104,8 +15,78 @@ const AsyncFetchIssueInfo = async (owner, repo) => {
  */
 const GetIssueInfo = async (owner, repo) => {
   try {
-    await AsyncFunctionWrapper(AsyncFetchIssueInfo, owner, repo);
-    console.log('issue fetch finish');
+    // 检查repo是否存在
+    const repoResponse = await octokit.request('GET /repos/{owner}/{repo}', {
+      owner: owner,
+      repo: repo,
+    });
+    let page_num = 1;
+    const per_page = 100;
+
+    while (1) {
+      const issueMessage = await octokit.request(
+        'GET /repos/{owner}/{repo}/issues',
+        {
+          owner: owner,
+          repo: repo,
+          state: 'all',
+          page: page_num,
+          per_page: per_page,
+          since: new Date(
+            new Date().getTime() - 365 * 24 * 60 * 60 * 1000,
+          ).toString(),
+        },
+      );
+
+      if (page_num > 600 || issueMessage.data.length == 0) {
+        // 最多60000条
+        console.log(`fetch issue msg finish! total ${page_num} pages`);
+        break;
+      }
+
+      for (const issue of issueMessage.data) {
+        let issueObject;
+        try {
+          issueObject = await IssueSchema.findOne({
+            id: issue.id,
+          });
+        } catch (error) {
+          console.log(error);
+        }
+        if (!issueObject) {
+          try {
+            // console.log(pull);
+            // break;
+            const newIssue = {
+              id: issue.id,
+              url: issue.html_url,
+              number: issue.number,
+              state: issue.state,
+              title: issue.title,
+              isLocked: issue.locked,
+              body: issue.body ? issue.body : 'test',
+              created_at: issue.created_at,
+              updated_at: issue.updated_at,
+              closed_at: issue.closed_at ? issue.closed_at : undefined,
+              repos_id: repoResponse.data.id,
+              user_id: issue.user ? issue.user.id : 65600975,
+              user_name: issue.user ? issue.user.login : 'pytorch',
+              repo_owner: issue.html_url.split('/')[3],
+              repo_name: issue.html_url.split('/')[4],
+            };
+            const CreateIssue = await IssueSchema.create(newIssue);
+          } catch (e) {
+            console.log(e);
+          }
+        } else {
+          issueObject.state = issue.state;
+          issueObject.updated_at = issue.updated_at;
+          issueObject.closed_at = issue.closed_at;
+          await issueObject.save();
+        }
+      }
+      page_num++;
+    }
   } catch (err) {
     throw createCustomError(err, 500);
   }
@@ -133,7 +114,7 @@ const GetRepoIssueUpdateFrequencyByYear = async (owner, repo) => {
     const IssueInRange = await IssueSchema.find({
       repo_owner: owner,
       repo_name: repo,
-    }).sort([['updated_at', 1]]);
+    }).sort([['created_at', 1]]);
     const begin = IssueInRange[0].created_at;
     return await YearCounter(IssueInRange, 'updated_at', begin);
   } catch (e) {
@@ -191,7 +172,7 @@ const GetRepoIssueCloseFrequencyByYear = async (owner, repo) => {
     const IssueInRange = await IssueSchema.find({
       repo_owner: owner,
       repo_name: repo,
-    }).sort([['closed_at', 1]]);
+    }).sort([['created_at', 1]]);
     const begin = IssueInRange[0].created_at;
     return await YearCounter(IssueInRange, 'closed_at', begin);
   } catch (e) {
@@ -220,7 +201,7 @@ const GetRepoIssueUpdateFrequencyByMonth = async (owner, repo) => {
     const IssueInRange = await IssueSchema.find({
       repo_owner: owner,
       repo_name: repo,
-    }).sort([['updated_at', 1]]);
+    }).sort([['created_at', 1]]);
     const begin = IssueInRange[0].created_at;
     return await MonthCounter(IssueInRange, 'updated_at', begin);
   } catch (e) {
@@ -278,7 +259,7 @@ const GetRepoIssueCloseFrequencyByMonth = async (owner, repo) => {
     const IssueInRange = await IssueSchema.find({
       repo_owner: owner,
       repo_name: repo,
-    }).sort([['closed_at', 1]]);
+    }).sort([['created_at', 1]]);
     const begin = IssueInRange[0].created_at;
     return await MonthCounter(IssueInRange, 'closed_at', begin);
   } catch (e) {
@@ -306,7 +287,7 @@ const GetRepoIssueUpdateFrequencyByDay = async (owner, repo) => {
     const IssueInRange = await IssueSchema.find({
       repo_owner: owner,
       repo_name: repo,
-    }).sort([['updated_at', 1]]);
+    }).sort([['created_at', 1]]);
     const begin = IssueInRange[0].created_at;
     return await DayCounter(IssueInRange, 'updated_at', begin);
   } catch (e) {
@@ -362,7 +343,7 @@ const GetRepoIssueCloseFrequencyByDay = async (owner, repo) => {
     const IssueInRange = await IssueSchema.find({
       repo_owner: owner,
       repo_name: repo,
-    }).sort([['closed_at', 1]]);
+    }).sort([['created_at', 1]]);
     const begin = IssueInRange[0].created_at;
     return await DayCounter(IssueInRange, 'closed_at', begin);
   } catch (e) {
@@ -390,7 +371,7 @@ const GetIssuersCountInRange = async (owner, repo) => {
     const IssueInRange = await IssueSchema.find({
       repo_owner: owner,
       repo_name: repo,
-    }).sort([['updated_at', 1]]);
+    }).sort([['created_at', 1]]);
     const begin = IssueInRange[0].created_at;
     const BaseYear = begin ? begin.split('-')[0] : '2008';
     const BaseMonth = begin ? begin.split('-')[1] : '3';

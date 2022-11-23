@@ -136,7 +136,7 @@ const GetRepoCommitFrequencyByYear = async (req, res) => {
       throw 'missing body data';
     }
     const CommitInRange = await RepoCommitTimeFilter(owner, repo, begin, tail);
-    const arr = await YearCounter(CommitInRange, begin, tail, 'updated_at');
+    const arr = await YearCounter(CommitInRange, 'updated_at', begin, tail);
     res.status(200).json({
       arr,
     });
@@ -170,9 +170,7 @@ const GetRepoCommitFrequencyByMonth = async (req, res) => {
       throw 'missing body data';
     }
     const CommitInRange = await RepoCommitTimeFilter(owner, repo, begin, tail);
-
-    const arr = await MonthCounter(CommitInRange, 'updated_at', begin, tail);
-
+    const arr = await MonthCounter(CommitInRange, begin, 'updated_at', tail);
     res.status(200).json({
       arr,
     });
@@ -205,7 +203,7 @@ const GetRepoCommitFrequencyByDay = async (req, res) => {
       throw 'missing body data';
     }
     const CommitInRange = await RepoCommitTimeFilter(owner, repo, begin, tail);
-    const arr = await DayCounter(CommitInRange, begin, tail, 'updated_at');
+    const arr = await DayCounter(CommitInRange, 'updated_at', begin, tail);
     res.status(200).json({
       arr,
     });
@@ -305,14 +303,14 @@ const RepoCommitTimeFilter = async (
   begin = '1970-01-01',
   tail = '2023-01-01',
 ) => {
-  let AllCommitsOfRepo = await CommitSchema.find({
+  const AllCommitsOfRepo = await CommitSchema.find({
     repo_owner: owner,
     repo_name: repo,
   });
   const FullBeginTime = begin + 'T00:00:00.000Z';
   const FullTailTime = tail + 'T00:00:00.000Z';
 
-  AllCommitsOfRepo = AllCommitsOfRepo.filter(commit => {
+  AllCommitsOfRepo.filter(commit => {
     return (
       Date.parse(FullTailTime) >= Date.parse(commit.updated_at) &&
       Date.parse(FullBeginTime) <= Date.parse(commit.updated_at)
@@ -330,5 +328,4 @@ module.exports = {
   GetRepoCommitFrequencyByMonth,
   GetRepoCommitFrequencyByDay,
   GetCommitersCountInRange,
-  RepoCommitTimeFilter,
 };

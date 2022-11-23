@@ -44,7 +44,6 @@ const {
   GetRepoIssueCreateFrequencyByDay,
   GetIssuersCountInRange,
 } = require('../controllers/issue');
-const {GetCoreContributorByYear} = require('../controllers/CoreContributor');
 router.route('/import').post(GetMessage);
 router.route('/login').post(CheckUser);
 router.route('/register').post(CreateUser);
@@ -126,5 +125,4 @@ router
   .route('/GetRepoIssueCreateFrequencyByDay')
   .post(GetRepoIssueCreateFrequencyByDay);
 router.route('/GetIssuersCountInRange').post(GetIssuersCountInRange);
-router.route('/GetCoreContributorByYear').post(GetCoreContributorByYear);
 module.exports = router;

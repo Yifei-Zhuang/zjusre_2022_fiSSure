@@ -11,7 +11,6 @@ const IssueSchema = require('../models/issue');
 const CommitUtil = require('../utils/commit');
 const IssueUtil = require('../utils/issue');
 const PullUtil = require('../utils/pull');
-const pull = require('../models/pull');
 const octokit = new Octokit({
   auth: process.env.GITHUB_ACCESS_TOKEN || config.GITHUB_ACCESS_TOKEN,
 });
@@ -31,15 +30,12 @@ const GetMessage = async (req, res) => {
       });
 
     //      获取仓库的commit，issue，pull信息
-    await CommitUtil.GetCommitInfo(owner, repo);
+    await Promise.all([
+      CommitUtil.GetCommitInfo(owner, repo),
+      PullUtil.GetPullInfo(owner, repo),
+      IssueUtil.GetIssueInfo(owner, repo),
+    ]);
 
-    await IssueUtil.GetIssueInfo(owner, repo);
-    try {
-      await PullUtil.GetPullInfo(owner, repo);
-    } catch (e) {
-      console.log(`dont't mind this`, e);
-    }
-    console.log('fetch metadata finish');
     let commit_frequency;
 
     let issue_frequency;
@@ -169,7 +165,6 @@ const GetDashboard = async (req, res) => {
               repo,
             ),
           };
-          // console.log('commit_frequency compute finish', commit_frequency);
         } catch (e) {
           console.log('commit fetch error');
           throw e;
@@ -180,28 +175,27 @@ const GetDashboard = async (req, res) => {
           pull_frequency = {
             pull_year_create_frequency:
               await PullUtil.GetRepoPullCreateFrequencyByYear(owner, repo),
-            pull_year_close_frequency:
+            pull_year_create_frequency:
               await PullUtil.GetRepoPullCloseFrequencyByYear(owner, repo),
-            pull_year_update_frequency:
+            pull_year_close_frequency:
               await PullUtil.GetRepoPullUpdateFrequencyByYear(owner, repo),
             pull_month_create_frequency:
               await PullUtil.GetRepoPullCreateFrequencyByMonth(owner, repo),
-            pull_month_close_frequency:
+            pull_month_create_frequency:
               await PullUtil.GetRepoPullCloseFrequencyByMonth(owner, repo),
-            pull_month_update_frequency:
+            pull_month_close_frequency:
               await PullUtil.GetRepoPullUpdateFrequencyByMonth(owner, repo),
             pull_day_create_frequency: getDayS
               ? await PullUtil.GetRepoPullCreateFrequencyByDay(owner, repo)
               : {},
-            pull_day_close_frequency: getDayS
+            pull_day_create_frequency: getDayS
               ? await PullUtil.GetRepoPullCloseFrequencyByDay(owner, repo)
               : {},
-            pull_day_update_frequency: getDayS
+            pull_day_close_frequency: getDayS
               ? await PullUtil.GetRepoPullUpdateFrequencyByDay(owner, repo)
               : {},
             puller_count: await PullUtil.GetPullersCountInRange(owner, repo),
           };
-          // console.log('pull_frequency compute finish', pull_frequency);
         } catch (e) {
           console.log('pull fetch error');
           throw e;
@@ -212,28 +206,27 @@ const GetDashboard = async (req, res) => {
           issue_frequency = {
             issue_year_create_frequency:
               await IssueUtil.GetRepoIssueCreateFrequencyByYear(owner, repo),
-            Issue_year_update_frequency:
-              await IssueUtil.GetRepoIssueUpdateFrequencyByYear(owner, repo),
-            Issue_year_close_frequency:
+            Issue_year_create_frequency:
               await IssueUtil.GetRepoIssueCloseFrequencyByYear(owner, repo),
+            Issue_year_close_frequency:
+              await IssueUtil.GetRepoIssueUpdateFrequencyByYear(owner, repo),
             Issue_month_create_frequency:
               await IssueUtil.GetRepoIssueCreateFrequencyByMonth(owner, repo),
-            Issue_month_update_frequency:
-              await IssueUtil.GetRepoIssueUpdateFrequencyByMonth(owner, repo),
-            Issue_month_close_frequency:
+            Issue_month_create_frequency:
               await IssueUtil.GetRepoIssueCloseFrequencyByMonth(owner, repo),
+            Issue_month_close_frequency:
+              await IssueUtil.GetRepoIssueUpdateFrequencyByMonth(owner, repo),
             Issue_day_create_frequency: getDayS
               ? await IssueUtil.GetRepoIssueCreateFrequencyByDay(owner, repo)
               : {},
-            Issue_day_update_frequency: getDayS
-              ? await IssueUtil.GetRepoIssueUpdateFrequencyByDay(owner, repo)
+            Issue_day_create_frequency: getDayS
+              ? await IssueUtil.GetRepoIssueCloseFrequencyByDay(owner, repo)
               : {},
             Issue_day_close_frequency: getDayS
-              ? await IssueUtil.GetRepoIssueCloseFrequencyByDay(owner, repo)
+              ? await IssueUtil.GetRepoIssueUpdateFrequencyByDay(owner, repo)
               : {},
             Issuer_count: await IssueUtil.GetIssuersCountInRange(owner, repo),
           };
-          // console.log('issue_frequency compute finish', issue_frequency);
         } catch (e) {
           console.log('issue fetch error');
           throw e;
