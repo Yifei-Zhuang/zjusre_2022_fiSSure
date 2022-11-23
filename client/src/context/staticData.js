@@ -36,66 +36,6 @@ const detail = {
       public_gists: 31,
       followers: 80,
       created_at: '2012-09-29T17:47:22Z',
-<<<<<<< HEAD
-<<<<<<< HEAD
-    },
-<<<<<<< HEAD
-    "issue_frequency": {
-        "2017-4-5": 33,
-        "2017-6-5": 24,
-        "2017-8-5": 73,
-        "2017-10-5": 139,
-        "2017-12-5": 72,
-        "2018-4-5": 43,
-        "2019-4-5": 342,
-        "2020-4-5": 62,
-        "2021-4-5": 15,
-        "2022-4-5": 32,
-    },
-    "issuer_frequency": {
-        "2017-4-5": 3,
-        "2017-6-5": 4,
-        "2017-8-5": 3,
-        "2017-10-5": 1,
-        "2017-12-5": 7,
-        "2018-4-5": 4,
-        "2019-4-5": 2,
-        "2020-4-5": 6,
-        "2021-4-5": 1,
-        "2022-4-5": 3,
-=======
-    {
-      name: 'zou3519',
-      avatar_url: 'https://avatars.githubusercontent.com/u/5652049?v=4',
-      contributions: 1234,
-      company: null,
-      public_repos: 47,
-      public_gists: 21,
-      followers: 181,
-      created_at: '2013-10-10T01:51:13Z',
->>>>>>> parent of da3ef2c (update client's issue graph)
-    },
-    {
-      name: 'soumith',
-      avatar_url: 'https://avatars.githubusercontent.com/u/1310570?v=4',
-      contributions: 1147,
-      company: 'Facebook AI Research',
-      public_repos: 166,
-      public_gists: 77,
-      followers: 11177,
-      created_at: '2012-01-06T23:20:12Z',
-    },
-    {
-      name: 'gchanan',
-      avatar_url: 'https://avatars.githubusercontent.com/u/3768583?v=4',
-      contributions: 1084,
-      company: null,
-      public_repos: 22,
-      public_gists: 40,
-      followers: 255,
-      created_at: '2013-03-04T20:09:56Z',
-    },
-=======
     },
     {
       name: 'zou3519',
@@ -127,40 +67,6 @@ const detail = {
       followers: 255,
       created_at: '2013-03-04T20:09:56Z',
     },
->>>>>>> parent of da3ef2c (update client's issue graph)
-=======
-    },
-    {
-      name: 'zou3519',
-      avatar_url: 'https://avatars.githubusercontent.com/u/5652049?v=4',
-      contributions: 1234,
-      company: null,
-      public_repos: 47,
-      public_gists: 21,
-      followers: 181,
-      created_at: '2013-10-10T01:51:13Z',
-    },
-    {
-      name: 'soumith',
-      avatar_url: 'https://avatars.githubusercontent.com/u/1310570?v=4',
-      contributions: 1147,
-      company: 'Facebook AI Research',
-      public_repos: 166,
-      public_gists: 77,
-      followers: 11177,
-      created_at: '2012-01-06T23:20:12Z',
-    },
-    {
-      name: 'gchanan',
-      avatar_url: 'https://avatars.githubusercontent.com/u/3768583?v=4',
-      contributions: 1084,
-      company: null,
-      public_repos: 22,
-      public_gists: 40,
-      followers: 255,
-      created_at: '2013-03-04T20:09:56Z',
-    },
->>>>>>> parent of da3ef2c (update client's issue graph)
   ],
   timeline: {
     created_at: '2016-08-13T05:26:41Z',
