@@ -1,21 +1,33 @@
+const {prependOnceListener} = require('../models/issue');
+
 const YearCounter = async (input, property, begin, tail) => {
   try {
-    const BaseYear = begin ? begin : '2008';
-    const LastYear = tail ? tail : new Date().getUTCFullYear();
+    const BaseYear = begin ? begin.split('-')[0] : '2008';
+    const LastYear = tail ? tail.split('-')[0] : new Date().getUTCFullYear();
     let arr = {};
-    for (let i = parseInt(BaseYear); i <= parseInt(LastYear); i++) {
-      const curYear = `${i}-01-01T00:00:00.00Z`;
-      const nextYear = `${i + 1}-01-01T00:00:00.00Z`;
+    let pre = 0;
+    for (
+      let i = parseInt(BaseYear);
+      i <= parseInt(LastYear) && pre < input.length;
+      i++
+    ) {
+      let curYear = Date.parse(`${i}-01-01T00:00:00.00Z`);
+      let nextYear = Date.parse(`${i + 1}-01-01T00:00:00.00Z`);
+
       let count = 0;
-      input.forEach(item => {
+      for (let j = pre; j < input.length; j++) {
+        const item = input[j];
         if (
           item[property] &&
-          Date.parse(curYear) <= Date.parse(item[property]) &&
-          Date.parse(nextYear) >= Date.parse(item[property])
+          curYear <= Date.parse(input[j][property]) &&
+          nextYear >= Date.parse(input[j][property])
         ) {
           count++;
+          pre++;
+        } else if (nextYear < Date.parse(input[j][property])) {
+          pre = j;
         }
-      });
+      }
       arr[`${i}-01-01`] = count;
     }
     return arr;
@@ -33,7 +45,12 @@ const MonthCounter = async (input, property, begin, tail) => {
       : new Date().toISOString().split('-')[1];
 
     let arr = {};
-    for (let i = parseInt(BaseYear); i <= parseInt(LastYear); i++) {
+    let pre = 0;
+    for (
+      let i = parseInt(BaseYear);
+      i <= parseInt(LastYear) && pre < input.length;
+      i++
+    ) {
       for (
         let j = i == BaseYear ? parseInt(BaseMonth) : 1;
         j <= (i == LastYear ? parseInt(LastMonth) : 12);
@@ -42,24 +59,33 @@ const MonthCounter = async (input, property, begin, tail) => {
         if (j == 13) {
           break;
         }
-        const curMonth =
+        let curMonth =
           j < 10 ? `${i}-0${j}-01T00:00:00.00Z` : `${i}-${j}-01T00:00:00.00Z`;
-        const nextMonth =
+        let nextMonth =
           j != 12
             ? j >= 9
               ? `${i}-${j + 1}-01T00:00:00.00Z`
               : `${i}-0${j + 1}-01T00:00:00.00Z`
             : `${i + 1}-${'01'}-01T00:00:00.00Z`;
+        curMonth = Date.parse(curMonth);
+        nextMonth = Date.parse(nextMonth);
+
         let count = 0;
-        input.forEach(item => {
+        for (let x = pre; x < input.length; x++) {
+          const item = input[x];
           if (
             item[property] &&
-            Date.parse(curMonth) <= Date.parse(item[property]) &&
-            Date.parse(nextMonth) >= Date.parse(item[property])
+            curMonth <= Date.parse(item[property]) &&
+            nextMonth >= Date.parse(item[property])
           ) {
             count++;
+            pre++;
+          } else if (nextMonth < Date.parse(item[property])) {
+            pre = x;
+            break;
           }
-        });
+        }
+
         let key;
         if (j < 10) {
           key = `${i}-0${j}-01`;
@@ -90,6 +116,7 @@ const DayCounter = async (input, property, begin, tail) => {
     let arr = {};
     //! 不考虑闰年
     const daysOfMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    let pre = 0;
     for (let i = parseInt(BaseYear); i <= parseInt(LastYear); i++) {
       for (
         let j = i == parseInt(BaseYear) ? parseInt(BaseMonth) : 1;
@@ -113,7 +140,7 @@ const DayCounter = async (input, property, begin, tail) => {
           if (p > daysOfMonth[j - 1]) {
             break;
           }
-          const curDay =
+          let curDay =
             p < 10
               ? j < 10
                 ? `${i}-0${j}-0${p}T00:00:00.00Z`
@@ -121,7 +148,7 @@ const DayCounter = async (input, property, begin, tail) => {
               : j < 10
               ? `${i}-0${j}-${p}T00:00:00.00Z`
               : `${i}-${j}-${p}T00:00:00.00Z`;
-          const nextDay =
+          let nextDay =
             p == daysOfMonth[j - 1]
               ? j == 12
                 ? `${i + 1}-01-01T00:00:00.00Z`
@@ -136,15 +163,23 @@ const DayCounter = async (input, property, begin, tail) => {
               ? `${i}-0${j}-0${p + 1}T00:00:00.00Z`
               : `${i}-${j}-0${p + 1}T00:00:00.00Z`;
           let count = 0;
-          input.forEach(item => {
+          for (let x = pre; x < input.length; x++) {
+            const item = input[x];
+            curDay = Date.parse(curDay);
+            nextDay = Date.parse(nextDay);
+
             if (
               item[property] &&
-              Date.parse(curDay) <= Date.parse(item[property]) &&
-              Date.parse(nextDay) >= Date.parse(item[property])
+              curDay <= Date.parse(item[property]) &&
+              nextDay >= Date.parse(item[property])
             ) {
               count++;
+              x++;
+            } else if (nextDay >= Date.parse(item[property])) {
+              pre = x;
+              break;
             }
-          });
+          }
           let key = undefined;
           if (j < 10) {
             if (p < 10) {
@@ -168,4 +203,32 @@ const DayCounter = async (input, property, begin, tail) => {
     throw e;
   }
 };
-module.exports = {YearCounter, MonthCounter, DayCounter};
+async function Sleep(msec) {
+  return new Promise(resolve => setTimeout(resolve, msec));
+}
+const AsyncFunctionWrapper = async (fn, ...props) => {
+  // let arr = new Array(10).map(item =>{
+  //   return fn(...props)
+  // })
+  // await Promise.all(...arr)
+  await Promise.all([
+    fn(...props),
+    fn(...props),
+    fn(...props),
+    fn(...props),
+    fn(...props),
+    // fn(...props),
+    // fn(...props),
+    // fn(...props),
+    // fn(...props),
+    // fn(...props),
+    // fn(...props),
+  ]);
+};
+module.exports = {
+  YearCounter,
+  MonthCounter,
+  DayCounter,
+  AsyncFunctionWrapper,
+  Sleep,
+};

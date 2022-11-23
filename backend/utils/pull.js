@@ -7,7 +7,102 @@ const octokit = new Octokit({
   auth: process.env.GITHUB_ACCESS_TOKEN || config.GITHUB_ACCESS_TOKEN,
 });
 
-const {YearCounter, MonthCounter, DayCounter} = require('../utils/index');
+const {
+  YearCounter,
+  MonthCounter,
+  DayCounter,
+  AsyncFunctionWrapper,
+  Sleep,
+} = require('./index');
+const {Mutex} = require('async-mutex');
+let PageMutex = new Mutex();
+let PAGE_NUM = 0;
+const GetPageNum = async () => {
+  let release = await PageMutex.acquire();
+  let returnVal = PAGE_NUM;
+  PAGE_NUM++;
+  release();
+  return returnVal;
+};
+const AsyncFetchPullInfo = async (owner, repo) => {
+  // 检查repo是否存在
+  const repoResponse = await octokit.request('GET /repos/{owner}/{repo}', {
+    owner: owner,
+    repo: repo,
+  });
+  const per_page = 100;
+
+  while (1) {
+    const page_num = await GetPageNum();
+    const pullMessage = await octokit.request(
+      'GET /repos/{owner}/{repo}/pulls',
+      {
+        owner: owner,
+        repo: repo,
+        state: 'all',
+        page: page_num,
+        per_page: per_page,
+        since: new Date(
+          new Date().getTime() - 365 * 24 * 60 * 60 * 1000,
+        ).toString(),
+      },
+    );
+    if (pullMessage.data.length == 0 || page_num >= 300) {
+      console.log(`fetch pull msg finish! total ${page_num} pages`);
+      break;
+    }
+
+    for (const pull of pullMessage.data) {
+      let pullObject;
+      try {
+        pullObject = await PullSchema.findOne({
+          id: pull.id,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+      if (!pullObject) {
+        // console.log(pull);
+        // break;
+        let newPull;
+
+        newPull = {
+          id: pull.id,
+          url: pull.html_url,
+          number: pull.number,
+          state: pull.state,
+          title: pull.title,
+          isLocked: pull.locked,
+          // 存储body等待时间非常长，所以这里先填一个空值
+          body: pull.body ? pull.body : 'test',
+          // body: ' ',
+          created_at: pull.created_at,
+          updated_at: pull.updated_at,
+          closed_at: pull.closed_at ? pull.closed_at : undefined,
+          merged_at: pull.merged_at ? pull.merged_at : undefined,
+          is_merged: pull.merged_at != null,
+          repos_id: repoResponse.data.id,
+          user_id: pull.user.id,
+          repo_owner: pull.html_url.split('/')[3],
+          repo_name: pull.html_url.split('/')[4],
+        };
+
+        const CreatePull = await PullSchema.create(newPull);
+        // await Sleep(1000);
+      } else {
+        pullObject.state = pull.state;
+        isLocked: pull.locked;
+        pullObject.body = pull.body ? pull.body : 'test';
+        pullObject.title = pull.title;
+        pullObject.updated_at = pull.updated_at;
+        pullObject.closed_at = pull.updated_at;
+        is_merged: pull.merged_at != null;
+        await pullObject.save();
+        // await Sleep(1000);
+      }
+    }
+  }
+};
 /**
  * @brief 获取指定仓库的pull记录（最多10000条）
  * @method post
@@ -16,84 +111,8 @@ const {YearCounter, MonthCounter, DayCounter} = require('../utils/index');
  */
 const GetPullInfo = async (owner, repo) => {
   try {
-    // 检查repo是否存在
-    const repoResponse = await octokit.request('GET /repos/{owner}/{repo}', {
-      owner: owner,
-      repo: repo,
-    });
-    let page_num = 1;
-    const per_page = 100;
-
-    while (1) {
-      const pullMessage = await octokit.request(
-        'GET /repos/{owner}/{repo}/pulls',
-        {
-          owner: owner,
-          repo: repo,
-          state: 'all',
-          page: page_num,
-          per_page: per_page,
-          since: new Date(
-            new Date().getTime() - 365 * 24 * 60 * 60 * 1000,
-          ).toString(),
-        },
-      );
-      if (page_num > 50 || pullMessage.data.length == 0) {
-        // 最多5000条
-        console.log(`fetch pull msg finish! total ${page_num} pages`);
-        break;
-      }
-
-      for (const pull of pullMessage.data) {
-        let pullObject;
-        try {
-          pullObject = await PullSchema.findOne({
-            id: pull.id,
-          });
-        } catch (error) {
-          console.log(error);
-        }
-        if (!pullObject) {
-          try {
-            // console.log(pull);
-            // break;
-            const newPull = {
-              id: pull.id,
-              url: pull.html_url,
-              number: pull.number,
-              state: pull.state,
-              title: pull.title,
-              isLocked: pull.locked,
-              // 存储body等待时间非常长，所以这里先填一个空值
-              body: pull.body ? pull.body : 'test',
-              // body: ' ',
-              created_at: pull.created_at,
-              updated_at: pull.updated_at,
-              closed_at: pull.closed_at ? pull.closed_at : undefined,
-              merged_at: pull.merged_at ? pull.merged_at : undefined,
-              is_merged: pull.merged_at != null,
-              repos_id: repoResponse.data.id,
-              user_id: pull.user.id,
-              repo_owner: pull.html_url.split('/')[3],
-              repo_name: pull.html_url.split('/')[4],
-            };
-            const CreatePull = await PullSchema.create(newPull);
-          } catch (e) {
-            console.log(e);
-          }
-        } else {
-          pullObject.state = pull.state;
-          pullObject.isLocked = pull.isLocked;
-          pullObject.body = pull.body ? pull.body : 'test';
-          pullObject.title = pull.title;
-          pullObject.updated_at = pull.updated_at;
-          pullObject.closed_at = pull.updated_at;
-          pullObject.is_merged = pull.is_merged;
-          await pullObject.save();
-        }
-      }
-      page_num++;
-    }
+    await AsyncFunctionWrapper(AsyncFetchPullInfo, owner, repo);
+    console.log('pull fetch finish');
   } catch (err) {
     throw createCustomError(err, 500);
   }
@@ -109,7 +128,7 @@ const GetAllPullOfRepo = async (owner, repo) => {
     return await PullSchema.find({
       repo_owner: owner,
       repo_name: repo,
-    }).sort([['created_at', 1]]);
+    }).sort([['updated_at', 1]]);
   } catch (e) {
     throw createCustomError(e, 500);
   }
@@ -134,7 +153,10 @@ const GetRepoPullUpdateFrequencyByYear = async (owner, repo) => {
       throw 'missing body data';
     }
 
-    const PullInRange = await GetAllPullOfRepo(owner, repo);
+    const PullInRange = await PullSchema.find({
+      repo_owner: owner,
+      repo_name: repo,
+    }).sort([['updated_at', 1]]);
     const begin = PullInRange[0].created_at;
     return await YearCounter(PullInRange, 'updated_at', begin);
   } catch (e) {
@@ -160,8 +182,12 @@ const GetRepoPullCloseFrequencyByYear = async (owner, repo) => {
     if (!owner || !repo) {
       throw 'missing body data';
     }
-    const PullInRange = await GetAllPullOfRepo(owner, repo);
+    const PullInRange = await PullSchema.find({
+      repo_owner: owner,
+      repo_name: repo,
+    }).sort([['closed_at', 1]]);
     const begin = PullInRange[0].created_at;
+
     return await YearCounter(PullInRange, 'closed_at', begin);
   } catch (e) {
     throw createCustomError(e, 500);
@@ -186,7 +212,10 @@ const GetRepoPullCreateFrequencyByYear = async (owner, repo) => {
     if (!owner || !repo) {
       throw 'missing body data';
     }
-    const PullInRange = await GetAllPullOfRepo(owner, repo);
+    const PullInRange = await PullSchema.find({
+      repo_owner: owner,
+      repo_name: repo,
+    }).sort([['created_at', 1]]);
     const begin = PullInRange[0].created_at;
     return await YearCounter(PullInRange, 'created_at', begin);
   } catch (e) {
@@ -212,8 +241,12 @@ const GetRepoPullUpdateFrequencyByMonth = async (owner, repo) => {
     if (!owner || !repo) {
       throw 'missing body data';
     }
-    const PullInRange = await GetAllPullOfRepo(owner, repo);
+    const PullInRange = await PullSchema.find({
+      repo_owner: owner,
+      repo_name: repo,
+    }).sort([['updated_at', 1]]);
     const begin = PullInRange[0].created_at;
+
     return await MonthCounter(PullInRange, 'updated_at', begin);
   } catch (e) {
     throw createCustomError(e, 500);
@@ -224,8 +257,13 @@ const GetRepoPullCloseFrequencyByMonth = async (owner, repo) => {
     if (!owner || !repo) {
       throw 'missing body data';
     }
-    const PullInRange = await GetAllPullOfRepo(owner, repo);
+    const PullInRange = await PullSchema.find({
+      repo_owner: owner,
+      repo_name: repo,
+    }).sort([['closed_at', 1]]);
+
     const begin = PullInRange[0].created_at;
+
     return await MonthCounter(PullInRange, 'closed_at', begin);
   } catch (e) {
     throw createCustomError(e, 500);
@@ -250,7 +288,10 @@ const GetRepoPullCreateFrequencyByMonth = async (owner, repo) => {
     if (!owner || !repo) {
       throw 'missing body data';
     }
-    const PullInRange = await GetAllPullOfRepo(owner, repo);
+    const PullInRange = await PullSchema.find({
+      repo_owner: owner,
+      repo_name: repo,
+    }).sort([['created_at', 1]]);
     const begin = PullInRange[0].created_at;
     return await MonthCounter(PullInRange, 'created_at', begin);
   } catch (e) {
@@ -276,7 +317,10 @@ const GetRepoPullUpdateFrequencyByDay = async (owner, repo) => {
     if (!owner || !repo) {
       throw 'missing body data';
     }
-    const PullInRange = await GetAllPullOfRepo(owner, repo);
+    const PullInRange = await PullSchema.find({
+      repo_owner: owner,
+      repo_name: repo,
+    }).sort([['updated_at', 1]]);
     const begin = PullInRange[0].created_at;
     return await DayCounter(PullInRange, 'updated_at', begin);
   } catch (e) {
@@ -302,7 +346,10 @@ const GetRepoPullCloseFrequencyByDay = async (owner, repo) => {
     if (!owner || !repo) {
       throw 'missing body data';
     }
-    const PullInRange = await GetAllPullOfRepo(owner, repo);
+    const PullInRange = await PullSchema.find({
+      repo_owner: owner,
+      repo_name: repo,
+    }).sort([['closed_at', 1]]);
     const begin = PullInRange[0].created_at;
     return await DayCounter(PullInRange, 'closed_at', begin);
   } catch (e) {
@@ -328,7 +375,10 @@ const GetRepoPullCreateFrequencyByDay = async (owner, repo) => {
     if (!owner || !repo) {
       throw 'missing body data';
     }
-    const PullInRange = await GetAllPullOfRepo(owner, repo);
+    const PullInRange = await PullSchema.find({
+      repo_owner: owner,
+      repo_name: repo,
+    }).sort([['created_at', 1]]);
     const begin = PullInRange[0].created_at;
     return await DayCounter(PullInRange, 'created_at', begin);
   } catch (e) {

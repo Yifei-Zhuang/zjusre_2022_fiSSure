@@ -5,8 +5,91 @@ const octokit = new Octokit({
   auth: process.env.GITHUB_ACCESS_TOKEN || config.GITHUB_ACCESS_TOKEN,
 });
 const {createCustomError} = require('../errors/custom-error');
+const {Mutex} = require('async-mutex');
+const {
+  YearCounter,
+  MonthCounter,
+  DayCounter,
+  AsyncFunctionWrapper,
+} = require('./index');
 
-const {YearCounter, MonthCounter, DayCounter} = require('./index');
+let PageMutex = new Mutex();
+let PAGE_NUM = 0;
+const GetPageNum = async () => {
+  let release = await PageMutex.acquire();
+  let returnVal = PAGE_NUM;
+  PAGE_NUM++;
+  release();
+  return returnVal;
+};
+
+const AsyncFetchCommitInfo = async (owner, repo) => {
+  const per_page = 100;
+  const repoResponse = await octokit.request('GET /repos/{owner}/{repo}', {
+    owner: owner,
+    repo: repo,
+  });
+  while (1) {
+    const page_num = await GetPageNum();
+
+    const commitMessage = await octokit.request(
+      'GET /repos/{owner}/{repo}/commits',
+      {
+        owner: owner,
+        repo: repo,
+        page: page_num,
+        per_page: per_page,
+      },
+    );
+    // if (page_num > 250 || commitMessage.data.length == 0) {
+    if (commitMessage.data.length == 0) {
+      // 最多10000条
+      console.log(`fetch commit msg finish! total ${page_num} pages`);
+      break;
+    }
+
+    for (const commit of commitMessage.data) {
+      let commitObject;
+      try {
+        commitObject = await CommitSchema.findOne({
+          sha: commit.sha,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+      if (!commitObject) {
+        let name = commit.author
+          ? commit.author.login
+          : commit.commit.author
+          ? commit.commit.author.name
+          : 'test';
+        try {
+          const newCommit = {
+            sha: commit.sha,
+            url: commit.html_url,
+            author_id: commit.author ? commit.author.id : undefined,
+            author_name: name,
+            author_email: commit.commit.author
+              ? commit.commit.author.email
+              : '',
+            updated_at: commit.commit.author
+              ? commit.commit.author.date
+              : '2020-12-20T17:44:07Z',
+            message: commit.commit.message,
+            repos_id: repoResponse.data.id,
+            repo_owner: commit.html_url.split('/')[3],
+            repo_name: commit.html_url.split('/')[4],
+          };
+          const CreateCommit = await CommitSchema.create(newCommit);
+          //避免github检测
+        } catch (e) {
+          console.log(e);
+        }
+      } else {
+      }
+    }
+  }
+};
 /**
  * @brief 获取指定仓库的所有commit（debug使用）
  * @method post
@@ -16,72 +99,20 @@ const {YearCounter, MonthCounter, DayCounter} = require('./index');
  */
 const GetCommitInfo = async (owner, repo) => {
   try {
-    // 检查repo是否存在
-    const repoResponse = await octokit.request('GET /repos/{owner}/{repo}', {
-      owner: owner,
-      repo: repo,
-    });
-    let page_num = 1;
-    const per_page = 100;
-
-    while (1) {
-      const commitMessage = await octokit.request(
-        'GET /repos/{owner}/{repo}/commits',
-        {
-          owner: owner,
-          repo: repo,
-          page: page_num,
-          per_page: per_page,
-        },
-      );
-
-      if (page_num > 250 || commitMessage.data.length == 0) {
-        // 最多10000条
-        console.log(`fetch commit msg finish! total ${page_num} pages`);
-        break;
-      }
-
-      for (const commit of commitMessage.data) {
-        let commitObject;
-        try {
-          commitObject = await CommitSchema.findOne({
-            sha: commit.sha,
-          });
-        } catch (error) {
-          console.log(error);
-        }
-        if (!commitObject) {
-          let name = commit.author
-            ? commit.author.login
-            : commit.commit.author
-            ? commit.commit.author.name
-            : 'test';
-          try {
-            const newCommit = {
-              sha: commit.sha,
-              url: commit.html_url,
-              author_id: commit.author ? commit.author.id : undefined,
-              author_name: name,
-              author_email: commit.commit.author
-                ? commit.commit.author.email
-                : '',
-              updated_at: commit.commit.author
-                ? commit.commit.author.date
-                : '2020-12-20T17:44:07Z',
-              message: commit.commit.message,
-              repos_id: repoResponse.data.id,
-              repo_owner: commit.html_url.split('/')[3],
-              repo_name: commit.html_url.split('/')[4],
-            };
-            const CreateCommit = await CommitSchema.create(newCommit);
-          } catch (e) {
-            console.log(e);
-          }
-        } else {
-        }
-      }
-      page_num++;
-    }
+    await Promise.all([
+      AsyncFetchCommitInfo(owner, repo),
+      AsyncFetchCommitInfo(owner, repo),
+      AsyncFetchCommitInfo(owner, repo),
+      AsyncFetchCommitInfo(owner, repo),
+      AsyncFetchCommitInfo(owner, repo),
+      AsyncFetchCommitInfo(owner, repo),
+      AsyncFetchCommitInfo(owner, repo),
+      AsyncFetchCommitInfo(owner, repo),
+      AsyncFetchCommitInfo(owner, repo),
+      AsyncFetchCommitInfo(owner, repo),
+      AsyncFetchCommitInfo(owner, repo),
+    ]);
+    console.log('commit fetch finish');
   } catch (err) {
     throw createCustomError(err, 500);
   }
@@ -111,6 +142,7 @@ const GetRepoCommitFrequencyByYear = async (owner, repo) => {
       repo_name: repo,
     }).sort([['updated_at', 1]]);
     const begin = CommitInRange[0].updated_at;
+
     return await YearCounter(CommitInRange, 'updated_at', begin);
   } catch (e) {
     throw createCustomError(e, 400);
@@ -140,6 +172,7 @@ const GetRepoCommitFrequencyByMonth = async (owner, repo) => {
       repo_name: repo,
     }).sort([['updated_at', 1]]);
     const begin = CommitInRange[0].updated_at;
+
     return await MonthCounter(CommitInRange, 'updated_at', begin);
   } catch (e) {
     throw createCustomError(e, 500);
