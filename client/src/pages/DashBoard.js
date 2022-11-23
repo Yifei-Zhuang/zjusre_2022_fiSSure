@@ -14,6 +14,7 @@ import {
     CommitFrequency,
     CommiterFrequency,
     IssueFrequency,
+    IssuerFrequency,
     ContributorList,
 } from "../components/DashBoard";
 import detail from "../context/staticData"
@@ -39,6 +40,7 @@ export default function DashboardApp() {
         commit_frequency,
         commiter_frequency,
         issue_frequency,
+        issuer_frequency,
         contributors,
     } = detail;
 
@@ -101,16 +103,20 @@ export default function DashboardApp() {
                     </Grid>
                 </Box>
 
-                <Box sx={{ paddingTop:3 , paddingBottom:1 }}>
-                    <Typography variant="h4">issue</Typography>
+                <Box sx={{ paddingTop:3 , paddingBottom:1}}>
+                    <Typography variant="h4">Issue</Typography>
                 </Box>
                 <Box>
                     <Grid container spacing={3}>
-                        <Grid item xs={12} sm={6} md={6}>
+                        <Grid item xs={12} sm={12} md={12}>
                             <IssueFrequency {...issue_frequency} />
+                        </Grid>
+                        <Grid item xs={12} sm={12} md={12}>
+                            <IssuerFrequency {...issuer_frequency} />
                         </Grid>
                     </Grid>
                 </Box>
+                
 
                 <Box sx={{ paddingTop:3 , paddingBottom:1 }}>
                     <Typography variant="h4">pull request</Typography>

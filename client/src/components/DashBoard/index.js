@@ -9,6 +9,7 @@ import CommitFrequency from "./CommitFrequency";
 import IssueFrequency from "./IssueFrequency";
 import ContributorList from "./ContributorList";
 import CommiterFrequency from "./CommiterFrequency";
+import IssuerFrequency from "./IssuerFrequrncy"
 
 export {
   CommitNumber,
@@ -22,4 +23,5 @@ export {
   CommiterFrequency,
   IssueFrequency,
   ContributorList,
+  IssuerFrequency,
 };
