@@ -115,6 +115,8 @@ const GetCommitInfo = async (owner, repo) => {
     console.log('commit fetch finish');
   } catch (err) {
     throw createCustomError(err, 500);
+  } finally {
+    PAGE_NUM = 0;
   }
 };
 /**

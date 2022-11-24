@@ -115,6 +115,8 @@ const GetPullInfo = async (owner, repo) => {
     console.log('pull fetch finish');
   } catch (err) {
     throw createCustomError(err, 500);
+  } finally {
+    PAGE_NUM = 0;
   }
 };
 /**

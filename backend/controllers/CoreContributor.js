@@ -177,6 +177,7 @@ const GetContributorCompanyDistribution = async coreContributor => {
     coreContributor,
     contributorCompany,
   );
+  CONTRIBUTOR_INDEX = 0;
   return contributorCompany;
 };
 

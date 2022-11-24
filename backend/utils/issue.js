@@ -80,6 +80,7 @@ const AsyncFetchIssueInfo = async (owner, repo) => {
             repos_id: repoResponse.data.id,
             user_id: issue.user ? issue.user.id : 65600975,
             user_name: issue.user ? issue.user.login : 'pytorch',
+            comment_count: issue.comments,
             repo_owner: issue.html_url.split('/')[3],
             repo_name: issue.html_url.split('/')[4],
           };
@@ -108,6 +109,8 @@ const GetIssueInfo = async (owner, repo) => {
     console.log('issue fetch finish');
   } catch (err) {
     throw createCustomError(err, 500);
+  } finally {
+    PAGE_NUM = 0;
   }
 };
 
