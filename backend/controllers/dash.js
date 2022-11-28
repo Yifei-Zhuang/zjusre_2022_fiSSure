@@ -103,6 +103,7 @@ const GetMessage = async (req, res) => {
       });
     } catch (e) {
       console.log(e);
+      throw e;
     }
 
     res.status(201).json({status: 'success!'});

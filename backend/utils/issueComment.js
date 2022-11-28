@@ -76,16 +76,22 @@ const AsyncFetchCommentInfo = async (
         }
       } else {
         try {
-          let commentsResponse = await octokit.request(
-            '/repos/{owner}/{repo}/issues/{issue_number}/comments',
-            {
-              owner: owner,
-              repo: repo,
-              issue_number: issue.number,
-              page: 1,
-              per_page: 20,
-            },
-          );
+          let commentsResponse = null;
+          try {
+            commentsResponse = await octokit.request(
+              '/repos/{owner}/{repo}/issues/{issue_number}/comments',
+              {
+                owner: owner,
+                repo: repo,
+                issue_number: issue.number,
+                page: 1,
+                per_page: 20,
+              },
+            );
+          } catch (e) {
+            console.log(e);
+            throw e;
+          }
           // 只插入最早的comment
           let index = 0;
           for (index = 0; index < commentsResponse.data.length; index++) {
