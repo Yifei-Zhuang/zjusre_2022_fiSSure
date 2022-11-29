@@ -173,7 +173,7 @@ const GetDashboard = async (req, res) => {
                 repo,
               ),
             };
-            console.log('commit_frequency compute finish', commit_frequency);
+            console.log('commit_frequency compute finish');
           } catch (e) {
             console.log('commit fetch error');
             throw e;
@@ -206,7 +206,7 @@ const GetDashboard = async (req, res) => {
               : {},
             puller_count: await PullUtil.GetPullersCountInRange(owner, repo),
           };
-          console.log('pull_frequency compute finish', pull_frequency);
+          console.log('pull_frequency compute finish');
         } catch (e) {
           console.log('pull fetch error');
           throw e;
@@ -238,7 +238,7 @@ const GetDashboard = async (req, res) => {
               : {},
             Issuer_count: await IssueUtil.GetIssuersCountInRange(owner, repo),
           };
-          console.log('issue_frequency compute finish', issue_frequency);
+          console.log('issue_frequency compute finish');
         } catch (e) {
           console.log('issue fetch error');
           throw e;
@@ -253,16 +253,23 @@ const GetDashboard = async (req, res) => {
           ),
         };
       })();
-      detail = {
-        ...detail._doc,
-        ...commit_frequency,
-        ...pull_frequency,
-        ...issue_frequency,
-        ...issue_comment_frequency,
-      };
-      res.status(201).json({detail});
+      console.log('compute finish');
+      try {
+        detail = {
+          ...detail._doc,
+          ...commit_frequency,
+          ...pull_frequency,
+          ...issue_frequency,
+          ...issue_comment_frequency,
+        };
+        res.status(201).json(detail);
+      } catch (e) {
+        console.log(e);
+        throw e;
+      }
     } catch (e) {
       console.log(e);
+      throw e;
     }
   } catch (err) {
     res.status(404).json(err);

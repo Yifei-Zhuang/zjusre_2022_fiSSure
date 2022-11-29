@@ -144,13 +144,12 @@ const GetRepoCommitFrequencyByYear = async (owner, repo) => {
     if (!owner || !repo) {
       throw 'missing body data';
     }
-
     const CommitInRange = await CommitSchema.find({
       repo_owner: owner,
       repo_name: repo,
     }).sort([['updated_at', 1]]);
+    console.log('fetch CommitInRange finish');
     const begin = CommitInRange[0].updated_at;
-
     return await YearCounter(CommitInRange, 'updated_at', begin);
   } catch (e) {
     throw createCustomError(e, 400);

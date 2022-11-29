@@ -51,8 +51,7 @@ const AsyncFetchCommentInfo = async (
   issueCommentMap,
 ) => {
   while (1) {
-    // let i = await GetIssueIndex(issues.length - 1);
-    let i = await GetIssueIndex(6000);
+    let i = await GetIssueIndex(issues.length - 1);
     if (!i) {
       return;
     }
@@ -155,7 +154,7 @@ const getFirstResponseTimeMap = async (owner, repo) => {
     fromCacheSet.add(cache.month);
   });
   FROMCACHESET = fromCacheSet;
-  console.log(FROMCACHESET);
+  // console.log(FROMCACHESET);
   let mmap = new ConcurrentMap();
   const issues = await IssueSchema.find({
     repo_owner: owner,
@@ -207,7 +206,7 @@ const getFirstResponseTimeMap = async (owner, repo) => {
     let currentMonth = new Date().toISOString().substring(0, 7) + '-01';
     for (const e in returnVal) {
       if (e == currentMonth) {
-        continue;
+        break;
       }
       await issueCommentsCacheSchema.create({
         month: e,
