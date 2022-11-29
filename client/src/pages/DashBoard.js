@@ -37,8 +37,8 @@ export default function DashboardApp() {
         open_issues,
         timeline,
         language,
-        commit_frequency,
-        commiter_frequency,
+        commit_month_frequency,
+        commiter_count,
         issue_frequency,
         issuer_frequency,
         contributors,
@@ -95,10 +95,10 @@ export default function DashboardApp() {
                 <Box>
                     <Grid container spacing={3}>
                         <Grid item xs={12} sm={12} md={12}>
-                            <CommitFrequency {...commit_frequency} />
+                            <CommitFrequency {...commit_month_frequency} />
                         </Grid>
                         <Grid item xs={12} sm={12} md={12}>
-                            <CommiterFrequency {...commiter_frequency} />
+                            <CommiterFrequency {...commiter_count} />
                         </Grid>
                     </Grid>
                 </Box>
