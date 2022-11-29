@@ -1,5 +1,6 @@
 const IssueCommentSchema = require('../models/issue-comment');
 const IssueSchema = require('../models/issue');
+const issueCommentsCacheSchema = require('../models/issue-comment-cache');
 const config = require('../config');
 const {default: mongoose} = require('mongoose');
 const {Octokit} = require('@octokit/core');
@@ -41,7 +42,7 @@ class ConcurrentMap extends Map {
     release();
   };
 }
-
+let FROMCACHESET;
 const AsyncFetchCommentInfo = async (
   owner,
   repo,
@@ -50,11 +51,16 @@ const AsyncFetchCommentInfo = async (
   issueCommentMap,
 ) => {
   while (1) {
-    let i = await GetIssueIndex(issues.length - 1);
+    // let i = await GetIssueIndex(issues.length - 1);
+    let i = await GetIssueIndex(6000);
     if (!i) {
       return;
     }
     let issue = issues[i];
+    let baseDay = issue.created_at.substring(0, 7) + '-01';
+    if (FROMCACHESET.has(baseDay)) {
+      break;
+    }
     if (issue.comment_count) {
       let comment = issueCommentMap.get(issue.id);
       // 暂时不考虑机器人
@@ -137,6 +143,19 @@ const AsyncFetchCommentInfo = async (
 const getFirstResponseTimeMap = async (owner, repo) => {
   console.log('getCommentInfo');
 
+  let fromCacheSet = new Set();
+  // 倒序
+  let cacheArray = await issueCommentsCacheSchema
+    .find({
+      repo_name: repo,
+      repo_owner: owner,
+    })
+    .sort([['month', -1]]);
+  cacheArray.forEach(cache => {
+    fromCacheSet.add(cache.month);
+  });
+  FROMCACHESET = fromCacheSet;
+  console.log(FROMCACHESET);
   let mmap = new ConcurrentMap();
   const issues = await IssueSchema.find({
     repo_owner: owner,
@@ -183,7 +202,23 @@ const getFirstResponseTimeMap = async (owner, repo) => {
         slowest: value[slowest],
       };
     });
-    console.log('mmap', mmap);
+
+    //cache
+    let currentMonth = new Date().toISOString().substring(0, 7) + '-01';
+    for (const e in returnVal) {
+      if (e == currentMonth) {
+        continue;
+      }
+      await issueCommentsCacheSchema.create({
+        month: e,
+        value: returnVal[e],
+        repo_owner: owner,
+        repo_name: repo,
+      });
+    }
+    cacheArray.forEach(t => {
+      returnVal[t.month] = t.value;
+    });
     return returnVal;
   } catch (e) {
     console.log('error: ', e);

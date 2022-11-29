@@ -1,7 +1,14 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
-const connectDB = (url) => {
-    return mongoose.connect(url)
-}
+// const connectDB = url => {
+//   return mongoose.connect(url, {
+//     authSource: 'admin',
+//     user: 'admin',
+//     pass: 'ZJUSRE',
+//   });
+// };
 
-module.exports = connectDB
+const connectDB = url => {
+  return mongoose.connect(url, {});
+};
+module.exports = connectDB;
