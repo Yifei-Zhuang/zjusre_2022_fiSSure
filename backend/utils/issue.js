@@ -32,9 +32,9 @@ const AsyncFetchIssueInfo = async (owner, repo) => {
   while (1) {
     const page_num = await GetPageNum();
     const per_page = 100;
-    const issueMessage = await octokit.request(
-      'GET /repos/{owner}/{repo}/issues',
-      {
+    let issueMessage = null;
+    try {
+      issueMessage = await octokit.request('GET /repos/{owner}/{repo}/issues', {
         owner: owner,
         repo: repo,
         state: 'all',
@@ -43,12 +43,13 @@ const AsyncFetchIssueInfo = async (owner, repo) => {
         since: new Date(
           new Date().getTime() - 365 * 24 * 60 * 60 * 1000,
         ).toString(),
-      },
-    );
-
+      });
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
     // if (page_num > 600 || issueMessage.data.length == 0) {
     if (issueMessage.data.length == 0) {
-      // 最多60000条
       console.log(`fetch issue msg finish! total ${page_num} pages`);
       break;
     }

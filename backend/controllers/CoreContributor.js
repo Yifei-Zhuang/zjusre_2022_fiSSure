@@ -5,7 +5,7 @@ const {default: mongoose} = require('mongoose');
 const {RepoCommitTimeFilter} = require('./commit');
 const {AsyncFunctionWrapper} = require('../utils');
 const {Mutex} = require('async-mutex');
-
+const {OctokitRequest} = require('../utils/index');
 const octokit = new Octokit({
   auth: process.env.GITHUB_ACCESS_TOKEN || config.GITHUB_ACCESS_TOKEN,
 });

@@ -32,15 +32,21 @@ const AsyncFetchCommitInfo = async (owner, repo) => {
   while (1) {
     const page_num = await GetPageNum();
 
-    const commitMessage = await octokit.request(
-      'GET /repos/{owner}/{repo}/commits',
-      {
-        owner: owner,
-        repo: repo,
-        page: page_num,
-        per_page: per_page,
-      },
-    );
+    let commitMessage = null;
+    try {
+      commitMessage = await octokit.request(
+        'GET /repos/{owner}/{repo}/commits',
+        {
+          owner: owner,
+          repo: repo,
+          page: page_num,
+          per_page: per_page,
+        },
+      );
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
     // if (page_num > 250 || commitMessage.data.length == 0) {
     if (commitMessage.data.length == 0) {
       // 最多10000条
@@ -138,13 +144,12 @@ const GetRepoCommitFrequencyByYear = async (owner, repo) => {
     if (!owner || !repo) {
       throw 'missing body data';
     }
-
     const CommitInRange = await CommitSchema.find({
       repo_owner: owner,
       repo_name: repo,
     }).sort([['updated_at', 1]]);
+    console.log('fetch CommitInRange finish');
     const begin = CommitInRange[0].updated_at;
-
     return await YearCounter(CommitInRange, 'updated_at', begin);
   } catch (e) {
     throw createCustomError(e, 400);

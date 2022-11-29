@@ -32,9 +32,9 @@ const GetMessage = async (req, res) => {
       });
 
     //      获取仓库的commit，issue，pull信息
-    await CommitUtil.GetCommitInfo(owner, repo);
+    // await CommitUtil.GetCommitInfo(owner, repo);
 
-    await IssueUtil.GetIssueInfo(owner, repo);
+    // await IssueUtil.GetIssueInfo(owner, repo);
     try {
       await PullUtil.GetPullInfo(owner, repo);
     } catch (e) {
@@ -103,6 +103,7 @@ const GetMessage = async (req, res) => {
       });
     } catch (e) {
       console.log(e);
+      throw e;
     }
 
     res.status(201).json({status: 'success!'});
@@ -172,99 +173,103 @@ const GetDashboard = async (req, res) => {
                 repo,
               ),
             };
-            // console.log('commit_frequency compute finish', commit_frequency);
+            console.log('commit_frequency compute finish');
           } catch (e) {
             console.log('commit fetch error');
             throw e;
           }
         })(),
-        (async () => {
-          try {
-            pull_frequency = {
-              pull_year_create_frequency:
-                await PullUtil.GetRepoPullCreateFrequencyByYear(owner, repo),
-              pull_year_close_frequency:
-                await PullUtil.GetRepoPullCloseFrequencyByYear(owner, repo),
-              pull_year_update_frequency:
-                await PullUtil.GetRepoPullUpdateFrequencyByYear(owner, repo),
-              pull_month_create_frequency:
-                await PullUtil.GetRepoPullCreateFrequencyByMonth(owner, repo),
-              pull_month_close_frequency:
-                await PullUtil.GetRepoPullCloseFrequencyByMonth(owner, repo),
-              pull_month_update_frequency:
-                await PullUtil.GetRepoPullUpdateFrequencyByMonth(owner, repo),
-              pull_day_create_frequency: getDayS
-                ? await PullUtil.GetRepoPullCreateFrequencyByDay(owner, repo)
-                : {},
-              pull_day_close_frequency: getDayS
-                ? await PullUtil.GetRepoPullCloseFrequencyByDay(owner, repo)
-                : {},
-              pull_day_update_frequency: getDayS
-                ? await PullUtil.GetRepoPullUpdateFrequencyByDay(owner, repo)
-                : {},
-              puller_count: await PullUtil.GetPullersCountInRange(owner, repo),
-            };
-            // console.log('pull_frequency compute finish', pull_frequency);
-          } catch (e) {
-            console.log('pull fetch error');
-            throw e;
-          }
-        })(),
-        (async () => {
-          try {
-            issue_frequency = {
-              issue_year_create_frequency:
-                await IssueUtil.GetRepoIssueCreateFrequencyByYear(owner, repo),
-              Issue_year_update_frequency:
-                await IssueUtil.GetRepoIssueUpdateFrequencyByYear(owner, repo),
-              Issue_year_close_frequency:
-                await IssueUtil.GetRepoIssueCloseFrequencyByYear(owner, repo),
-              Issue_month_create_frequency:
-                await IssueUtil.GetRepoIssueCreateFrequencyByMonth(owner, repo),
-              Issue_month_update_frequency:
-                await IssueUtil.GetRepoIssueUpdateFrequencyByMonth(owner, repo),
-              Issue_month_close_frequency:
-                await IssueUtil.GetRepoIssueCloseFrequencyByMonth(owner, repo),
-              Issue_day_create_frequency: getDayS
-                ? await IssueUtil.GetRepoIssueCreateFrequencyByDay(owner, repo)
-                : {},
-              Issue_day_update_frequency: getDayS
-                ? await IssueUtil.GetRepoIssueUpdateFrequencyByDay(owner, repo)
-                : {},
-              Issue_day_close_frequency: getDayS
-                ? await IssueUtil.GetRepoIssueCloseFrequencyByDay(owner, repo)
-                : {},
-              Issuer_count: await IssueUtil.GetIssuersCountInRange(owner, repo),
-            };
-            // console.log('issue_frequency compute finish', issue_frequency);
-          } catch (e) {
-            console.log('issue fetch error');
-            throw e;
-          }
-        })(),
-        (async () => {
-          issue_comment_frequency = {
-            monthly_count: await IssueCommentUtil.getIssueCloseTime(
-              owner,
-              repo,
-            ),
-            response_time: await IssueCommentUtil.getFirstResponseTimeMap(
-              owner,
-              repo,
-            ),
-          };
-        })(),
       ]);
-      detail = {
-        ...detail._doc,
-        ...commit_frequency,
-        ...pull_frequency,
-        ...issue_frequency,
-        ...issue_comment_frequency,
-      };
-      res.status(201).json({detail});
+      await (async () => {
+        try {
+          pull_frequency = {
+            pull_year_create_frequency:
+              await PullUtil.GetRepoPullCreateFrequencyByYear(owner, repo),
+            pull_year_close_frequency:
+              await PullUtil.GetRepoPullCloseFrequencyByYear(owner, repo),
+            pull_year_update_frequency:
+              await PullUtil.GetRepoPullUpdateFrequencyByYear(owner, repo),
+            pull_month_create_frequency:
+              await PullUtil.GetRepoPullCreateFrequencyByMonth(owner, repo),
+            pull_month_close_frequency:
+              await PullUtil.GetRepoPullCloseFrequencyByMonth(owner, repo),
+            pull_month_update_frequency:
+              await PullUtil.GetRepoPullUpdateFrequencyByMonth(owner, repo),
+            pull_day_create_frequency: getDayS
+              ? await PullUtil.GetRepoPullCreateFrequencyByDay(owner, repo)
+              : {},
+            pull_day_close_frequency: getDayS
+              ? await PullUtil.GetRepoPullCloseFrequencyByDay(owner, repo)
+              : {},
+            pull_day_update_frequency: getDayS
+              ? await PullUtil.GetRepoPullUpdateFrequencyByDay(owner, repo)
+              : {},
+            puller_count: await PullUtil.GetPullersCountInRange(owner, repo),
+          };
+          console.log('pull_frequency compute finish');
+        } catch (e) {
+          console.log('pull fetch error');
+          throw e;
+        }
+      })();
+      await (async () => {
+        try {
+          issue_frequency = {
+            issue_year_create_frequency:
+              await IssueUtil.GetRepoIssueCreateFrequencyByYear(owner, repo),
+            Issue_year_update_frequency:
+              await IssueUtil.GetRepoIssueUpdateFrequencyByYear(owner, repo),
+            Issue_year_close_frequency:
+              await IssueUtil.GetRepoIssueCloseFrequencyByYear(owner, repo),
+            Issue_month_create_frequency:
+              await IssueUtil.GetRepoIssueCreateFrequencyByMonth(owner, repo),
+            Issue_month_update_frequency:
+              await IssueUtil.GetRepoIssueUpdateFrequencyByMonth(owner, repo),
+            Issue_month_close_frequency:
+              await IssueUtil.GetRepoIssueCloseFrequencyByMonth(owner, repo),
+            Issue_day_create_frequency: getDayS
+              ? await IssueUtil.GetRepoIssueCreateFrequencyByDay(owner, repo)
+              : {},
+            Issue_day_update_frequency: getDayS
+              ? await IssueUtil.GetRepoIssueUpdateFrequencyByDay(owner, repo)
+              : {},
+            Issue_day_close_frequency: getDayS
+              ? await IssueUtil.GetRepoIssueCloseFrequencyByDay(owner, repo)
+              : {},
+            Issuer_count: await IssueUtil.GetIssuersCountInRange(owner, repo),
+          };
+          console.log('issue_frequency compute finish');
+        } catch (e) {
+          console.log('issue fetch error');
+          throw e;
+        }
+      })();
+      await (async () => {
+        issue_comment_frequency = {
+          monthly_count: await IssueCommentUtil.getIssueCloseTime(owner, repo),
+          response_time: await IssueCommentUtil.getFirstResponseTimeMap(
+            owner,
+            repo,
+          ),
+        };
+      })();
+      console.log('compute finish');
+      try {
+        detail = {
+          ...detail._doc,
+          ...commit_frequency,
+          ...pull_frequency,
+          ...issue_frequency,
+          ...issue_comment_frequency,
+        };
+        res.status(201).json(detail);
+      } catch (e) {
+        console.log(e);
+        throw e;
+      }
     } catch (e) {
       console.log(e);
+      throw e;
     }
   } catch (err) {
     res.status(404).json(err);

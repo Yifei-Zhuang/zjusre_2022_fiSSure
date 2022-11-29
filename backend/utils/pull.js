@@ -34,9 +34,9 @@ const AsyncFetchPullInfo = async (owner, repo) => {
 
   while (1) {
     const page_num = await GetPageNum();
-    const pullMessage = await octokit.request(
-      'GET /repos/{owner}/{repo}/pulls',
-      {
+    let pullMessage = null;
+    try {
+      pullMessage = await octokit.request('GET /repos/{owner}/{repo}/pulls', {
         owner: owner,
         repo: repo,
         state: 'all',
@@ -45,8 +45,11 @@ const AsyncFetchPullInfo = async (owner, repo) => {
         since: new Date(
           new Date().getTime() - 365 * 24 * 60 * 60 * 1000,
         ).toString(),
-      },
-    );
+      });
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
     if (pullMessage.data.length == 0 || page_num >= 300) {
       console.log(`fetch pull msg finish! total ${page_num} pages`);
       break;
