@@ -42,6 +42,7 @@ export default function DashboardApp() {
         issue_frequency,
         issuer_frequency,
         contributors,
+        contributes,
     } = detail;
 
     if (isLoading) {
@@ -133,11 +134,11 @@ export default function DashboardApp() {
                 <Box>
                     <Grid container spacing={3}>
                         <Grid item xs={12} sm={6} md={12}>
-                            <Contribute {...contribute} />
+                            <Contribute {...contributes} />
                         </Grid>
                         {contributors && (
                             <Grid item xs={12} sm={6} md={12}>
-                                <ContributorList {...contributors} />
+                                <ContributorList {...contributes} />
                             </Grid>
                         )}
                     </Grid>
