@@ -48,18 +48,21 @@ export default function DashboardApp() {
     if (isLoading) {
         return <Loading center />;
     } else {
-        const contribute = {
-            name: [],
-            contributions: [],
-        };
+        // const contribute = {
+        //     name: [],
+        //     contributions: [],
+        // };
 
-        if (contributors) {
-            for (var i = 0; i < Math.min(5, contributors.length); ++i) {
-                contribute.name.push(contributors[i].name);
-                contribute.contributions.push(contributors[i].contributions);
-            }
+        // if (contributors) {
+        //     for (var i = 0; i < Math.min(5, contributors.length); ++i) {
+        //         contribute.name.push(contributors[i].name);
+        //         contribute.contributions.push(contributors[i].contributions);
+        //     }
+        // }
+        const contributeDetail = {
+            contributes: contributes,
+            contributeYear: 2019,
         }
-
         return (
             <Container maxWidth="xl">
                 <Box sx={{ pb: 5 }}>
@@ -133,14 +136,12 @@ export default function DashboardApp() {
                 </Box>
                 <Box>
                     <Grid container spacing={3}>
-                        <Grid item xs={12} sm={6} md={12}>
+                        {/* <Grid item xs={12} sm={6} md={12}>
                             <Contribute {...contributes} />
+                        </Grid> */}
+                        <Grid item xs={12} sm={6} md={12}>
+                            <ContributorList {...contributeDetail} />
                         </Grid>
-                        {contributors && (
-                            <Grid item xs={12} sm={6} md={12}>
-                                <ContributorList {...contributes} />
-                            </Grid>
-                        )}
                     </Grid>
                 </Box>
 

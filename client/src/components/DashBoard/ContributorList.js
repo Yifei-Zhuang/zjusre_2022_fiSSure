@@ -22,7 +22,7 @@ function Contributor({ contributor }) {
     );
 }
 
-const ContributorList = (contributes, contributeYear) => {
+const ContributorList = ({contributes, contributeYear}) => {
     const contributesList = contributes["coreContributorByYear"];
     const Year = 2019;
     let coreContributorList;
