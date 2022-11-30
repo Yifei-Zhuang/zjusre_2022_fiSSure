@@ -9,7 +9,7 @@ const {OctokitRequest} = require('../utils/index');
 const octokit = new Octokit({
   auth: process.env.GITHUB_ACCESS_TOKEN || config.GITHUB_ACCESS_TOKEN,
 });
-
+const GithubUserSchema = require('../models/github-user');
 /**
  * @brief 获取指定仓库的 2019-2022 每年的核心贡献者
  * @param {*} owner
@@ -127,7 +127,11 @@ class ConcurrentMap extends Map {
   };
 }
 
-const AsyncFetchUserInfo = async (coreContributor, contributorCompanyMap) => {
+const AsyncFetchUserInfo = async (
+  coreContributor,
+  contributorCompanyMap,
+  map,
+) => {
   let maxIndex = coreContributor.length - 1;
   while (1) {
     let index = await GetContributorIndex(maxIndex);
@@ -136,15 +140,23 @@ const AsyncFetchUserInfo = async (coreContributor, contributorCompanyMap) => {
     }
     let company = null;
     try {
-      const userInfo = await octokit.request('GET /users/{username}', {
-        username: coreContributor[index].contributor,
-      });
-      console.log(userInfo);
-      company = userInfo.data.company;
+      company = map.get(coreContributor[index].contributor);
+      if (company === undefined) {
+        const userInfo = await octokit.request('GET /users/{username}', {
+          username: coreContributor[index].contributor,
+        });
+        console.log(userInfo);
+        company = userInfo.data.company;
+        // 存储
+        await GithubUserSchema.create({
+          login: coreContributor[index].contributor,
+          company: company,
+        });
+      }
     } catch (e) {
       // console.log(e);
     } finally {
-      if (company == null || company == '') {
+      if (company == null || company === undefined || company == '') {
         company = 'other';
       }
       console.log(company);
@@ -164,10 +176,16 @@ const AsyncFetchUserInfo = async (coreContributor, contributorCompanyMap) => {
 // 同步的公司分析，速度比较缓慢，考虑使用异步
 const GetContributorCompanyDistribution = async coreContributor => {
   let contributorCompany = new ConcurrentMap();
+  let githubUsers = await GithubUserSchema.find();
+  let map = new Map();
+  githubUsers.forEach(user => {
+    map.set(user.login, user.company);
+  });
   await AsyncFunctionWrapper(
     AsyncFetchUserInfo,
     coreContributor,
     contributorCompany,
+    map,
   );
   CONTRIBUTOR_INDEX = 0;
   return contributorCompany;
