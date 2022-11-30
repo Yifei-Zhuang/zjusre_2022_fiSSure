@@ -1,12 +1,12 @@
-import { Icon } from "@iconify/react";
-import moment from "moment";
+import { useState } from "react";
+import { ToggleButtonGroup, ToggleButton, autocompleteClasses } from "@mui/material";
 import { Box, Stack, Card, Typography, CardHeader, Chip } from "@mui/material";
 
 function Contributor({ contributor }) {
 
     return (
         <Stack direction="row" alignItems="center" spacing={2}>
-            <Box sx={{ minWidth: 120 }}>
+            <Box sx={{ width: 140 }}>
                 <a>{contributor["contributor"]}</a>
                 {/* <Typography variant="body2" sx={{ color: "text.secondary" }} noWrap>
           {description}
@@ -14,7 +14,7 @@ function Contributor({ contributor }) {
             </Box>
             <Typography
                 variant="caption"
-                sx={{ pr: 3, flexShrink: 0, color: "text.secondary" }}
+                sx={{ pl: 4, flexShrink: 0, color: "text.secondary" }}
             >
                 commits: {contributor["commit"]}
             </Typography>
@@ -22,19 +22,38 @@ function Contributor({ contributor }) {
     );
 }
 
-const ContributorList = ({contributes, contributeYear}) => {
+const ContributorList = ({ contributes }) => {
     const contributesList = contributes["coreContributorByYear"];
-    const Year = 2019;
+    const [coreContributeYear,setYear] = useState(contributes.coreContributorByYear[0].year);
+    const yearList = [];
+    for(var i in contributes.coreContributorByYear){
+        yearList.push(contributes.coreContributorByYear[i].year)
+    }
     let coreContributorList;
-    for (var contributeIndex in contributesList){
-        if(contributesList[contributeIndex]["year"] == Year){
-            coreContributorList = contributesList[contributeIndex]["coreContributor"]
+    for (var contributeIndex in contributesList) {
+        if (contributesList[contributeIndex]["year"] == coreContributeYear) {
+            coreContributorList = contributesList[contributeIndex]["coreContributor"];
             break;
         }
     }
 
     return (
         <Card>
+            <ToggleButtonGroup
+                sx={{width:"100%"}}
+                color="primary"
+                value={coreContributeYear}
+                exclusive
+                onChange={(event, value) => { setYear(value); }}
+            >
+                {
+                    yearList.map((year) => {
+                        return (
+                            <ToggleButton sx={{width:"25.25%"}} key={year} value={year}>{year}</ToggleButton>
+                        )
+                    })
+                }
+            </ToggleButtonGroup>
             <CardHeader title="Contributors List" />
             <Stack spacing={3} sx={{ p: 3, pr: 0 }}>
                 {coreContributorList.map((coreContributor) => {
