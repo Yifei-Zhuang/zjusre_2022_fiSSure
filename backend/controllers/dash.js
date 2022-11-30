@@ -263,7 +263,7 @@ const GetDashboard = async (req, res) => {
           ...pull_frequency,
           ...issue_frequency,
           ...issue_comment_frequency,
-          ...coreContributorByYear,
+          coreContributorByYear,
         };
         res.status(201).json(detail);
       } catch (e) {
