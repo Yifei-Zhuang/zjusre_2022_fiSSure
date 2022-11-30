@@ -318,9 +318,9 @@ const RepoCommitTimeFilter = async (
       Date.parse(FullBeginTime) <= Date.parse(commit.updated_at)
     );
   });
-  if (AllCommitsOfRepo.length == 0) {
-    return {2022: '0', 2021: '0', 2020: '0', 2019: '0'};
-  }
+  // if (AllCommitsOfRepo.length == 0) {
+  //   return {2022: '0', 2021: '0', 2020: '0', 2019: '0'};
+  // }
   return AllCommitsOfRepo;
 };
 module.exports = {

@@ -13,6 +13,7 @@ const IssueUtil = require('../utils/issue');
 const PullUtil = require('../utils/pull');
 const IssueCommentUtil = require('../utils/issueComment');
 const pull = require('../models/pull');
+const { GetCoreContributorByYear1 } = require('../utils/CoreContributor');
 const octokit = new Octokit({
   auth: process.env.GITHUB_ACCESS_TOKEN || config.GITHUB_ACCESS_TOKEN,
 });
@@ -254,6 +255,7 @@ const GetDashboard = async (req, res) => {
         };
       })();
       console.log('compute finish');
+      let coreContributorByYear = await GetCoreContributorByYear1(owner, repo);
       try {
         detail = {
           ...detail._doc,
@@ -261,6 +263,7 @@ const GetDashboard = async (req, res) => {
           ...pull_frequency,
           ...issue_frequency,
           ...issue_comment_frequency,
+          ...coreContributorByYear,
         };
         res.status(201).json(detail);
       } catch (e) {
