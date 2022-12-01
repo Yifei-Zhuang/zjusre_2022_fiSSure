@@ -5,16 +5,15 @@ import { Box, Stack, Card, Typography, CardHeader, Chip } from "@mui/material";
 function Contributor({ contributor }) {
 
     return (
-        <Stack direction="row" alignItems="center" spacing={2}>
-            <Box sx={{ width: 140 }}>
+        <Stack direction="row" alignItems="center"  spacing={2}>
+            <Box sx={{ width: "50%" }}>
                 <a>{contributor["contributor"]}</a>
                 {/* <Typography variant="body2" sx={{ color: "text.secondary" }} noWrap>
           {description}
         </Typography> */}
             </Box>
             <Typography
-                variant="caption"
-                sx={{ pl: 4, flexShrink: 0, color: "text.secondary" }}
+                sx={{ mr: 1, flexShrink: 0, color: "text.secondary" }}
             >
                 commits: {contributor["commit"]}
             </Typography>
