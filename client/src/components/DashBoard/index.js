@@ -4,9 +4,10 @@ import StarNumber from "./StarNumber";
 import ForkNumber from "./ForkNumber";
 import TimeLine from "./TimeLine";
 import Language from "./Language";
-import Contribute from "./Contribution";
+import Contribute from "./CoreContribution";
 import CommitFrequency from "./CommitFrequency";
 import IssueFrequency from "./IssueFrequency";
+import CoreContribute from "./CoreContribution";
 import ContributorList from "./ContributorList";
 import CommiterFrequency from "./CommiterFrequency";
 import IssuerFrequency from "./IssuerFrequrncy"
@@ -22,6 +23,7 @@ export {
   CommitFrequency,
   CommiterFrequency,
   IssueFrequency,
+  CoreContribute,
   ContributorList,
   IssuerFrequency,
 };

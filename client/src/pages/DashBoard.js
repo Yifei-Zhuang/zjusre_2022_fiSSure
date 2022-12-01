@@ -1,8 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAppContext } from "../context/appContext";
 import Loading from "../components/Loading";
 import { useParams } from "react-router-dom";
-import { Box, Grid, Container, Typography } from "@mui/material";
+import { Box, Grid, Container, Typography} from "@mui/material";
 import {
     CommitNumber,
     IssueNumber,
@@ -10,7 +10,7 @@ import {
     ForkNumber,
     TimeLine,
     Language,
-    Contribute,
+    CoreContribute,
     CommitFrequency,
     CommiterFrequency,
     IssueFrequency,
@@ -23,6 +23,8 @@ export default function DashboardApp() {
     useEffect(() => {
         getDashBoard(id);
     }, []);
+    
+
     const { id } = useParams();
 
     // 使用请求的detail数据
@@ -41,9 +43,10 @@ export default function DashboardApp() {
         commiter_count,
         issue_frequency,
         issuer_frequency,
-        contributors,
         contributes,
     } = detail;
+
+    const [nowYear, setYear] = useState(contributes.coreContributorByYear[0].year)
 
     if (isLoading) {
         return <Loading center />;
@@ -59,9 +62,22 @@ export default function DashboardApp() {
         //         contribute.contributions.push(contributors[i].contributions);
         //     }
         // }
+        const coreContributeData = {};
+        const yearList = [];
+        if (contributes) {
+            const coreContributeByYear = contributes["coreContributorByYear"];
+            for (var i = 0; i < coreContributeByYear.length; i++) {
+                var year = coreContributeByYear[i].year;
+                var count = 0;
+                yearList.push(year);
+                coreContributeByYear[i].coreContributor.map((tmp) => { count += tmp.commit; })
+                coreContributeData[year] = count;
+            }
+        }
+
         const contributeDetail = {
             contributes: contributes,
-            contributeYear: 2019,
+            contributeYear: nowYear,
         }
         return (
             <Container maxWidth="xl">
@@ -93,7 +109,7 @@ export default function DashboardApp() {
                 </Box>
 
 
-                <Box sx={{ paddingTop:3 , paddingBottom:1}}>
+                <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
                     <Typography variant="h4">Commit</Typography>
                 </Box>
                 <Box>
@@ -107,7 +123,7 @@ export default function DashboardApp() {
                     </Grid>
                 </Box>
 
-                <Box sx={{ paddingTop:3 , paddingBottom:1}}>
+                <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
                     <Typography variant="h4">Issue</Typography>
                 </Box>
                 <Box>
@@ -120,9 +136,9 @@ export default function DashboardApp() {
                         </Grid>
                     </Grid>
                 </Box>
-                
 
-                <Box sx={{ paddingTop:3 , paddingBottom:1 }}>
+
+                <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
                     <Typography variant="h4">pull request</Typography>
                 </Box>
                 <Box>
@@ -131,21 +147,21 @@ export default function DashboardApp() {
                     </Grid>
                 </Box>
 
-                <Box sx={{ paddingTop:3 , paddingBottom:1 }}>
+                <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
                     <Typography variant="h4">contribute</Typography>
                 </Box>
-                <Box>
+                <Box >
                     <Grid container spacing={3}>
-                        {/* <Grid item xs={12} sm={6} md={12}>
-                            <Contribute {...contributes} />
-                        </Grid> */}
-                        <Grid item xs={12} sm={6} md={12}>
-                            <ContributorList {...contributeDetail} />
+                        <Grid item xs={9}>
+                            <CoreContribute {...coreContributeData} />
+                        </Grid>
+                        <Grid sx={{maxHeight:"100%"}} item xs={3} >
+                            <ContributorList sx={{height:1}} {...contributeDetail} />
                         </Grid>
                     </Grid>
                 </Box>
 
-                <Box sx={{ paddingTop:3 , paddingBottom:1 }}>
+                <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
                     <Typography variant="h4">Design</Typography>
                 </Box>
                 <Box>
