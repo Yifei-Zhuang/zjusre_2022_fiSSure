@@ -24,14 +24,21 @@ function Contributor({ contributor }) {
 
 const ContributorList = ({ contributes }) => {
     const contributesList = contributes["coreContributorByYear"];
-    const [coreContributeYear,setYear] = useState(contributes.coreContributorByYear[0].year);
+    const [coreContributeYear, setYear] = useState(contributes.coreContributorByYear[0].year);
+    const [standByYear, setStandByYear] = useState(0);
     const yearList = [];
-    for(var i in contributes.coreContributorByYear){
+    for (var i in contributes.coreContributorByYear) {
         yearList.push(contributes.coreContributorByYear[i].year)
     }
     let coreContributorList;
+    if (coreContributeYear !== null && standByYear !== null && coreContributeYear !== standByYear) {
+        setStandByYear(coreContributeYear);
+    }
+    else if(coreContributeYear === null && standByYear !== null && standByYear !== 0) {
+        setYear(standByYear);
+    }
     for (var contributeIndex in contributesList) {
-        if (contributesList[contributeIndex]["year"] == coreContributeYear) {
+        if (contributesList[contributeIndex]["year"] == (coreContributeYear === null? standByYear: coreContributeYear)) {
             coreContributorList = contributesList[contributeIndex]["coreContributor"];
             break;
         }
@@ -40,7 +47,7 @@ const ContributorList = ({ contributes }) => {
     return (
         <Card>
             <ToggleButtonGroup
-                sx={{width:"100%"}}
+                sx={{ width: "100%" }}
                 color="primary"
                 value={coreContributeYear}
                 exclusive
@@ -49,7 +56,7 @@ const ContributorList = ({ contributes }) => {
                 {
                     yearList.map((year) => {
                         return (
-                            <ToggleButton sx={{width:"25.25%"}} key={year} value={year}>{year}</ToggleButton>
+                            <ToggleButton sx={{ width: "25.25%" }} key={year} value={year}>{year}</ToggleButton>
                         )
                     })
                 }
