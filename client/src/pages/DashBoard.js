@@ -15,6 +15,8 @@ import {
     CommiterFrequency,
     IssueFrequency,
     IssuerFrequency,
+    IssueResponse,
+    IssueClose,
     ContributorList,
 } from "../components/DashBoard";
 import detail from "../context/staticData"
@@ -43,7 +45,9 @@ export default function DashboardApp() {
         commiter_count,
         issue_frequency,
         issuer_frequency,
+        response_time,
         contributes,
+        monthly_count
     } = detail;
 
     const [nowYear, setYear] = useState(contributes.coreContributorByYear[0].year)
@@ -160,6 +164,23 @@ export default function DashboardApp() {
                         </Grid>
                     </Grid>
                 </Box>
+                <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
+                    <Typography variant="h4">Issue closed and Issue response</Typography>
+                </Box>
+                <Box>
+                    <Grid container spacing={3}>
+                        <Grid item xs={12} sm={12} md={12}>
+                            <IssueResponse {...response_time}/>
+                        </Grid>
+                    </Grid>
+                    <Grid container spacing={3}>
+                        <Grid item xs={12} sm={12} md={12}>
+                            <IssueClose {...monthly_count}/>
+                        </Grid>
+                    </Grid>
+                </Box>
+
+            
 
                 <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
                     <Typography variant="h4">Design</Typography>
