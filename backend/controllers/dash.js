@@ -175,7 +175,6 @@ const GetDashboard = async (req, res) => {
                 repo,
               ),
             };
-            console.log(commit_frequency);
           } catch (e) {
             console.log('commit fetch error');
             throw e;
@@ -372,6 +371,9 @@ const RepoGetIssueFrequency = async (owner, name) => {
         .limit(50)),
     ],
   };
+  if (!repoMessage.data || repoMessage.data.length == 0) {
+    return 0;
+  }
   const x1 = repoMessage.data[0].created_at;
   const x2 = repoMessage.data[repoMessage.data.length - 1].created_at;
   const t1 = TransDate(x1);
