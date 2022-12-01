@@ -162,6 +162,9 @@ const GetRepoCommitFrequencyByYear = async (owner, repo) => {
         map.set(key, CommitYearCache.commit_year_frequency[key]);
       }
     }
+    if (CommitInRange.length == 0) {
+      return {};
+    }
     const begin = CommitInRange[0].updated_at;
     // result不会有cache中已有的结果
     let result = await YearCounter(
@@ -183,9 +186,14 @@ const GetRepoCommitFrequencyByYear = async (owner, repo) => {
       temp[key] = result[key];
     }
     if (CommitYearCache) {
+      if (!CommitYearCache.commit_year_frequency) {
+        CommitYearCache.commit_year_frequency = {};
+      }
+      console.log(1);
       // 更新计算结果
       Object.assign(CommitYearCache.commit_year_frequency, temp);
       CommitYearCache.save();
+      console.log(2);
     } else {
       CommitYearSchema.create({
         commit_year_frequency: temp,
@@ -193,7 +201,7 @@ const GetRepoCommitFrequencyByYear = async (owner, repo) => {
         repo_name: repo,
       });
     }
-    return {...result, ...CommitYearCache.commit_year_frequency};
+    return {...result, ...CommitYearCache?.commit_year_frequency};
   } catch (e) {
     throw createCustomError(e, 400);
   }
@@ -221,6 +229,9 @@ const GetRepoCommitFrequencyByMonth = async (owner, repo) => {
       repo_owner: owner,
       repo_name: repo,
     }).sort([['updated_at', 1]]);
+    if (CommitInRange.length == 0) {
+      return {};
+    }
     const begin = CommitInRange[0].updated_at;
 
     let map = new Map();
@@ -264,7 +275,7 @@ const GetRepoCommitFrequencyByMonth = async (owner, repo) => {
         repo_name: repo,
       });
     }
-    return {...result, ...CommitMonthCache.commit_month_frequency};
+    return {...result, ...CommitMonthCache?.commit_month_frequency};
   } catch (e) {
     throw createCustomError(e, 500);
   }
@@ -291,6 +302,9 @@ const GetRepoCommitFrequencyByDay = async (owner, repo) => {
       repo_owner: owner,
       repo_name: repo,
     }).sort([['updated_at', 1]]);
+    if (CommitInRange.length == 0) {
+      return {};
+    }
     const begin = CommitInRange[0].updated_at;
     return await DayCounter(CommitInRange, 'updated_at', begin);
   } catch (e) {
@@ -319,6 +333,9 @@ const GetCommitersCountInRange = async (owner, repo) => {
       repo_owner: owner,
       repo_name: repo,
     }).sort([['updated_at', 1]]);
+    if (CommitInRange.length == 0) {
+      return {};
+    }
     const begin = CommitInRange[0].updated_at;
     const BaseYear = begin ? begin.split('-')[0] : '2008';
     const BaseMonth = begin ? begin.split('-')[1] : '3';

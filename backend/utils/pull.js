@@ -162,6 +162,9 @@ const GetRepoPullUpdateFrequencyByYear = async (owner, repo) => {
       repo_owner: owner,
       repo_name: repo,
     }).sort([['updated_at', 1]]);
+    if (PullInRange.length == 0) {
+      return {};
+    }
     const begin = PullInRange[0].created_at;
     return await YearCounter(PullInRange, 'updated_at', begin);
   } catch (e) {
@@ -191,6 +194,9 @@ const GetRepoPullCloseFrequencyByYear = async (owner, repo) => {
       repo_owner: owner,
       repo_name: repo,
     }).sort([['closed_at', 1]]);
+    if (PullInRange.length == 0) {
+      return {};
+    }
     const begin = PullInRange[0].created_at;
 
     return await YearCounter(PullInRange, 'closed_at', begin);
@@ -221,6 +227,9 @@ const GetRepoPullCreateFrequencyByYear = async (owner, repo) => {
       repo_owner: owner,
       repo_name: repo,
     }).sort([['created_at', 1]]);
+    if (PullInRange.length == 0) {
+      return {};
+    }
     const begin = PullInRange[0].created_at;
     return await YearCounter(PullInRange, 'created_at', begin);
   } catch (e) {
@@ -250,6 +259,9 @@ const GetRepoPullUpdateFrequencyByMonth = async (owner, repo) => {
       repo_owner: owner,
       repo_name: repo,
     }).sort([['updated_at', 1]]);
+    if (PullInRange.length == 0) {
+      return {};
+    }
     const begin = PullInRange[0].created_at;
 
     return await MonthCounter(PullInRange, 'updated_at', begin);
@@ -266,7 +278,9 @@ const GetRepoPullCloseFrequencyByMonth = async (owner, repo) => {
       repo_owner: owner,
       repo_name: repo,
     }).sort([['closed_at', 1]]);
-
+    if (PullInRange.length == 0) {
+      return {};
+    }
     const begin = PullInRange[0].created_at;
 
     return await MonthCounter(PullInRange, 'closed_at', begin);
@@ -297,6 +311,9 @@ const GetRepoPullCreateFrequencyByMonth = async (owner, repo) => {
       repo_owner: owner,
       repo_name: repo,
     }).sort([['created_at', 1]]);
+    if (PullInRange.length == 0) {
+      return {};
+    }
     const begin = PullInRange[0].created_at;
     return await MonthCounter(PullInRange, 'created_at', begin);
   } catch (e) {
@@ -326,6 +343,9 @@ const GetRepoPullUpdateFrequencyByDay = async (owner, repo) => {
       repo_owner: owner,
       repo_name: repo,
     }).sort([['updated_at', 1]]);
+    if (PullInRange.length == 0) {
+      return {};
+    }
     const begin = PullInRange[0].created_at;
     return await DayCounter(PullInRange, 'updated_at', begin);
   } catch (e) {
@@ -355,6 +375,9 @@ const GetRepoPullCloseFrequencyByDay = async (owner, repo) => {
       repo_owner: owner,
       repo_name: repo,
     }).sort([['closed_at', 1]]);
+    if (PullInRange.length == 0) {
+      return {};
+    }
     const begin = PullInRange[0].created_at;
     return await DayCounter(PullInRange, 'closed_at', begin);
   } catch (e) {
@@ -384,6 +407,9 @@ const GetRepoPullCreateFrequencyByDay = async (owner, repo) => {
       repo_owner: owner,
       repo_name: repo,
     }).sort([['created_at', 1]]);
+    if (PullInRange.length == 0) {
+      return {};
+    }
     const begin = PullInRange[0].created_at;
     return await DayCounter(PullInRange, 'created_at', begin);
   } catch (e) {
@@ -409,6 +435,9 @@ const GetPullersCountInRange = async (owner, repo) => {
       throw 'missing body data';
     }
     const PullInRange = await GetAllPullOfRepo(owner, repo);
+    if (PullInRange.length == 0) {
+      return {};
+    }
     const begin = PullInRange[0].created_at;
     const BaseYear = begin ? begin.split('-')[0] : '2008';
     const BaseMonth = begin ? begin.split('-')[1] : '3';

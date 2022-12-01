@@ -138,6 +138,9 @@ const GetRepoIssueUpdateFrequencyByYear = async (owner, repo) => {
       repo_owner: owner,
       repo_name: repo,
     }).sort([['updated_at', 1]]);
+    if (IssueInRange.length == 0) {
+      return {};
+    }
     const begin = IssueInRange[0].created_at;
     return await YearCounter(IssueInRange, 'updated_at', begin);
   } catch (e) {
@@ -167,6 +170,9 @@ const GetRepoIssueCreateFrequencyByYear = async (owner, repo) => {
       repo_owner: owner,
       repo_name: repo,
     }).sort([['created_at', 1]]);
+    if (IssueInRange.length == 0) {
+      return {};
+    }
     const begin = IssueInRange[0].created_at;
     return await YearCounter(IssueInRange, 'created_at', begin);
   } catch (e) {
@@ -196,6 +202,9 @@ const GetRepoIssueCloseFrequencyByYear = async (owner, repo) => {
       repo_owner: owner,
       repo_name: repo,
     }).sort([['closed_at', 1]]);
+    if (IssueInRange.length == 0) {
+      return {};
+    }
     const begin = IssueInRange[0].created_at;
     return await YearCounter(IssueInRange, 'closed_at', begin);
   } catch (e) {
@@ -225,6 +234,9 @@ const GetRepoIssueUpdateFrequencyByMonth = async (owner, repo) => {
       repo_owner: owner,
       repo_name: repo,
     }).sort([['updated_at', 1]]);
+    if (IssueInRange.length == 0) {
+      return {};
+    }
     const begin = IssueInRange[0].created_at;
     return await MonthCounter(IssueInRange, 'updated_at', begin);
   } catch (e) {
@@ -254,6 +266,9 @@ const GetRepoIssueCreateFrequencyByMonth = async (owner, repo) => {
       repo_owner: owner,
       repo_name: repo,
     }).sort([['created_at', 1]]);
+    if (IssueInRange.length == 0) {
+      return {};
+    }
     const begin = IssueInRange[0].created_at;
     return await MonthCounter(IssueInRange, 'created_at', begin);
   } catch (e) {
@@ -283,6 +298,9 @@ const GetRepoIssueCloseFrequencyByMonth = async (owner, repo) => {
       repo_owner: owner,
       repo_name: repo,
     }).sort([['closed_at', 1]]);
+    if (IssueInRange.length == 0) {
+      return {};
+    }
     const begin = IssueInRange[0].created_at;
     return await MonthCounter(IssueInRange, 'closed_at', begin);
   } catch (e) {
@@ -311,6 +329,9 @@ const GetRepoIssueUpdateFrequencyByDay = async (owner, repo) => {
       repo_owner: owner,
       repo_name: repo,
     }).sort([['updated_at', 1]]);
+    if (IssueInRange.length == 0) {
+      return {};
+    }
     const begin = IssueInRange[0].created_at;
     return await DayCounter(IssueInRange, 'updated_at', begin);
   } catch (e) {
@@ -339,6 +360,9 @@ const GetRepoIssueCreateFrequencyByDay = async (owner, repo) => {
       repo_owner: owner,
       repo_name: repo,
     }).sort([['created_at', 1]]);
+    if (IssueInRange.length == 0) {
+      return {};
+    }
     const begin = IssueInRange[0].created_at;
     return await DayCounter(IssueInRange, 'created_at', begin);
   } catch (e) {
@@ -367,6 +391,9 @@ const GetRepoIssueCloseFrequencyByDay = async (owner, repo) => {
       repo_owner: owner,
       repo_name: repo,
     }).sort([['closed_at', 1]]);
+    if (IssueInRange.length == 0) {
+      return {};
+    }
     const begin = IssueInRange[0].created_at;
     return await DayCounter(IssueInRange, 'closed_at', begin);
   } catch (e) {
@@ -395,6 +422,9 @@ const GetIssuersCountInRange = async (owner, repo) => {
       repo_owner: owner,
       repo_name: repo,
     }).sort([['updated_at', 1]]);
+    if (IssueInRange.length == 0) {
+      return {};
+    }
     const begin = IssueInRange[0].created_at;
     const BaseYear = begin ? begin.split('-')[0] : '2008';
     const BaseMonth = begin ? begin.split('-')[1] : '3';

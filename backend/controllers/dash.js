@@ -307,7 +307,9 @@ const RepoGetCommitFrequency = async (owner, name) => {
         .limit(50)),
     ],
   };
-
+  if (!repoMessage.data || !repoMessage.data.length) {
+    return 0;
+  }
   const x1 = repoMessage.data[0].updated_at;
   const x2 = repoMessage.data[repoMessage.data.length - 1].updated_at;
   const t1 = TransDate(x1);
