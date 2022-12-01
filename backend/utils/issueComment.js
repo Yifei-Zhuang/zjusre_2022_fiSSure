@@ -140,8 +140,6 @@ const AsyncFetchCommentInfo = async (
   }
 };
 const getFirstResponseTimeMap = async (owner, repo) => {
-  console.log('getCommentInfo');
-
   let fromCacheSet = new Set();
   // 倒序
   let cacheArray = await issueCommentsCacheSchema

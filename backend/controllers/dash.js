@@ -13,7 +13,7 @@ const IssueUtil = require('../utils/issue');
 const PullUtil = require('../utils/pull');
 const IssueCommentUtil = require('../utils/issueComment');
 const pull = require('../models/pull');
-const { GetCoreContributorByYear1 } = require('../utils/CoreContributor');
+const {GetCoreContributorByYear1} = require('../utils/CoreContributor');
 const octokit = new Octokit({
   auth: process.env.GITHUB_ACCESS_TOKEN || config.GITHUB_ACCESS_TOKEN,
 });
@@ -33,9 +33,9 @@ const GetMessage = async (req, res) => {
       });
 
     //      获取仓库的commit，issue，pull信息
-    // await CommitUtil.GetCommitInfo(owner, repo);
+    await CommitUtil.GetCommitInfo(owner, repo);
 
-    // await IssueUtil.GetIssueInfo(owner, repo);
+    await IssueUtil.GetIssueInfo(owner, repo);
     try {
       await PullUtil.GetPullInfo(owner, repo);
     } catch (e) {
@@ -158,6 +158,7 @@ const GetDashboard = async (req, res) => {
       let pull_frequency;
       let issue_frequency;
       let issue_comment_frequency;
+      console.log(new Date(), 'compute commit begin');
       await Promise.all([
         (async () => {
           try {
@@ -174,13 +175,15 @@ const GetDashboard = async (req, res) => {
                 repo,
               ),
             };
-            console.log('commit_frequency compute finish');
+            console.log(commit_frequency);
           } catch (e) {
             console.log('commit fetch error');
             throw e;
           }
         })(),
       ]);
+      console.log(new Date(), 'compute commit finish');
+      console.log(new Date(), 'compute pull begin');
       await (async () => {
         try {
           pull_frequency = {
@@ -207,12 +210,13 @@ const GetDashboard = async (req, res) => {
               : {},
             puller_count: await PullUtil.GetPullersCountInRange(owner, repo),
           };
-          console.log('pull_frequency compute finish');
         } catch (e) {
           console.log('pull fetch error');
           throw e;
         }
       })();
+      console.log(new Date(), 'compute pull finish');
+      console.log(new Date(), 'compute issue begin');
       await (async () => {
         try {
           issue_frequency = {
@@ -239,12 +243,13 @@ const GetDashboard = async (req, res) => {
               : {},
             Issuer_count: await IssueUtil.GetIssuersCountInRange(owner, repo),
           };
-          console.log('issue_frequency compute finish');
         } catch (e) {
           console.log('issue fetch error');
           throw e;
         }
       })();
+      console.log(new Date(), 'compute issue finish');
+      console.log(new Date(), 'compute comment begin');
       await (async () => {
         issue_comment_frequency = {
           monthly_count: await IssueCommentUtil.getIssueCloseTime(owner, repo),
@@ -253,9 +258,13 @@ const GetDashboard = async (req, res) => {
             repo,
           ),
         };
+        console.log(new Date(), 'compute comment finish');
       })();
-      console.log('compute finish');
+      console.log(new Date(), 'compute comment begin');
+      console.log(new Date(), 'compute coreContributorByYear begin');
       let coreContributorByYear = await GetCoreContributorByYear1(owner, repo);
+      console.log(new Date(), 'compute coreContributorByYear finish');
+
       try {
         detail = {
           ...detail._doc,

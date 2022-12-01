@@ -65,11 +65,12 @@ const GetCoreContributorByYear1 = async (owner, repo) => {
         nowCommits += sortedContributor[index].commit;
         index += 1;
       }
+
       // console.log("finally");
       let contributorCompany = await GetContributorCompanyDistribution(
         coreContributor,
       );
-      console.log(contributorCompany);
+      // console.log(contributorCompany);
       let contributorCompanyArray = [];
       contributorCompany.forEach((value, key) => {
         contributorCompanyArray.push({
@@ -86,6 +87,7 @@ const GetCoreContributorByYear1 = async (owner, repo) => {
         coreContributorCompany: contributorCompanyArray,
       });
     }
+
     return coreContributorByYear;
   } catch (e) {
     console.log(e);
@@ -145,7 +147,7 @@ const AsyncFetchUserInfo = async (
         const userInfo = await octokit.request('GET /users/{username}', {
           username: coreContributor[index].contributor,
         });
-        console.log(userInfo);
+        // console.log(userInfo);
         company = userInfo.data.company;
         // 存储
         await GithubUserSchema.create({
@@ -159,7 +161,7 @@ const AsyncFetchUserInfo = async (
       if (company == null || company === undefined || company == '') {
         company = 'other';
       }
-      console.log(company);
+      // console.log(company);
       if (await contributorCompanyMap.has(company)) {
         await contributorCompanyMap.set(
           company,

@@ -1,6 +1,6 @@
 const {prependOnceListener} = require('../models/issue');
 
-const YearCounter = async (input, property, begin, tail) => {
+const YearCounter = async (input, property, begin, tail, map) => {
   try {
     const BaseYear = begin ? begin.split('-')[0] : '2008';
     const LastYear = tail ? tail.split('-')[0] : new Date().getUTCFullYear();
@@ -11,9 +11,13 @@ const YearCounter = async (input, property, begin, tail) => {
       i <= parseInt(LastYear) && pre < input.length;
       i++
     ) {
-      let curYear = Date.parse(`${i}-01-01T00:00:00.00Z`);
-      let nextYear = Date.parse(`${i + 1}-01-01T00:00:00.00Z`);
-
+      let _curYear = `${i}-01-01T00:00:00.00Z`;
+      let _nextYear = `${i + 1}-01-01T00:00:00.00Z`;
+      if (map && map.has(_curYear.substring(0, 10))) {
+        continue;
+      }
+      let curYear = Date.parse(_curYear);
+      let nextYear = Date.parse(_nextYear);
       let count = 0;
       for (let j = pre; j < input.length; j++) {
         const item = input[j];
@@ -26,16 +30,18 @@ const YearCounter = async (input, property, begin, tail) => {
           pre++;
         } else if (nextYear < Date.parse(input[j][property])) {
           pre = j;
+          break;
         }
       }
       arr[`${i}-01-01`] = count;
     }
     return arr;
   } catch (e) {
+    console.log(e);
     throw e;
   }
 };
-const MonthCounter = async (input, property, begin, tail) => {
+const MonthCounter = async (input, property, begin, tail, map) => {
   try {
     const BaseYear = begin ? begin.split('-')[0] : '2008';
     const BaseMonth = begin ? begin.split('-')[1] : '3';
@@ -59,16 +65,19 @@ const MonthCounter = async (input, property, begin, tail) => {
         if (j == 13) {
           break;
         }
-        let curMonth =
+        let _curMonth =
           j < 10 ? `${i}-0${j}-01T00:00:00.00Z` : `${i}-${j}-01T00:00:00.00Z`;
-        let nextMonth =
+        let _nextMonth =
           j != 12
             ? j >= 9
               ? `${i}-${j + 1}-01T00:00:00.00Z`
               : `${i}-0${j + 1}-01T00:00:00.00Z`
             : `${i + 1}-${'01'}-01T00:00:00.00Z`;
-        curMonth = Date.parse(curMonth);
-        nextMonth = Date.parse(nextMonth);
+        if (map && map.has(_curMonth.substring(0, 10))) {
+          continue;
+        }
+        let curMonth = Date.parse(_curMonth);
+        let nextMonth = Date.parse(_nextMonth);
 
         let count = 0;
         for (let x = pre; x < input.length; x++) {

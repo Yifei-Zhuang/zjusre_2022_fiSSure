@@ -402,9 +402,13 @@ const GetIssuersCountInRange = async (owner, repo) => {
     const LastMonth = new Date().toISOString().split('-')[1];
     const set = new Set();
     const arr = {base: 0};
-
+    let pre = 0;
     try {
-      for (let i = parseInt(BaseYear); i <= parseInt(LastYear); i++) {
+      for (
+        let i = parseInt(BaseYear);
+        i <= parseInt(LastYear) && pre < IssueInRange.length;
+        i++
+      ) {
         for (
           let j = i == BaseYear ? parseInt(BaseMonth) : 1;
           j <= (i == LastYear) ? parseInt(LastMonth) : 12;
@@ -413,25 +417,35 @@ const GetIssuersCountInRange = async (owner, repo) => {
           if (j == 13) {
             break;
           }
-          const curMonth =
+          let curMonth =
             j < 10 ? `${i}-0${j}-01T00:00:00.00Z` : `${i}-${j}-01T00:00:00.00Z`;
-          const nextMonth =
+          let nextMonth =
             j != 12
               ? j >= 9
                 ? `${i}-${j + 1}-01T00:00:00.00Z`
                 : `${i}-0${j + 1}-01T00:00:00.00Z`
               : `${i + 1}-${'01'}-01T00:00:00.00Z`;
+          curMonth = Date.parse(curMonth);
+          nextMonth = Date.parse(nextMonth);
+
           let count = 0;
-          IssueInRange.forEach(issue => {
+          for (let x = pre; x < IssueInRange.length; x++) {
+            const issue = IssueInRange[x];
             if (
-              Date.parse(curMonth) <= Date.parse(issue['updated_at']) &&
-              Date.parse(nextMonth) >= Date.parse(issue['updated_at']) &&
+              issue['updated_at'] &&
+              curMonth <= Date.parse(issue['updated_at']) &&
+              nextMonth >= Date.parse(issue['updated_at']) &&
               !set.has(issue.user_id)
             ) {
               count++;
+              pre++;
               set.add(issue.user_id, true);
+            } else if (nextMonth < Date.parse(issue['updated_at'])) {
+              pre = x;
+              break;
             }
-          });
+          }
+
           let key;
           if (j < 10) {
             key = `${i}-0${j}-01`;

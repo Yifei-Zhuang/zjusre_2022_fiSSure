@@ -1,4 +1,7 @@
 const CommitSchema = require('../models/commit');
+const CommitYearSchema = require('../models/commit-year-cache');
+const CommitMonthSchema = require('../models/commit-month-cache');
+
 const {Octokit} = require('@octokit/core');
 const config = require('../config');
 const octokit = new Octokit({
@@ -144,13 +147,53 @@ const GetRepoCommitFrequencyByYear = async (owner, repo) => {
     if (!owner || !repo) {
       throw 'missing body data';
     }
+    // 升序排列
     const CommitInRange = await CommitSchema.find({
       repo_owner: owner,
       repo_name: repo,
     }).sort([['updated_at', 1]]);
-    console.log('fetch CommitInRange finish');
+    let map = new Map();
+    const CommitYearCache = await CommitYearSchema.findOne({
+      repo_owner: owner,
+      repo_name: repo,
+    });
+    if (CommitYearCache) {
+      for (const key in CommitYearCache.commit_year_frequency) {
+        map.set(key, CommitYearCache.commit_year_frequency[key]);
+      }
+    }
     const begin = CommitInRange[0].updated_at;
-    return await YearCounter(CommitInRange, 'updated_at', begin);
+    // result不会有cache中已有的结果
+    let result = await YearCounter(
+      CommitInRange,
+      'updated_at',
+      begin,
+      null,
+      map,
+    );
+    // 存储计算结果
+
+    let temp = {};
+    // 去掉最后一年
+    const curYear = `${new Date().getUTCFullYear()}-01-01`;
+    for (const key in result) {
+      if (key === curYear) {
+        continue;
+      }
+      temp[key] = result[key];
+    }
+    if (CommitYearCache) {
+      // 更新计算结果
+      Object.assign(CommitYearCache.commit_year_frequency, temp);
+      CommitYearCache.save();
+    } else {
+      CommitYearSchema.create({
+        commit_year_frequency: temp,
+        repo_owner: owner,
+        repo_name: repo,
+      });
+    }
+    return {...result, ...CommitYearCache.commit_year_frequency};
   } catch (e) {
     throw createCustomError(e, 400);
   }
@@ -180,7 +223,48 @@ const GetRepoCommitFrequencyByMonth = async (owner, repo) => {
     }).sort([['updated_at', 1]]);
     const begin = CommitInRange[0].updated_at;
 
-    return await MonthCounter(CommitInRange, 'updated_at', begin);
+    let map = new Map();
+    const CommitMonthCache = await CommitMonthSchema.findOne({
+      repo_owner: owner,
+      repo_name: repo,
+    });
+    if (CommitMonthCache) {
+      for (const key in CommitMonthCache.commit_month_frequency) {
+        map.set(key, CommitMonthCache.commit_month_frequency[key]);
+      }
+    }
+    let result = await MonthCounter(
+      CommitInRange,
+      'updated_at',
+      begin,
+      null,
+      map,
+    );
+    // 存储计算结果
+
+    let temp = {};
+    // 去掉最后一年
+    const curMonth = `${new Date().getUTCFullYear()}-${
+      new Date().toISOString().split('-')[1]
+    }-01`;
+    for (const key in result) {
+      if (key === curMonth) {
+        continue;
+      }
+      temp[key] = result[key];
+    }
+    if (CommitMonthCache) {
+      Object.assign(CommitMonthCache.commit_month_frequency, temp);
+      // 更新计算结果
+      await CommitMonthCache.save();
+    } else {
+      await CommitMonthSchema.create({
+        commit_month_frequency: temp,
+        repo_owner: owner,
+        repo_name: repo,
+      });
+    }
+    return {...result, ...CommitMonthCache.commit_month_frequency};
   } catch (e) {
     throw createCustomError(e, 500);
   }
@@ -242,8 +326,12 @@ const GetCommitersCountInRange = async (owner, repo) => {
     const LastMonth = new Date().toISOString().split('-')[1];
     const set = new Set();
     const arr = {base: 0};
-
-    for (let i = parseInt(BaseYear); i <= parseInt(LastYear); i++) {
+    let pre = 0;
+    for (
+      let i = parseInt(BaseYear);
+      i <= parseInt(LastYear) && pre < CommitInRange.length;
+      i++
+    ) {
       for (
         let j = i == BaseYear ? parseInt(BaseMonth) : 1;
         j <= (i == LastYear) ? parseInt(LastMonth) : 12;
@@ -252,25 +340,33 @@ const GetCommitersCountInRange = async (owner, repo) => {
         if (j == 13) {
           break;
         }
-        const curMonth =
+        let curMonth =
           j < 10 ? `${i}-0${j}-01T00:00:00.00Z` : `${i}-${j}-01T00:00:00.00Z`;
-        const nextMonth =
+        let nextMonth =
           j != 12
             ? j >= 9
               ? `${i}-${j + 1}-01T00:00:00.00Z`
               : `${i}-0${j + 1}-01T00:00:00.00Z`
             : `${i + 1}-${'01'}-01T00:00:00.00Z`;
+        curMonth = Date.parse(curMonth);
+        nextMonth = Date.parse(nextMonth);
         let count = 0;
-        CommitInRange.forEach(commit => {
+        for (let x = pre; x < CommitInRange.length; x++) {
+          const commit = CommitInRange[x];
           if (
-            Date.parse(curMonth) <= Date.parse(commit['updated_at']) &&
-            Date.parse(nextMonth) >= Date.parse(commit['updated_at']) &&
+            commit['updated_at'] &&
+            curMonth <= Date.parse(commit['updated_at']) &&
+            nextMonth >= Date.parse(commit['updated_at']) &&
             !set.has(commit.author_name)
           ) {
             count++;
+            pre++;
             set.add(commit.author_name, true);
+          } else if (nextMonth < Date.parse(commit['updated_at'])) {
+            pre = x;
+            break;
           }
-        });
+        }
         let key;
         if (j < 10) {
           key = `${i}-0${j}-01`;

@@ -6,7 +6,6 @@ const GithubUserSchema = new mongoose.Schema({
   },
   company: {
     type: String,
-    require: [true, 'must provide company'],
   },
 });
 module.exports = mongoose.model('GithubUser', GithubUserSchema);
