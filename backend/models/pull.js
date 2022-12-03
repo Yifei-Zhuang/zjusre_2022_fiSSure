@@ -50,6 +50,9 @@ const PullSchema = new mongoose.Schema({
   user_id: {
     type: String,
   },
+  labels: {
+    type: [String],
+  },
   // 以下为冗余字段，仅供查询使用
   repo_owner: {
     type: String,

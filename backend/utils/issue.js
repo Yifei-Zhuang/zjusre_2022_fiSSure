@@ -39,7 +39,7 @@ const AsyncFetchIssueInfo = async (owner, repo) => {
         repo: repo,
         state: 'all',
         page: page_num,
-        per_page: per_page,
+        per_page: 100,
         since: new Date(
           new Date().getTime() - 365 * 24 * 60 * 60 * 1000,
         ).toString(),
@@ -84,6 +84,7 @@ const AsyncFetchIssueInfo = async (owner, repo) => {
             comment_count: issue.comments,
             repo_owner: issue.html_url.split('/')[3],
             repo_name: issue.html_url.split('/')[4],
+            labels: issue.labels.map(item => item.name),
           };
           const CreateIssue = await IssueSchema.create(newIssue);
         } catch (e) {
@@ -93,6 +94,7 @@ const AsyncFetchIssueInfo = async (owner, repo) => {
         issueObject.state = issue.state;
         issueObject.updated_at = issue.updated_at;
         issueObject.closed_at = issue.closed_at ? issue.closed_at : undefined;
+        issueObject.labels = issue.labels.map(item => item.name);
         await issueObject.save();
       }
     }

@@ -46,6 +46,9 @@ const IssueSchema = new mongoose.Schema({
     type: Number,
     require: [true, 'must provide comment_count'],
   },
+  labels: {
+    type: [String],
+  },
   // 以下为冗余字段，仅供查询使用
   repo_owner: {
     type: String,

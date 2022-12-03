@@ -88,18 +88,20 @@ const AsyncFetchPullInfo = async (owner, repo) => {
           user_id: pull.user.id,
           repo_owner: pull.html_url.split('/')[3],
           repo_name: pull.html_url.split('/')[4],
+          labels: pull.labels.map(item => item.name),
         };
 
         const CreatePull = await PullSchema.create(newPull);
         // await Sleep(1000);
       } else {
         pullObject.state = pull.state;
-        isLocked: pull.locked;
+        pullObject.isLocked = pull.locked;
         pullObject.body = pull.body ? pull.body : 'test';
         pullObject.title = pull.title;
         pullObject.updated_at = pull.updated_at;
         pullObject.closed_at = pull.updated_at;
-        is_merged: pull.merged_at != null;
+        pullObject.is_merged = pull.merged_at != null;
+        pullObject.labels = pull.labels.map(item => item.name);
         await pullObject.save();
         // await Sleep(1000);
       }
@@ -114,6 +116,7 @@ const AsyncFetchPullInfo = async (owner, repo) => {
  */
 const GetPullInfo = async (owner, repo) => {
   try {
+    console.log(1);
     await AsyncFunctionWrapper(AsyncFetchPullInfo, owner, repo);
     console.log('pull fetch finish');
   } catch (err) {
