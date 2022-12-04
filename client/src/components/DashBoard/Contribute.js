@@ -70,15 +70,15 @@ const CoreContribute = (data) => {
 };
 
 const ContributorList = (data) => {
-    const [coreContributeYear, setYear] = useState(data[0].year);
+    const [coreContributeYear, setYear] = useState(data[0] === undefined? 0 : data[0].year);
 
     const yearList = [];
-    for(var i in data){
+    for(let i in data){
         yearList.push(data[i].year);
     }
 
     let coreContributorList = [];
-    for(var i in data){
+    for(let i in data){
         if(data[i].year == coreContributeYear){
             coreContributorList = data[i].coreContributor;
             break;
