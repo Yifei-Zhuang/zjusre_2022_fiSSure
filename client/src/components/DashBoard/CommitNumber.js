@@ -29,8 +29,8 @@ const IconWrapperStyle = styled("div")(({ theme }) => ({
 
 
 export default function CommitNumber(data) {
-    let total = 0;
-    let commits = data.commit_month_frequency;
+    var total = 0;
+    var commits = data.data;
     for(var i in commits){
         total += commits[i];
     }

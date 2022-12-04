@@ -24,6 +24,7 @@ import {
 import detail from "../context/staticData"
 
 export default function DashboardApp() {
+    // 暂时关闭从后端获得数据
     useEffect(() => {
         getDashBoard(id);
     }, []);
@@ -124,7 +125,7 @@ export default function DashboardApp() {
                 <Box>
                     <Grid container spacing={3}>
                         <Grid item xs={12} sm={6} md={3}>
-                            <CommitNumber commit_month_frequency={commit_month_frequency} />
+                            <CommitNumber data={commit_month_frequency} />
                         </Grid>
                         <Grid item xs={12} sm={6} md={3}>
                             <IssueNumber total={open_issues} />
