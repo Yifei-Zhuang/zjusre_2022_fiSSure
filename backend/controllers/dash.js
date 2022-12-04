@@ -1,9 +1,9 @@
 const asyncWrapper = require('../middleware/async');
-const {createCustomError} = require('../errors/custom-error');
+const { createCustomError } = require('../errors/custom-error');
 const RepoSchema = require('../models/repo');
 const ObjectId = require('mongodb').ObjectId;
 const dotenv = require('dotenv');
-const {Octokit} = require('@octokit/core');
+const { Octokit } = require('@octokit/core');
 const res = require('express/lib/response');
 const config = require('../config');
 const CommitSchema = require('../models/commit');
@@ -13,7 +13,7 @@ const IssueUtil = require('../utils/issue');
 const PullUtil = require('../utils/pull');
 const IssueCommentUtil = require('../utils/issueComment');
 const pull = require('../models/pull');
-const {GetCoreContributorByYear1} = require('../utils/CoreContributor');
+const { GetCoreContributorByYear1 } = require('../utils/CoreContributor');
 const octokit = new Octokit({
   auth: process.env.GITHUB_ACCESS_TOKEN || config.GITHUB_ACCESS_TOKEN,
 });
@@ -107,7 +107,7 @@ const GetMessage = async (req, res) => {
       throw e;
     }
 
-    res.status(201).json({status: 'success!'});
+    res.status(201).json({ status: 'success!' });
   } catch (err) {
     res.status(404).json(err);
   }
@@ -120,7 +120,7 @@ const SearchRepoName = async (req, res) => {
       var search = await RepoSchema.find({});
     } else
       search = await RepoSchema.find({
-        name: {$regex: SearchKey, $options: '$i'},
+        name: { $regex: SearchKey, $options: '$i' },
       });
     var repos = [];
     for (var i in search) {
@@ -135,7 +135,7 @@ const SearchRepoName = async (req, res) => {
       repos.push(eachRepo);
     }
     console.log(repos);
-    return res.status(201).json({repos});
+    return res.status(201).json({ repos });
   } catch (err) {
     res.status(404).json(err);
   }
@@ -146,7 +146,7 @@ const GetDashboard = async (req, res) => {
     let getDayS = req.body.getDay ? true : false;
     let detail;
     try {
-      detail = await RepoSchema.findOne({_id: ObjectId(req.body.id)});
+      detail = await RepoSchema.findOne({ _id: ObjectId(req.body.id) });
     } catch (e) {
       console.log('detail fetch error');
       throw e;
@@ -215,63 +215,63 @@ const GetDashboard = async (req, res) => {
         }
       })();
       console.log(new Date(), 'compute pull finish');
-      console.log(new Date(), 'compute issue begin');
-      await (async () => {
-        try {
-          issue_frequency = {
-            issue_year_create_frequency:
-              await IssueUtil.GetRepoIssueCreateFrequencyByYear(owner, repo),
-            Issue_year_update_frequency:
-              await IssueUtil.GetRepoIssueUpdateFrequencyByYear(owner, repo),
-            Issue_year_close_frequency:
-              await IssueUtil.GetRepoIssueCloseFrequencyByYear(owner, repo),
-            Issue_month_create_frequency:
-              await IssueUtil.GetRepoIssueCreateFrequencyByMonth(owner, repo),
-            Issue_month_update_frequency:
-              await IssueUtil.GetRepoIssueUpdateFrequencyByMonth(owner, repo),
-            Issue_month_close_frequency:
-              await IssueUtil.GetRepoIssueCloseFrequencyByMonth(owner, repo),
-            Issue_day_create_frequency: getDayS
-              ? await IssueUtil.GetRepoIssueCreateFrequencyByDay(owner, repo)
-              : {},
-            Issue_day_update_frequency: getDayS
-              ? await IssueUtil.GetRepoIssueUpdateFrequencyByDay(owner, repo)
-              : {},
-            Issue_day_close_frequency: getDayS
-              ? await IssueUtil.GetRepoIssueCloseFrequencyByDay(owner, repo)
-              : {},
-            Issuer_count: await IssueUtil.GetIssuersCountInRange(owner, repo),
-          };
-        } catch (e) {
-          console.log('issue fetch error');
-          throw e;
-        }
-      })();
-      console.log(new Date(), 'compute issue finish');
-      console.log(new Date(), 'compute comment begin');
-      await (async () => {
-        issue_comment_frequency = {
-          monthly_count: await IssueCommentUtil.getIssueCloseTime(owner, repo),
-          response_time: await IssueCommentUtil.getFirstResponseTimeMap(
-            owner,
-            repo,
-          ),
-        };
-        console.log(new Date(), 'compute comment finish');
-      })();
-      console.log(new Date(), 'compute comment begin');
-      console.log(new Date(), 'compute coreContributorByYear begin');
-      let coreContributorByYear = await GetCoreContributorByYear1(owner, repo);
-      console.log(new Date(), 'compute coreContributorByYear finish');
+      // console.log(new Date(), 'compute issue begin');
+      // await (async () => {
+      //   try {
+      //     issue_frequency = {
+      //       issue_year_create_frequency:
+      //         await IssueUtil.GetRepoIssueCreateFrequencyByYear(owner, repo),
+      //       Issue_year_update_frequency:
+      //         await IssueUtil.GetRepoIssueUpdateFrequencyByYear(owner, repo),
+      //       Issue_year_close_frequency:
+      //         await IssueUtil.GetRepoIssueCloseFrequencyByYear(owner, repo),
+      //       Issue_month_create_frequency:
+      //         await IssueUtil.GetRepoIssueCreateFrequencyByMonth(owner, repo),
+      //       Issue_month_update_frequency:
+      //         await IssueUtil.GetRepoIssueUpdateFrequencyByMonth(owner, repo),
+      //       Issue_month_close_frequency:
+      //         await IssueUtil.GetRepoIssueCloseFrequencyByMonth(owner, repo),
+      //       Issue_day_create_frequency: getDayS
+      //         ? await IssueUtil.GetRepoIssueCreateFrequencyByDay(owner, repo)
+      //         : {},
+      //       Issue_day_update_frequency: getDayS
+      //         ? await IssueUtil.GetRepoIssueUpdateFrequencyByDay(owner, repo)
+      //         : {},
+      //       Issue_day_close_frequency: getDayS
+      //         ? await IssueUtil.GetRepoIssueCloseFrequencyByDay(owner, repo)
+      //         : {},
+      //       Issuer_count: await IssueUtil.GetIssuersCountInRange(owner, repo),
+      //     };
+      //   } catch (e) {
+      //     console.log('issue fetch error');
+      //     throw e;
+      //   }
+      // })();
+      // console.log(new Date(), 'compute issue finish');
+      // console.log(new Date(), 'compute comment begin');
+      // await (async () => {
+      //   issue_comment_frequency = {
+      //     monthly_count: await IssueCommentUtil.getIssueCloseTime(owner, repo),
+      //     response_time: await IssueCommentUtil.getFirstResponseTimeMap(
+      //       owner,
+      //       repo,
+      //     ),
+      //   };
+      //   console.log(new Date(), 'compute comment finish');
+      // })();
+      // console.log(new Date(), 'compute comment begin');
+      // console.log(new Date(), 'compute coreContributorByYear begin');
+      // let coreContributorByYear = await GetCoreContributorByYear1(owner, repo);
+      // console.log(new Date(), 'compute coreContributorByYear finish');
 
       try {
         detail = {
           ...detail._doc,
           ...commit_frequency,
           ...pull_frequency,
-          ...issue_frequency,
-          ...issue_comment_frequency,
-          coreContributorByYear,
+          // ...issue_frequency,
+          // ...issue_comment_frequency,
+          // coreContributorByYear,
         };
         res.status(201).json(detail);
       } catch (e) {
@@ -289,8 +289,8 @@ const GetDashboard = async (req, res) => {
 
 const DeleteRepo = async (req, res) => {
   try {
-    const test = await RepoSchema.deleteOne({_id: ObjectId(req.body.id)});
-    res.status(201).json({msg: 'success!'});
+    const test = await RepoSchema.deleteOne({ _id: ObjectId(req.body.id) });
+    res.status(201).json({ msg: 'success!' });
   } catch (err) {
     res.status(404).json(err);
   }
