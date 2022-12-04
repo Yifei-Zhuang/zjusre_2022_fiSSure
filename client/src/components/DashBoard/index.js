@@ -13,7 +13,8 @@ import CommiterFrequency from "./CommiterFrequency";
 import IssuerFrequency from "./IssuerFrequrncy";
 import IssueResponse from "./IssueResponse";
 import IssueClose from "./IssueClose";
-
+import PullFrequency from "./PullFrequency"
+import PullerFrequency from "./PullerFrequency"
 export {
   CommitNumber,
   IssueNumber,
@@ -29,5 +30,7 @@ export {
   ContributorList,
   IssuerFrequency,
   IssueResponse,
-  IssueClose
+  IssueClose,
+  PullFrequency,
+  PullerFrequency
 };

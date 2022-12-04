@@ -16,246 +16,246 @@ const detail = {
     '2022-11-21': 38,
     '2022-11-20': 12,
   },
-  contributes:{
-    "coreContributorByYear": [
-        {
-            "year": 2019,
-            "coreContributor": [
-                {
-                    "contributor": "iwzy7071",
-                    "commit": 42
-                },
-                {
-                    "contributor": "tespent",
-                    "commit": 27
-                },
-                {
-                    "contributor": "h-lujian",
-                    "commit": 24
-                },
-                {
-                    "contributor": "QSCTech-Sange",
-                    "commit": 14
-                },
-                {
-                    "contributor": "fish98",
-                    "commit": 14
-                },
-                {
-                    "contributor": "JiangTanZJU",
-                    "commit": 9
-                },
-                {
-                    "contributor": "nonohh",
-                    "commit": 9
-                },
-                {
-                    "contributor": "Gk0Wk",
-                    "commit": 8
-                },
-                {
-                    "contributor": "megrxu",
-                    "commit": 8
-                },
-                {
-                    "contributor": "determ1ne",
-                    "commit": 6
-                }
-            ],
-            "coreContributorCompany": [
-                {
-                    "company": "other",
-                    "coreContributors": 5
-                },
-                {
-                    "company": "Zhejiang University",
-                    "coreContributors": 3
-                },
-                {
-                    "company": "Hangzhou University",
-                    "coreContributors": 1
-                },
-                {
-                    "company": "@QSCTech",
-                    "coreContributors": 1
-                }
-            ]
-        },
-        {
-            "year": 2020,
-            "coreContributor": [
-                {
-                    "contributor": "dougefla",
-                    "commit": 84
-                },
-                {
-                    "contributor": "tespent",
-                    "commit": 63
-                },
-                {
-                    "contributor": "CHN-ChenYi",
-                    "commit": 39
-                },
-                {
-                    "contributor": "HAO Jiahui",
-                    "commit": 21
-                },
-                {
-                    "contributor": "Lokilankaaa",
-                    "commit": 15
-                },
-                {
-                    "contributor": "QSCTech-Sange",
-                    "commit": 15
-                },
-                {
-                    "contributor": "Phantom1003",
-                    "commit": 12
-                },
-                {
-                    "contributor": "Yao-Shao",
-                    "commit": 9
-                },
-                {
-                    "contributor": "Ais0n",
-                    "commit": 9
-                },
-                {
-                    "contributor": "yu-cao",
-                    "commit": 9
-                },
-                {
-                    "contributor": "Shaw Haines",
-                    "commit": 9
-                }
-            ],
-            "coreContributorCompany": [
-                {
-                    "company": "other",
-                    "coreContributors": 6
-                },
-                {
-                    "company": "Zhejiang University",
-                    "coreContributors": 4
-                },
-                {
-                    "company": "Tencent Games",
-                    "coreContributors": 1
-                }
-            ]
-        },
-        {
-            "year": 2021,
-            "coreContributor": [
-                {
-                    "contributor": "LukeLIN-web",
-                    "commit": 78
-                },
-                {
-                    "contributor": "palemoons",
-                    "commit": 54
-                },
-                {
-                    "contributor": "OE-Heart",
-                    "commit": 30
-                },
-                {
-                    "contributor": "Mythologyli",
-                    "commit": 30
-                },
-                {
-                    "contributor": "CHN-ChenYi",
-                    "commit": 21
-                },
-                {
-                    "contributor": "747745124",
-                    "commit": 12
-                },
-                {
-                    "contributor": "wandleshen",
-                    "commit": 12
-                },
-                {
-                    "contributor": "NonoHh",
-                    "commit": 12
-                }
-            ],
-            "coreContributorCompany": [
-                {
-                    "company": "Zhejiang University",
-                    "coreContributors": 4
-                },
-                {
-                    "company": "other",
-                    "coreContributors": 3
-                },
-                {
-                    "company": "UC Santa Barbara",
-                    "coreContributors": 1
-                }
-            ]
-        },
-        {
-            "year": 2022,
-            "coreContributor": [
-                {
-                    "contributor": "palemoons",
-                    "commit": 80
-                },
-                {
-                    "contributor": "Jack-Chan-2001",
-                    "commit": 69
-                },
-                {
-                    "contributor": "OE-Heart",
-                    "commit": 42
-                },
-                {
-                    "contributor": "LukeLIN-web",
-                    "commit": 30
-                },
-                {
-                    "contributor": "RuibaiXu",
-                    "commit": 18
-                },
-                {
-                    "contributor": "SoonWhy",
-                    "commit": 15
-                },
-                {
-                    "contributor": "huiwu321",
-                    "commit": 6
-                },
-                {
-                    "contributor": "permui",
-                    "commit": 6
-                },
-                {
-                    "contributor": "HIGHBu",
-                    "commit": 6
-                },
-                {
-                    "contributor": "NonoHh",
-                    "commit": 6
-                }
-            ],
-            "coreContributorCompany": [
-                {
-                    "company": "Zhejiang University",
-                    "coreContributors": 4
-                },
-                {
-                    "company": "other",
-                    "coreContributors": 4
-                },
-                {
-                    "company": "ZJU",
-                    "coreContributors": 2
-                }
-            ]
-        }
-    ]
-   },
+  contributes: {
+    coreContributorByYear: [
+      {
+        year: 2019,
+        coreContributor: [
+          {
+            contributor: 'iwzy7071',
+            commit: 42,
+          },
+          {
+            contributor: 'tespent',
+            commit: 27,
+          },
+          {
+            contributor: 'h-lujian',
+            commit: 24,
+          },
+          {
+            contributor: 'QSCTech-Sange',
+            commit: 14,
+          },
+          {
+            contributor: 'fish98',
+            commit: 14,
+          },
+          {
+            contributor: 'JiangTanZJU',
+            commit: 9,
+          },
+          {
+            contributor: 'nonohh',
+            commit: 9,
+          },
+          {
+            contributor: 'Gk0Wk',
+            commit: 8,
+          },
+          {
+            contributor: 'megrxu',
+            commit: 8,
+          },
+          {
+            contributor: 'determ1ne',
+            commit: 6,
+          },
+        ],
+        coreContributorCompany: [
+          {
+            company: 'other',
+            coreContributors: 5,
+          },
+          {
+            company: 'Zhejiang University',
+            coreContributors: 3,
+          },
+          {
+            company: 'Hangzhou University',
+            coreContributors: 1,
+          },
+          {
+            company: '@QSCTech',
+            coreContributors: 1,
+          },
+        ],
+      },
+      {
+        year: 2020,
+        coreContributor: [
+          {
+            contributor: 'dougefla',
+            commit: 84,
+          },
+          {
+            contributor: 'tespent',
+            commit: 63,
+          },
+          {
+            contributor: 'CHN-ChenYi',
+            commit: 39,
+          },
+          {
+            contributor: 'HAO Jiahui',
+            commit: 21,
+          },
+          {
+            contributor: 'Lokilankaaa',
+            commit: 15,
+          },
+          {
+            contributor: 'QSCTech-Sange',
+            commit: 15,
+          },
+          {
+            contributor: 'Phantom1003',
+            commit: 12,
+          },
+          {
+            contributor: 'Yao-Shao',
+            commit: 9,
+          },
+          {
+            contributor: 'Ais0n',
+            commit: 9,
+          },
+          {
+            contributor: 'yu-cao',
+            commit: 9,
+          },
+          {
+            contributor: 'Shaw Haines',
+            commit: 9,
+          },
+        ],
+        coreContributorCompany: [
+          {
+            company: 'other',
+            coreContributors: 6,
+          },
+          {
+            company: 'Zhejiang University',
+            coreContributors: 4,
+          },
+          {
+            company: 'Tencent Games',
+            coreContributors: 1,
+          },
+        ],
+      },
+      {
+        year: 2021,
+        coreContributor: [
+          {
+            contributor: 'LukeLIN-web',
+            commit: 78,
+          },
+          {
+            contributor: 'palemoons',
+            commit: 54,
+          },
+          {
+            contributor: 'OE-Heart',
+            commit: 30,
+          },
+          {
+            contributor: 'Mythologyli',
+            commit: 30,
+          },
+          {
+            contributor: 'CHN-ChenYi',
+            commit: 21,
+          },
+          {
+            contributor: '747745124',
+            commit: 12,
+          },
+          {
+            contributor: 'wandleshen',
+            commit: 12,
+          },
+          {
+            contributor: 'NonoHh',
+            commit: 12,
+          },
+        ],
+        coreContributorCompany: [
+          {
+            company: 'Zhejiang University',
+            coreContributors: 4,
+          },
+          {
+            company: 'other',
+            coreContributors: 3,
+          },
+          {
+            company: 'UC Santa Barbara',
+            coreContributors: 1,
+          },
+        ],
+      },
+      {
+        year: 2022,
+        coreContributor: [
+          {
+            contributor: 'palemoons',
+            commit: 80,
+          },
+          {
+            contributor: 'Jack-Chan-2001',
+            commit: 69,
+          },
+          {
+            contributor: 'OE-Heart',
+            commit: 42,
+          },
+          {
+            contributor: 'LukeLIN-web',
+            commit: 30,
+          },
+          {
+            contributor: 'RuibaiXu',
+            commit: 18,
+          },
+          {
+            contributor: 'SoonWhy',
+            commit: 15,
+          },
+          {
+            contributor: 'huiwu321',
+            commit: 6,
+          },
+          {
+            contributor: 'permui',
+            commit: 6,
+          },
+          {
+            contributor: 'HIGHBu',
+            commit: 6,
+          },
+          {
+            contributor: 'NonoHh',
+            commit: 6,
+          },
+        ],
+        coreContributorCompany: [
+          {
+            company: 'Zhejiang University',
+            coreContributors: 4,
+          },
+          {
+            company: 'other',
+            coreContributors: 4,
+          },
+          {
+            company: 'ZJU',
+            coreContributors: 2,
+          },
+        ],
+      },
+    ],
+  },
   timeline: {
     created_at: '2016-08-13T05:26:41Z',
     updated_at: '2022-11-21T15:38:11Z',
@@ -769,27 +769,114 @@ const detail = {
   },
   issue_year_create_frequency: {
     '2022-01-01': 6000,
+    "2021-01-01": 5000
+
   },
   Issue_year_update_frequency: {
     '2022-01-01': 6000,
+    "2021-01-01": 5000
   },
   Issue_year_close_frequency: {
-    '2022-01-01': 4195,
+    "2022-01-01": 19727,
+    "2021-01-01": 12345
   },
   Issue_month_create_frequency: {
-    '2022-08-01': 783,
-    '2022-09-01': 1655,
-    '2022-10-01': 2117,
-    '2022-11-01': 1445,
+    "2016-09-01": 1,
+    "2016-10-01": 7,
+    "2016-11-01": 2,
+    "2016-12-01": 1,
+    "2017-01-01": 8,
+    "2017-02-01": 8,
+    "2017-03-01": 13,
+    "2017-04-01": 10,
+    "2017-05-01": 10,
+    "2017-06-01": 13,
+    "2017-07-01": 17,
+    "2017-08-01": 10,
+    "2017-09-01": 15,
+    "2017-10-01": 3,
+    "2017-11-01": 7,
+    "2017-12-01": 11,
+    "2018-01-01": 11,
+    "2018-02-01": 15,
+    "2018-03-01": 11,
+    "2018-04-01": 27,
+    "2018-05-01": 21,
+    "2018-06-01": 39,
+    "2018-07-01": 26,
+    "2018-08-01": 42,
+    "2018-09-01": 23,
+    "2018-10-01": 37,
+    "2018-11-01": 25,
+    "2018-12-01": 38,
+    "2019-01-01": 39,
+    "2019-02-01": 38,
+    "2019-03-01": 52,
+    "2019-04-01": 44,
+    "2019-05-01": 45,
+    "2019-06-01": 53,
+    "2019-07-01": 76,
+    "2019-08-01": 108,
+    "2019-09-01": 87,
+    "2019-10-01": 108,
+    "2019-11-01": 115,
+    "2019-12-01": 76,
+    "2020-01-01": 112,
+    "2020-02-01": 95,
+    "2020-03-01": 130,
+    "2020-04-01": 138,
+    "2020-05-01": 124,
+    "2020-06-01": 107,
+    "2020-07-01": 152,
+    "2020-08-01": 141,
+    "2020-09-01": 166,
+    "2020-10-01": 142,
+    "2020-11-01": 134,
+    "2020-12-01": 138,
+    "2021-01-01": 171,
+    "2021-02-01": 149,
+    "2021-03-01": 187,
+    "2021-04-01": 247,
+    "2021-05-01": 208,
+    "2021-06-01": 255,
+    "2021-07-01": 250,
+    "2021-08-01": 318,
+    "2021-09-01": 369,
+    "2021-10-01": 490,
+    "2021-11-01": 950,
+    "2021-12-01": 1365,
+    "2022-01-01": 1543,
+    "2022-02-01": 1459,
+    "2022-03-01": 1492,
+    "2022-04-01": 1572,
+    "2022-05-01": 1968,
+    "2022-06-01": 2150,
+    "2022-07-01": 1805,
+    "2022-08-01": 1809,
+    "2022-09-01": 1655,
+    "2022-10-01": 2117,
+    "2022-11-01": 1817,
+    "2022-12-01": 140
   },
   Issue_month_update_frequency: {
-    '2022-08-01': 361,
-    '2022-09-01': 1285,
-    '2022-10-01': 2255,
-    '2022-11-01': 2099,
+    "2021-11-01": 103,
+    "2021-12-01": 1356,
+    "2022-01-01": 1573,
+    "2022-02-01": 1672,
+    "2022-03-01": 1667,
+    "2022-04-01": 1880,
+    "2022-05-01": 3116,
+    "2022-06-01": 3137,
+    "2022-07-01": 2554,
+    "2022-08-01": 2114,
+    "2022-09-01": 1893,
+    "2022-10-01": 2698,
+    "2022-11-01": 2878,
+    "2022-12-01": 716
   },
   Issue_month_close_frequency: {
-    '2022-11-01': 1174,
+    "2022-11-01": 1742,
+    "2022-12-01": 135
   },
   Issue_day_create_frequency: {},
   Issue_day_update_frequency: {},

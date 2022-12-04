@@ -1,39 +1,58 @@
-import { merge } from "lodash";
-import moment from "moment";
-import ReactApexChart from "react-apexcharts";
+import { merge } from 'lodash';
+import moment from 'moment';
+import ReactApexChart from 'react-apexcharts';
 // material
-import { Card, CardHeader, Box } from "@mui/material";
+import { Card, CardHeader, Box, Button, Popover, List, ListItemButton } from '@mui/material';
 //
-import BaseOptionChart from "./BaseOptionChart";
+import BaseOptionChart from './BaseOptionChart';
+import { useEffect, useState } from 'react';
 
 // ----------------------------------------------------------------------
 
-const IssueFrequency = (data) => {
+const IssueFrequency = data => {
+  // 定制表格显示数据
+  const [anchorEl, setAnchorEl] = useState(null);
+  const issueDataTypes = [
+    'issue_frequency',
+    'issue_year_create_frequency',
+    'Issue_year_update_frequency',
+    'Issue_year_close_frequency',
+    'Issue_month_create_frequency',
+    'Issue_month_update_frequency',
+    'Issue_month_close_frequency',
+  ]
+  const [currentType, setCurrentType] = useState(issueDataTypes[0]);
+  const listItems = issueDataTypes.map((type) => {
+    return (
+      <ListItemButton key={type} onClick={() => setCurrentType(type)} selected={type === currentType}>{type}</ListItemButton>
+    )
+  });
+
   var labels = [],
     number = [];
-  for (var interval in data) {
+  for (var interval in data[currentType]) {
     labels.push(interval);
-    number.push(data[interval]);
+    number.push(data[currentType][interval]);
   }
   const CHART_DATA = [
     {
-      name: "issue times",
-      type: "area",
+      name: currentType,
+      type: 'area',
       data: number,
     },
   ];
   const chartOptions = merge(BaseOptionChart(), {
     stroke: { width: [3, 2] },
-    plotOptions: { bar: { columnWidth: "11%", borderRadius: 4 } },
-    fill: { type: ["gradient"] },
+    plotOptions: { bar: { columnWidth: '11%', borderRadius: 4 } },
+    fill: { type: ['gradient'] },
     labels: labels,
-    xaxis: { type: "datetime" },
+    xaxis: { type: 'datetime' },
     tooltip: {
       shared: true,
       intersect: false,
       y: {
-        formatter: (y) => {
-          if (typeof y !== "undefined") {
+        formatter: y => {
+          if (typeof y !== 'undefined') {
             return `${y.toFixed(0)}`;
           }
           return y;
@@ -41,19 +60,46 @@ const IssueFrequency = (data) => {
       },
     },
   });
-
   return (
-    <Card>
-      <CardHeader title="Issue Frequency" />
-      <Box sx={{ p: 3, pb: 1 }} dir="ltr">
-        <ReactApexChart
-          type="line"
-          series={CHART_DATA}
-          options={chartOptions}
-          height={364}
-        />
-      </Box>
-    </Card>
+    <Box position={'relative'}>
+      <Card>
+        <CardHeader title={currentType.toUpperCase()} />
+        <Box sx={{ p: 3, pb: 1 }} dir="ltr">
+          <Button
+            sx={{
+              position: 'absolute',
+              right: '1em',
+              top: '1em',
+            }} aria-describedby={'__issueType'} variant="contained" onClick={(e) => setAnchorEl(e.currentTarget)}>
+            select type
+          </Button>
+          <Popover
+            id={'__issueType'}
+            open={Boolean(anchorEl)}
+            anchorEl={anchorEl}
+            onClose={() => setAnchorEl(null)}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'left',
+            }}
+          >
+            <List>
+              {listItems}
+            </List>
+          </Popover>
+          <ReactApexChart
+            type="line"
+            series={CHART_DATA}
+            options={chartOptions}
+            height={364}
+          />
+        </Box>
+      </Card>
+    </Box>
   );
 };
 

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useAppContext } from "../context/appContext";
 import Loading from "../components/Loading";
 import { useParams } from "react-router-dom";
-import { Box, Grid, Container, Typography} from "@mui/material";
+import { Box, Grid, Container, Typography, Button, Popover } from "@mui/material";
 import {
     CommitNumber,
     IssueNumber,
@@ -18,6 +18,8 @@ import {
     IssueResponse,
     IssueClose,
     ContributorList,
+    PullFrequency,
+    PullerFrequency
 } from "../components/DashBoard";
 import detail from "../context/staticData"
 
@@ -25,7 +27,7 @@ export default function DashboardApp() {
     useEffect(() => {
         getDashBoard(id);
     }, []);
-    
+
 
     const { id } = useParams();
 
@@ -44,7 +46,20 @@ export default function DashboardApp() {
         commit_month_frequency,
         commiter_count,
         issue_frequency,
-        issuer_frequency,
+        Issuer_count,
+        issue_year_create_frequency,
+        Issue_year_update_frequency,
+        Issue_year_close_frequency,
+        Issue_month_create_frequency,
+        Issue_month_update_frequency,
+        Issue_month_close_frequency,
+        pull_year_create_frequency,
+        pull_year_close_frequency,
+        pull_year_update_frequency,
+        pull_month_create_frequency,
+        pull_month_close_frequency,
+        pull_month_update_frequency,
+        puller_count,
         response_time,
         contributes,
         monthly_count
@@ -82,6 +97,24 @@ export default function DashboardApp() {
         const contributeDetail = {
             contributes: contributes,
             contributeYear: nowYear,
+        }
+
+        const IssueFrequencyDatas = {
+            issue_frequency,
+            issue_year_create_frequency,
+            Issue_year_update_frequency,
+            Issue_year_close_frequency,
+            Issue_month_create_frequency,
+            Issue_month_update_frequency,
+            Issue_month_close_frequency,
+        }
+        const PullFrequencyDatas = {
+            pull_year_create_frequency,
+            pull_year_close_frequency,
+            pull_year_update_frequency,
+            pull_month_create_frequency,
+            pull_month_close_frequency,
+            pull_month_update_frequency,
         }
         return (
             <Container maxWidth="xl">
@@ -133,10 +166,10 @@ export default function DashboardApp() {
                 <Box>
                     <Grid container spacing={3}>
                         <Grid item xs={12} sm={12} md={12}>
-                            <IssueFrequency {...issue_frequency} />
+                            <IssueFrequency {...IssueFrequencyDatas} />
                         </Grid>
                         <Grid item xs={12} sm={12} md={12}>
-                            <IssuerFrequency {...issuer_frequency} />
+                            <IssuerFrequency {...Issuer_count} />
                         </Grid>
                     </Grid>
                 </Box>
@@ -147,7 +180,12 @@ export default function DashboardApp() {
                 </Box>
                 <Box>
                     <Grid container spacing={3}>
-                        {/* TODO: pull request相关模块 */}
+                        <Grid item xs={12} sm={12} md={12}>
+                            <PullFrequency {...PullFrequencyDatas} />
+                        </Grid>
+                        <Grid item xs={12} sm={12} md={12}>
+                            <PullerFrequency {...puller_count} />
+                        </Grid>
                     </Grid>
                 </Box>
 
@@ -159,8 +197,8 @@ export default function DashboardApp() {
                         <Grid item xs={9}>
                             <CoreContribute {...coreContributeData} />
                         </Grid>
-                        <Grid sx={{maxHeight:"100%"}} item xs={3} >
-                            <ContributorList sx={{height:1}} {...contributeDetail} />
+                        <Grid sx={{ maxHeight: "100%" }} item xs={3} >
+                            <ContributorList sx={{ height: 1 }} {...contributeDetail} />
                         </Grid>
                     </Grid>
                 </Box>
@@ -170,17 +208,17 @@ export default function DashboardApp() {
                 <Box>
                     <Grid container spacing={3}>
                         <Grid item xs={12} sm={12} md={12}>
-                            <IssueResponse {...response_time}/>
+                            <IssueResponse {...response_time} />
                         </Grid>
                     </Grid>
                     <Grid container spacing={3}>
                         <Grid item xs={12} sm={12} md={12}>
-                            <IssueClose {...monthly_count}/>
+                            <IssueClose {...monthly_count} />
                         </Grid>
                     </Grid>
                 </Box>
 
-            
+
 
                 <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
                     <Typography variant="h4">Design</Typography>
