@@ -22,11 +22,27 @@ const PullFrequency = (data) => {
         },
     ];
     const chartOptions = merge(BaseOptionChart(), {
+        chart: {
+            type: 'area',
+            stacked: false,
+            zoom: {
+                type: 'x',
+                enabled: true,
+                autoScaleYaxis: true
+            },
+            toolbar: {
+                autoSelected: 'zoom'
+            }
+        },
         stroke: { width: [3, 2] },
         plotOptions: { bar: { columnWidth: "11%", borderRadius: 4 } },
         fill: { type: ["gradient", "solid"] },
         labels: labels,
-        xaxis: { type: "datetime" },
+        xaxis: {
+            categories: [
+                ...labels
+            ]
+        },
         tooltip: {
             shared: true,
             intersect: false,

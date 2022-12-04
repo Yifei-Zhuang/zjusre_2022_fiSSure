@@ -7,7 +7,7 @@ import BaseOptionChart from "./BaseOptionChart";
 // ----------------------------------------------------------------------
 
 const CoreContribute = (data) => {
-    var labels = [],
+  var labels = [],
     number = [];
   for (var interval in data) {
     labels.push(interval);
@@ -21,11 +21,27 @@ const CoreContribute = (data) => {
     },
   ];
   const chartOptions = merge(BaseOptionChart(), {
+    chart: {
+      type: 'area',
+      stacked: false,
+      zoom: {
+        type: 'x',
+        enabled: true,
+        autoScaleYaxis: true
+      },
+      toolbar: {
+        autoSelected: 'zoom'
+      }
+    },
     stroke: { width: [3, 2] },
     plotOptions: { bar: { columnWidth: "11%", borderRadius: 4 } },
     fill: { type: ["gradient", "solid"] },
     labels: labels,
-    xaxis: { type: "category" },
+    xaxis: {
+      categories: [
+        ...labels
+      ]
+    },
     tooltip: {
       shared: true,
       intersect: false,
@@ -45,7 +61,6 @@ const CoreContribute = (data) => {
       <CardHeader title="CoreContribute times" />
       <Box sx={{ p: 3, pb: 1 }} dir="ltr">
         <ReactApexChart
-          type="line"
           series={CHART_DATA}
           options={chartOptions}
           height={355}

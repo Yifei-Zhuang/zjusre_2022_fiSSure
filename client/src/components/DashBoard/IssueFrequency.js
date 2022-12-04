@@ -42,11 +42,27 @@ const IssueFrequency = data => {
     },
   ];
   const chartOptions = merge(BaseOptionChart(), {
+    chart: {
+      type: 'line',
+      stacked: true,
+      zoom: {
+        type: 'x',
+        enabled: true,
+        autoScaleYaxis: true
+      },
+      toolbar: {
+        autoSelected: 'zoom'
+      }
+    },
     stroke: { width: [3, 2] },
     plotOptions: { bar: { columnWidth: '11%', borderRadius: 4 } },
     fill: { type: ['gradient'] },
     labels: labels,
-    xaxis: { type: 'datetime' },
+    xaxis: {
+      categories: [
+        ...labels
+      ]
+    },
     tooltip: {
       shared: true,
       intersect: false,
@@ -92,7 +108,6 @@ const IssueFrequency = data => {
             </List>
           </Popover>
           <ReactApexChart
-            type="line"
             series={CHART_DATA}
             options={chartOptions}
             height={364}
