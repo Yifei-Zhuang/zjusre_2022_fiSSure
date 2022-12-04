@@ -215,63 +215,63 @@ const GetDashboard = async (req, res) => {
         }
       })();
       console.log(new Date(), 'compute pull finish');
-      // console.log(new Date(), 'compute issue begin');
-      // await (async () => {
-      //   try {
-      //     issue_frequency = {
-      //       issue_year_create_frequency:
-      //         await IssueUtil.GetRepoIssueCreateFrequencyByYear(owner, repo),
-      //       Issue_year_update_frequency:
-      //         await IssueUtil.GetRepoIssueUpdateFrequencyByYear(owner, repo),
-      //       Issue_year_close_frequency:
-      //         await IssueUtil.GetRepoIssueCloseFrequencyByYear(owner, repo),
-      //       Issue_month_create_frequency:
-      //         await IssueUtil.GetRepoIssueCreateFrequencyByMonth(owner, repo),
-      //       Issue_month_update_frequency:
-      //         await IssueUtil.GetRepoIssueUpdateFrequencyByMonth(owner, repo),
-      //       Issue_month_close_frequency:
-      //         await IssueUtil.GetRepoIssueCloseFrequencyByMonth(owner, repo),
-      //       Issue_day_create_frequency: getDayS
-      //         ? await IssueUtil.GetRepoIssueCreateFrequencyByDay(owner, repo)
-      //         : {},
-      //       Issue_day_update_frequency: getDayS
-      //         ? await IssueUtil.GetRepoIssueUpdateFrequencyByDay(owner, repo)
-      //         : {},
-      //       Issue_day_close_frequency: getDayS
-      //         ? await IssueUtil.GetRepoIssueCloseFrequencyByDay(owner, repo)
-      //         : {},
-      //       Issuer_count: await IssueUtil.GetIssuersCountInRange(owner, repo),
-      //     };
-      //   } catch (e) {
-      //     console.log('issue fetch error');
-      //     throw e;
-      //   }
-      // })();
-      // console.log(new Date(), 'compute issue finish');
-      // console.log(new Date(), 'compute comment begin');
-      // await (async () => {
-      //   issue_comment_frequency = {
-      //     monthly_count: await IssueCommentUtil.getIssueCloseTime(owner, repo),
-      //     response_time: await IssueCommentUtil.getFirstResponseTimeMap(
-      //       owner,
-      //       repo,
-      //     ),
-      //   };
-      //   console.log(new Date(), 'compute comment finish');
-      // })();
-      // console.log(new Date(), 'compute comment begin');
-      // console.log(new Date(), 'compute coreContributorByYear begin');
-      // let coreContributorByYear = await GetCoreContributorByYear1(owner, repo);
-      // console.log(new Date(), 'compute coreContributorByYear finish');
+      console.log(new Date(), 'compute issue begin');
+      await (async () => {
+        try {
+          issue_frequency = {
+            issue_year_create_frequency:
+              await IssueUtil.GetRepoIssueCreateFrequencyByYear(owner, repo),
+            Issue_year_update_frequency:
+              await IssueUtil.GetRepoIssueUpdateFrequencyByYear(owner, repo),
+            Issue_year_close_frequency:
+              await IssueUtil.GetRepoIssueCloseFrequencyByYear(owner, repo),
+            Issue_month_create_frequency:
+              await IssueUtil.GetRepoIssueCreateFrequencyByMonth(owner, repo),
+            Issue_month_update_frequency:
+              await IssueUtil.GetRepoIssueUpdateFrequencyByMonth(owner, repo),
+            Issue_month_close_frequency:
+              await IssueUtil.GetRepoIssueCloseFrequencyByMonth(owner, repo),
+            Issue_day_create_frequency: getDayS
+              ? await IssueUtil.GetRepoIssueCreateFrequencyByDay(owner, repo)
+              : {},
+            Issue_day_update_frequency: getDayS
+              ? await IssueUtil.GetRepoIssueUpdateFrequencyByDay(owner, repo)
+              : {},
+            Issue_day_close_frequency: getDayS
+              ? await IssueUtil.GetRepoIssueCloseFrequencyByDay(owner, repo)
+              : {},
+            Issuer_count: await IssueUtil.GetIssuersCountInRange(owner, repo),
+          };
+        } catch (e) {
+          console.log('issue fetch error');
+          throw e;
+        }
+      })();
+      console.log(new Date(), 'compute issue finish');
+      console.log(new Date(), 'compute comment begin');
+      await (async () => {
+        issue_comment_frequency = {
+          monthly_count: await IssueCommentUtil.getIssueCloseTime(owner, repo),
+          response_time: await IssueCommentUtil.getFirstResponseTimeMap(
+            owner,
+            repo,
+          ),
+        };
+        console.log(new Date(), 'compute comment finish');
+      })();
+      console.log(new Date(), 'compute comment begin');
+      console.log(new Date(), 'compute coreContributorByYear begin');
+      let coreContributorByYear = await GetCoreContributorByYear1(owner, repo);
+      console.log(new Date(), 'compute coreContributorByYear finish');
 
       try {
         detail = {
           ...detail._doc,
           ...commit_frequency,
           ...pull_frequency,
-          // ...issue_frequency,
-          // ...issue_comment_frequency,
-          // coreContributorByYear,
+          ...issue_frequency,
+          ...issue_comment_frequency,
+          coreContributorByYear,
         };
         res.status(201).json(detail);
       } catch (e) {

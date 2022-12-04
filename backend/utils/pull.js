@@ -23,7 +23,6 @@ const {
 } = require('./index');
 const { Mutex } = require('async-mutex');
 let PageMutex = new Mutex();
-let PAGE_NUM = 0;
 const GetPageNum = async () => {
   let release = await PageMutex.acquire();
   let returnVal = PAGE_NUM;
@@ -43,6 +42,7 @@ const AsyncFetchPullInfo = async (owner, repo) => {
     const page_num = await GetPageNum();
     let pullMessage = null;
     try {
+      console.log(page_num)
       pullMessage = await octokit.request('GET /repos/{owner}/{repo}/pulls', {
         owner: owner,
         repo: repo,
@@ -213,7 +213,7 @@ const GetRepoPullCreateFrequencyByYear = async (owner, repo) => {
       });
     }
     console.log(new Date(), 'end GetRepoPullCreateFrequencyByYear')
-    return { ...cache?.pull_year_create_frequency, ...result };
+    return { ...(cache ? cache?.pull_year_create_frequency : {}), ...result };
   } catch (e) {
     throw createCustomError(e, 500);
   }
@@ -284,7 +284,7 @@ const GetRepoPullUpdateFrequencyByYear = async (owner, repo) => {
       });
     }
     console.log(new Date(), 'end GetRepoPullUpdateFrequencyByYear');
-    return { ...cache?.pull_year_update_frequency, ...result };
+    return { ...(cache ? cache?.pull_year_update_frequency : {}), ...result };
   } catch (e) {
     throw createCustomError(e, 500);
   }
@@ -356,7 +356,7 @@ const GetRepoPullCloseFrequencyByYear = async (owner, repo) => {
       });
     }
     console.log(new Date(), 'end GetRepoPullCloseFrequencyByYear');
-    return { ...(cache.pull_year_close_frequency), ...result };
+    return { ...(cache ? cache.pull_year_close_frequency : {}), ...result };
   } catch (e) {
     throw createCustomError(e, 500);
   }
@@ -430,7 +430,7 @@ const GetRepoPullUpdateFrequencyByMonth = async (owner, repo) => {
       });
     }
     console.log(new Date(), 'end GetRepoPullUpdateFrequencyByMonth')
-    return { ...cache?.pull_month_update_frequency, ...result };
+    return { ...(cache ? cache?.pull_month_update_frequency : {}), ...result };
   } catch (e) {
     throw createCustomError(e, 500);
   }
@@ -465,7 +465,6 @@ const GetRepoPullCloseFrequencyByMonth = async (owner, repo) => {
     const begin = PullInRange[0].closed_at;
 
     let result = await MonthCounter(PullInRange, 'closed_at', begin, null, map);
-    console.log(result);
     let temp = {};
     // 去掉最后一年
     const curMonth = `${new Date().getUTCFullYear()}-${new Date().toISOString().split('-')[1]
@@ -564,7 +563,7 @@ const GetRepoPullCreateFrequencyByMonth = async (owner, repo) => {
       });
     }
     console.log(new Date(), 'end GetRepoPullCreateFrequencyByMonth')
-    return { ...(cache.pull_month_create_frequency), ...result };
+    return { ...(cache ? cache?.pull_month_create_frequency : {}), ...result };
   } catch (e) {
     throw createCustomError(e, 500);
   }
@@ -699,8 +698,8 @@ const GetPullersCountInRange = async (owner, repo) => {
     const PullInRange = await PullSchema.find({
       repo_owner: owner,
       repo_name: repo,
-      updated_at: { $gt: maxMonth }
-    }).sort([['updated_at', 1]])
+      created_at: { $gt: maxMonth }
+    }).sort([['created_at', 1]])
     if (PullInRange.length == 0) {
       return {};
     }
@@ -731,8 +730,8 @@ const GetPullersCountInRange = async (owner, repo) => {
         let count = 0;
         PullInRange.forEach(pull => {
           if (
-            Date.parse(curMonth) <= Date.parse(pull['updated_at']) &&
-            Date.parse(nextMonth) >= Date.parse(pull['updated_at']) &&
+            Date.parse(curMonth) <= Date.parse(pull['created_at']) &&
+            Date.parse(nextMonth) >= Date.parse(pull['created_at']) &&
             !set.has(pull.user_id)
           ) {
             count++;

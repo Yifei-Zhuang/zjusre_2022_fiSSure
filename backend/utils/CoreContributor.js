@@ -1,11 +1,11 @@
 const CommitSchema = require('../models/commit');
-const {Octokit} = require('@octokit/core');
+const { Octokit } = require('@octokit/core');
 const config = require('../config');
-const {default: mongoose} = require('mongoose');
-const {RepoCommitTimeFilter} = require('../controllers/commit');
-const {AsyncFunctionWrapper} = require('../utils');
-const {Mutex} = require('async-mutex');
-const {OctokitRequest} = require('../utils/index');
+const { default: mongoose } = require('mongoose');
+const { RepoCommitTimeFilter } = require('../controllers/commit');
+const { AsyncFunctionWrapper } = require('../utils');
+const { Mutex } = require('async-mutex');
+const { OctokitRequest } = require('../utils/index');
 const octokit = new Octokit({
   auth: process.env.GITHUB_ACCESS_TOKEN || config.GITHUB_ACCESS_TOKEN,
 });
@@ -23,13 +23,11 @@ const GetCoreContributorByYear1 = async (owner, repo) => {
       let start = i + '-01-01';
       let end = i + 1 + '-01-01';
       let contributorCommitNumber = new Map();
-      let allCommitsOfRepo = await RepoCommitTimeFilter(
-        owner,
-        repo,
-        start,
-        end,
-      );
-      // console.log(allCommitsOfRepo);
+      let allCommitsOfRepo = await CommitSchema.find({
+        repo_owner: owner,
+        repo_name: repo,
+        updated_at: { $gt: `${i}-01-01`, $lt: `${i + 1}-01-01` }
+      });
       const totalCommits = allCommitsOfRepo.length;
       allCommitsOfRepo.forEach(commit => {
         if (contributorCommitNumber.has(commit.author_name)) {

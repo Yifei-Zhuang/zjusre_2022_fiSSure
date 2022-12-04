@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
-const IssueYearUpdateCacheSchema = new mongoose.Schema({
-    issue_year_update_frequency: {
+const IssuerCacheSchema = new mongoose.Schema({
+    issuer_count: {
         type: Object,
-        required: [true, 'must provide issue_year_update_frequency'],
+        required: [true, 'must provide issuer_count'],
     },
     // 以下为冗余字段，仅供查询使用
     repo_owner: {
@@ -14,4 +14,4 @@ const IssueYearUpdateCacheSchema = new mongoose.Schema({
         required: [true, 'must provide repo_name'],
     },
 });
-module.exports = mongoose.model('IssueYearUpdate', IssueYearUpdateCacheSchema);
+module.exports = mongoose.model('Issuer-cache', IssuerCacheSchema);
