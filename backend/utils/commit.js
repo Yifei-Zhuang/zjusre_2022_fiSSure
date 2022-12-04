@@ -1,14 +1,15 @@
 const CommitSchema = require('../models/commit');
 const CommitYearSchema = require('../models/commit-year-cache');
 const CommitMonthSchema = require('../models/commit-month-cache');
+const CommiterCacheSchema = require('../models/commiter-cache');
 
-const {Octokit} = require('@octokit/core');
+const { Octokit } = require('@octokit/core');
 const config = require('../config');
 const octokit = new Octokit({
   auth: process.env.GITHUB_ACCESS_TOKEN || config.GITHUB_ACCESS_TOKEN,
 });
-const {createCustomError} = require('../errors/custom-error');
-const {Mutex} = require('async-mutex');
+const { createCustomError } = require('../errors/custom-error');
+const { Mutex } = require('async-mutex');
 const {
   YearCounter,
   MonthCounter,
@@ -70,8 +71,8 @@ const AsyncFetchCommitInfo = async (owner, repo) => {
         let name = commit.author
           ? commit.author.login
           : commit.commit.author
-          ? commit.commit.author.name
-          : 'test';
+            ? commit.commit.author.name
+            : 'test';
         try {
           const newCommit = {
             sha: commit.sha,
@@ -147,21 +148,25 @@ const GetRepoCommitFrequencyByYear = async (owner, repo) => {
     if (!owner || !repo) {
       throw 'missing body data';
     }
-    // 升序排列
-    const CommitInRange = await CommitSchema.find({
-      repo_owner: owner,
-      repo_name: repo,
-    }).sort([['updated_at', 1]]);
+
     let map = new Map();
     const CommitYearCache = await CommitYearSchema.findOne({
       repo_owner: owner,
       repo_name: repo,
     });
+    let maxYear = '1970-01-01';
     if (CommitYearCache) {
       for (const key in CommitYearCache.commit_year_frequency) {
+        maxYear = maxYear > key ? maxYear : key;
         map.set(key, CommitYearCache.commit_year_frequency[key]);
       }
     }
+    // 升序排列
+    const CommitInRange = await CommitSchema.find({
+      repo_owner: owner,
+      repo_name: repo,
+      updated_at: { $gt: maxYear },
+    }).sort([['updated_at', 1]]);
     if (CommitInRange.length == 0) {
       return {};
     }
@@ -189,11 +194,9 @@ const GetRepoCommitFrequencyByYear = async (owner, repo) => {
       if (!CommitYearCache.commit_year_frequency) {
         CommitYearCache.commit_year_frequency = {};
       }
-      console.log(1);
       // 更新计算结果
       Object.assign(CommitYearCache.commit_year_frequency, temp);
       CommitYearCache.save();
-      console.log(2);
     } else {
       CommitYearSchema.create({
         commit_year_frequency: temp,
@@ -201,7 +204,7 @@ const GetRepoCommitFrequencyByYear = async (owner, repo) => {
         repo_name: repo,
       });
     }
-    return {...result, ...CommitYearCache?.commit_year_frequency};
+    return { ...result, ...CommitYearCache?.commit_year_frequency };
   } catch (e) {
     throw createCustomError(e, 400);
   }
@@ -225,25 +228,29 @@ const GetRepoCommitFrequencyByMonth = async (owner, repo) => {
     if (!owner || !repo) {
       throw 'missing body data';
     }
-    const CommitInRange = await CommitSchema.find({
-      repo_owner: owner,
-      repo_name: repo,
-    }).sort([['updated_at', 1]]);
-    if (CommitInRange.length == 0) {
-      return {};
-    }
-    const begin = CommitInRange[0].updated_at;
 
     let map = new Map();
     const CommitMonthCache = await CommitMonthSchema.findOne({
       repo_owner: owner,
       repo_name: repo,
     });
+    let maxMonth = '2016-01-01';
     if (CommitMonthCache) {
       for (const key in CommitMonthCache.commit_month_frequency) {
+        maxMonth = maxMonth > key ? maxMonth : key;
         map.set(key, CommitMonthCache.commit_month_frequency[key]);
       }
     }
+    const CommitInRange = await CommitSchema.find({
+      repo_owner: owner,
+      repo_name: repo,
+      updated_at: { $gt: maxMonth },
+    }).sort([['updated_at', 1]]);
+    if (CommitInRange.length == 0) {
+      return {};
+    }
+    const begin = CommitInRange[0].updated_at;
+
     let result = await MonthCounter(
       CommitInRange,
       'updated_at',
@@ -255,9 +262,8 @@ const GetRepoCommitFrequencyByMonth = async (owner, repo) => {
 
     let temp = {};
     // 去掉最后一年
-    const curMonth = `${new Date().getUTCFullYear()}-${
-      new Date().toISOString().split('-')[1]
-    }-01`;
+    const curMonth = `${new Date().getUTCFullYear()}-${new Date().toISOString().split('-')[1]
+      }-01`;
     for (const key in result) {
       if (key === curMonth) {
         continue;
@@ -275,7 +281,7 @@ const GetRepoCommitFrequencyByMonth = async (owner, repo) => {
         repo_name: repo,
       });
     }
-    return {...result, ...CommitMonthCache?.commit_month_frequency};
+    return { ...result, ...CommitMonthCache?.commit_month_frequency };
   } catch (e) {
     throw createCustomError(e, 500);
   }
@@ -329,9 +335,24 @@ const GetCommitersCountInRange = async (owner, repo) => {
     if (!owner || !repo) {
       throw 'missing body data';
     }
+    let cache = await CommiterCacheSchema.findOne({
+      repo_owner: owner,
+      repo_name: repo,
+    });
+    let arr = { base: 0 };
+    if (cache) {
+      arr = { ...arr, ...cache.commiter_count };
+    } else {
+    }
+    console.log(arr)
+    let maxMonth =
+      Object.keys(arr).at(-1) === 'base'
+        ? '2011-01-01'
+        : Object.keys(arr).at(-1);
     const CommitInRange = await CommitSchema.find({
       repo_owner: owner,
       repo_name: repo,
+      updated_at: { $gt: maxMonth },
     }).sort([['updated_at', 1]]);
     if (CommitInRange.length == 0) {
       return {};
@@ -342,7 +363,7 @@ const GetCommitersCountInRange = async (owner, repo) => {
     const LastYear = new Date().getUTCFullYear();
     const LastMonth = new Date().toISOString().split('-')[1];
     const set = new Set();
-    const arr = {base: 0};
+
     let pre = 0;
     for (
       let i = parseInt(BaseYear);
@@ -394,7 +415,22 @@ const GetCommitersCountInRange = async (owner, repo) => {
       }
     }
     delete arr.base;
+    let copy = arr;
+    console.log(arr)
+    let lastMonth = Object.keys(copy).at(-1);
+    console.log(copy);
+    delete copy[lastMonth];
+    if (cache) {
+      cache.commiter_count = copy;
 
+      await cache.save();
+    } else {
+      await CommiterCacheSchema.create({
+        commiter_count: copy,
+        repo_name: repo,
+        repo_owner: owner,
+      });
+    }
     return arr;
   } catch (e) {
     throw createCustomError(e, 500);
