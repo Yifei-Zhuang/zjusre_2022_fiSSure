@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useAppContext } from "../context/appContext";
 import Loading from "../components/Loading";
 import { useParams } from "react-router-dom";
-import { Box, Grid, Container, Typography, Button, Popover } from "@mui/material";
+import { Box, Grid, Container, Typography, Button } from "@mui/material";
 import {
     CommitNumber,
     IssueNumber,
@@ -18,7 +18,8 @@ import {
     IssueResponse,
     IssueClose,
     PullFrequency,
-    PullerFrequency
+    PullerFrequency,
+    Compare
 } from "../components/DashBoard";
 import detail from "../context/staticData"
 
@@ -31,12 +32,13 @@ export default function DashboardApp() {
 
     const { id } = useParams();
 
+
     // 使用请求的detail数据
     // const { isLoading, detail, getDashBoard } = useAppContext();
 
     //使用死数据
     const { isLoading, getDashBoard } = useAppContext();
-
+    const [visible, setVisible] = useState(false);
     const {
         forks,
         stars,
@@ -65,6 +67,8 @@ export default function DashboardApp() {
         monthly_count
     } = detail;
 
+
+
     if (isLoading) {
         return <Loading center />;
     } else {
@@ -86,109 +90,138 @@ export default function DashboardApp() {
             pull_month_update_frequency,
         }
         return (
-            <Container maxWidth="xl">
-                <Box sx={{ pb: 5 }}>
-                    <Typography variant="h4">Report</Typography>
+            visible ? (
+                <Container maxWidth="xl">
+                <Box sx={{ pb: 5, display: "flex", justifyContent: "space-between" }}>
+                    <Typography variant="h4">Compare</Typography>
+                    <Button
+                        variant="contained" sx={{ mr: "0%" }}
+                        onClick={() => {
+                            setVisible(false);
+                            console.log(visible);
+                        }}>
+                        Report
+                    </Button>
                 </Box>
-                <Box>
-                    <Grid container spacing={3}>
-                        <Grid item xs={12} sm={6} md={3}>
-                            <CommitNumber data={commit_month_frequency} />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={3}>
-                            <IssueNumber total={open_issues} />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={3}>
-                            <StarNumber total={stars} />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={3}>
-                            <ForkNumber total={forks} />
-                        </Grid>
-
-                        <Grid item xs={12} sm={6} md={4}>
-                            <TimeLine {...timeline} />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={8}>
-                            <Language {...language} />
-                        </Grid>
-                    </Grid>
-                </Box>
-
-
-                <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
-                    <Typography variant="h4">Commit</Typography>
-                </Box>
-                <Box>
-                    <Grid container spacing={3}>
-                        <Grid item xs={12} sm={12} md={12}>
-                            <CommitFrequency {...commit_month_frequency} />
-                        </Grid>
-                        <Grid item xs={12} sm={12} md={12}>
-                            <CommiterFrequency {...commiter_count} />
-                        </Grid>
-                    </Grid>
-                </Box>
-
-                <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
-                    <Typography variant="h4">Issue</Typography>
-                </Box>
-                <Box>
-                    <Grid container spacing={3}>
-                        <Grid item xs={12} sm={12} md={12}>
-                            <IssueFrequency {...IssueFrequencyDatas} />
-                        </Grid>
-                        <Grid item xs={12} sm={12} md={12}>
-                            <IssuerFrequency {...Issuer_count} />
-                        </Grid>
-                    </Grid>
-                </Box>
-
-
-                <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
-                    <Typography variant="h4">pull request</Typography>
-                </Box>
-                <Box>
-                    <Grid container spacing={3}>
-                        <Grid item xs={12} sm={12} md={12}>
-                            <PullFrequency {...PullFrequencyDatas} />
-                        </Grid>
-                        <Grid item xs={12} sm={12} md={12}>
-                            <PullerFrequency {...puller_count} />
-                        </Grid>
-                    </Grid>
-                </Box>
-
-                <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
-                    <Typography variant="h4">contribute</Typography>
-                </Box>
-                <Box sx={{ height: 520, width: '100%' }}>
-                    <Contribute {...coreContributorByYear}/>
-                </Box>
-                <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
-                    <Typography variant="h4">Issue closed and Issue response</Typography>
-                </Box>
-                <Box>
-                    <Grid container spacing={3}>
-                        <Grid item xs={12} sm={12} md={12}>
-                            <IssueResponse {...response_time} />
-                        </Grid>
-                    </Grid>
-                    <Grid container spacing={3}>
-                        <Grid item xs={12} sm={12} md={12}>
-                            <IssueClose {...monthly_count} />
-                        </Grid>
-                    </Grid>
-                </Box>
-
-
-
-                <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
-                    <Typography variant="h4">Design</Typography>
-                </Box>
-                <Box>
-                    {/* TODO: 设计相关模块 */}
-                </Box>
+                <Compare />
             </Container>
+                
+            )
+                :
+                (
+                    <Container maxWidth="xl">
+                        <Box sx={{ pb: 5, display: "flex", justifyContent: "space-between" }}>
+                            <Typography variant="h4">Report</Typography>
+                            <Button
+                                variant="contained" sx={{ mr: "0%" }}
+                                onClick={() => {
+                                    setVisible(true);
+                                    console.log(visible);
+                                }}>
+                                Compare
+                            </Button>
+                        </Box>
+                        <Box>
+                            <Grid container spacing={3}>
+                                <Grid item xs={12} sm={6} md={3}>
+                                    <CommitNumber data={commit_month_frequency} />
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={3}>
+                                    <IssueNumber total={open_issues} />
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={3}>
+                                    <StarNumber total={stars} />
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={3}>
+                                    <ForkNumber total={forks} />
+                                </Grid>
+
+                                <Grid item xs={12} sm={6} md={4}>
+                                    <TimeLine {...timeline} />
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={8}>
+                                    <Language {...language} />
+                                </Grid>
+                            </Grid>
+                        </Box>
+
+
+                        <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
+                            <Typography variant="h4">Commit</Typography>
+                        </Box>
+                        <Box>
+                            <Grid container spacing={3}>
+                                <Grid item xs={12} sm={12} md={12}>
+                                    <CommitFrequency {...commit_month_frequency} />
+                                </Grid>
+                                <Grid item xs={12} sm={12} md={12}>
+                                    <CommiterFrequency {...commiter_count} />
+                                </Grid>
+                            </Grid>
+                        </Box>
+
+                        <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
+                            <Typography variant="h4">Issue</Typography>
+                        </Box>
+                        <Box>
+                            <Grid container spacing={3}>
+                                <Grid item xs={12} sm={12} md={12}>
+                                    <IssueFrequency {...IssueFrequencyDatas} />
+                                </Grid>
+                                <Grid item xs={12} sm={12} md={12}>
+                                    <IssuerFrequency {...Issuer_count} />
+                                </Grid>
+                            </Grid>
+                        </Box>
+
+
+                        <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
+                            <Typography variant="h4">pull request</Typography>
+                        </Box>
+                        <Box>
+                            <Grid container spacing={3}>
+                                <Grid item xs={12} sm={12} md={12}>
+                                    <PullFrequency {...PullFrequencyDatas} />
+                                </Grid>
+                                <Grid item xs={12} sm={12} md={12}>
+                                    <PullerFrequency {...puller_count} />
+                                </Grid>
+                            </Grid>
+                        </Box>
+
+                        <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
+                            <Typography variant="h4">contribute</Typography>
+                        </Box>
+                        <Box sx={{ height: 520, width: '100%' }}>
+                            <Contribute {...coreContributorByYear} />
+                        </Box>
+                        <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
+                            <Typography variant="h4">Issue closed and Issue response</Typography>
+                        </Box>
+                        <Box>
+                            <Grid container spacing={3}>
+                                <Grid item xs={12} sm={12} md={12}>
+                                    <IssueResponse {...response_time} />
+                                </Grid>
+                            </Grid>
+                            <Grid container spacing={3}>
+                                <Grid item xs={12} sm={12} md={12}>
+                                    <IssueClose {...monthly_count} />
+                                </Grid>
+                            </Grid>
+                        </Box>
+
+
+
+                        <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
+                            <Typography variant="h4">Design</Typography>
+                        </Box>
+                        <Box>
+                            {/* TODO: 设计相关模块 */}
+                        </Box>
+                    </Container>
+                )
+
         );
     }
 }

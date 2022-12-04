@@ -13,6 +13,7 @@ import IssueResponse from "./IssueResponse";
 import IssueClose from "./IssueClose";
 import PullFrequency from "./PullFrequency"
 import PullerFrequency from "./PullerFrequency"
+import Compare from "./Compare";
 export {
   CommitNumber,
   IssueNumber,
@@ -28,5 +29,6 @@ export {
   IssueResponse,
   IssueClose,
   PullFrequency,
-  PullerFrequency
+  PullerFrequency,
+  Compare
 };
