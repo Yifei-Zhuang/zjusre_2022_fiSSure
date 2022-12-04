@@ -1,9 +1,9 @@
 const asyncWrapper = require('../middleware/async');
-const {createCustomError} = require('../errors/custom-error');
+const { createCustomError } = require('../errors/custom-error');
 const RepoSchema = require('../models/repo');
 const ObjectId = require('mongodb').ObjectId;
 const dotenv = require('dotenv');
-const {Octokit} = require('@octokit/core');
+const { Octokit } = require('@octokit/core');
 const res = require('express/lib/response');
 const config = require('../config');
 const CommitSchema = require('../models/commit');
@@ -13,7 +13,7 @@ const IssueUtil = require('../utils/issue');
 const PullUtil = require('../utils/pull');
 const IssueCommentUtil = require('../utils/issueComment');
 const pull = require('../models/pull');
-const {GetCoreContributorByYear1} = require('../utils/CoreContributor');
+const { GetCoreContributorByYear1 } = require('../utils/CoreContributor');
 const octokit = new Octokit({
   auth: process.env.GITHUB_ACCESS_TOKEN || config.GITHUB_ACCESS_TOKEN,
 });
@@ -107,7 +107,7 @@ const GetMessage = async (req, res) => {
       throw e;
     }
 
-    res.status(201).json({status: 'success!'});
+    res.status(201).json({ status: 'success!' });
   } catch (err) {
     res.status(404).json(err);
   }
@@ -120,7 +120,7 @@ const SearchRepoName = async (req, res) => {
       var search = await RepoSchema.find({});
     } else
       search = await RepoSchema.find({
-        name: {$regex: SearchKey, $options: '$i'},
+        name: { $regex: SearchKey, $options: '$i' },
       });
     var repos = [];
     for (var i in search) {
@@ -135,7 +135,7 @@ const SearchRepoName = async (req, res) => {
       repos.push(eachRepo);
     }
     console.log(repos);
-    return res.status(201).json({repos});
+    return res.status(201).json({ repos });
   } catch (err) {
     res.status(404).json(err);
   }
@@ -146,7 +146,7 @@ const GetDashboard = async (req, res) => {
     let getDayS = req.body.getDay ? true : false;
     let detail;
     try {
-      detail = await RepoSchema.findOne({_id: ObjectId(req.body.id)});
+      detail = await RepoSchema.findOne({ _id: ObjectId(req.body.id) });
     } catch (e) {
       console.log('detail fetch error');
       throw e;
@@ -289,8 +289,8 @@ const GetDashboard = async (req, res) => {
 
 const DeleteRepo = async (req, res) => {
   try {
-    const test = await RepoSchema.deleteOne({_id: ObjectId(req.body.id)});
-    res.status(201).json({msg: 'success!'});
+    const test = await RepoSchema.deleteOne({ _id: ObjectId(req.body.id) });
+    res.status(201).json({ msg: 'success!' });
   } catch (err) {
     res.status(404).json(err);
   }

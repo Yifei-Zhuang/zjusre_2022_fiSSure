@@ -96,6 +96,7 @@ const AsyncFetchCommitInfo = async (owner, repo) => {
           console.log(e);
         }
       } else {
+        return;
       }
     }
   }
@@ -148,7 +149,6 @@ const GetRepoCommitFrequencyByYear = async (owner, repo) => {
     if (!owner || !repo) {
       throw 'missing body data';
     }
-
     let map = new Map();
     const CommitYearCache = await CommitYearSchema.findOne({
       repo_owner: owner,
@@ -204,7 +204,7 @@ const GetRepoCommitFrequencyByYear = async (owner, repo) => {
         repo_name: repo,
       });
     }
-    return { ...result, ...CommitYearCache?.commit_year_frequency };
+    return { ...CommitYearCache?.commit_year_frequency, ...result };
   } catch (e) {
     throw createCustomError(e, 400);
   }
@@ -281,7 +281,7 @@ const GetRepoCommitFrequencyByMonth = async (owner, repo) => {
         repo_name: repo,
       });
     }
-    return { ...result, ...CommitMonthCache?.commit_month_frequency };
+    return { ...CommitMonthCache?.commit_month_frequency, ...result };
   } catch (e) {
     throw createCustomError(e, 500);
   }
@@ -344,7 +344,6 @@ const GetCommitersCountInRange = async (owner, repo) => {
       arr = { ...arr, ...cache.commiter_count };
     } else {
     }
-    console.log(arr)
     let maxMonth =
       Object.keys(arr).at(-1) === 'base'
         ? '2011-01-01'
@@ -416,16 +415,14 @@ const GetCommitersCountInRange = async (owner, repo) => {
     }
     delete arr.base;
     let copy = arr;
-    console.log(arr)
     let lastMonth = Object.keys(copy).at(-1);
-    console.log(copy);
     delete copy[lastMonth];
     if (cache) {
       cache.commiter_count = copy;
 
-      await cache.save();
+      cache.save();
     } else {
-      await CommiterCacheSchema.create({
+      CommiterCacheSchema.create({
         commiter_count: copy,
         repo_name: repo,
         repo_owner: owner,
