@@ -10,14 +10,13 @@ import {
     ForkNumber,
     TimeLine,
     Language,
-    CoreContribute,
+    Contribute,
     CommitFrequency,
     CommiterFrequency,
     IssueFrequency,
     IssuerFrequency,
     IssueResponse,
     IssueClose,
-    ContributorList,
     PullFrequency,
     PullerFrequency
 } from "../components/DashBoard";
@@ -25,9 +24,9 @@ import detail from "../context/staticData"
 
 export default function DashboardApp() {
     // 暂时关闭从后端获得数据
-    useEffect(() => {
-        getDashBoard(id);
-    }, []);
+    // useEffect(() => {
+    //     getDashBoard(id);
+    // }, []);
 
 
     const { id } = useParams();
@@ -62,44 +61,13 @@ export default function DashboardApp() {
         pull_month_update_frequency,
         puller_count,
         response_time,
-        contributes,
+        coreContributorByYear,
         monthly_count
     } = detail;
-
-    const [nowYear, setYear] = useState(contributes.coreContributorByYear[0].year)
 
     if (isLoading) {
         return <Loading center />;
     } else {
-        // const contribute = {
-        //     name: [],
-        //     contributions: [],
-        // };
-
-        // if (contributors) {
-        //     for (var i = 0; i < Math.min(5, contributors.length); ++i) {
-        //         contribute.name.push(contributors[i].name);
-        //         contribute.contributions.push(contributors[i].contributions);
-        //     }
-        // }
-        const coreContributeData = {};
-        const yearList = [];
-        if (contributes) {
-            const coreContributeByYear = contributes["coreContributorByYear"];
-            for (var i = 0; i < coreContributeByYear.length; i++) {
-                var year = coreContributeByYear[i].year;
-                var count = 0;
-                yearList.push(year);
-                coreContributeByYear[i].coreContributor.map((tmp) => { count += tmp.commit; })
-                coreContributeData[year] = count;
-            }
-        }
-
-        const contributeDetail = {
-            contributes: contributes,
-            contributeYear: nowYear,
-        }
-
         const IssueFrequencyDatas = {
             issue_frequency,
             issue_year_create_frequency,
@@ -194,14 +162,7 @@ export default function DashboardApp() {
                     <Typography variant="h4">contribute</Typography>
                 </Box>
                 <Box >
-                    <Grid container spacing={3}>
-                        <Grid item xs={9}>
-                            <CoreContribute {...coreContributeData} />
-                        </Grid>
-                        <Grid sx={{ maxHeight: "100%" }} item xs={3} >
-                            <ContributorList sx={{ height: 1 }} {...contributeDetail} />
-                        </Grid>
-                    </Grid>
+                    <Contribute {...coreContributorByYear}/>
                 </Box>
                 <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
                     <Typography variant="h4">Issue closed and Issue response</Typography>
