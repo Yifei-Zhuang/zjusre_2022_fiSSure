@@ -3741,7 +3741,8 @@ const detail = {
                     "coreContributors": 1
                 }
             ]
-        }
+        },
+
     ]
 };
 

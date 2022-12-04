@@ -14,7 +14,7 @@ const CoreContribute = (data) => {
     }
     const CHART_DATA = [
         {
-            name: "comtribute times",
+            name: "comtributors",
             type: "area",
             data: number,
         },
@@ -57,7 +57,7 @@ const CoreContribute = (data) => {
 
     return (
         <Card>
-            <CardHeader title="CoreContribute times" />
+            <CardHeader title="Core Contributor count" />
             <Box sx={{ p: 3, pb: 1 }} dir="ltr">
                 <ReactApexChart
                     series={CHART_DATA}
@@ -96,7 +96,7 @@ const ContributorList = (data) => {
                 {
                     yearList.map((year) => {
                         return (
-                            <ToggleButton sx={{ width: "25.25%" }} key={year} value={year} onClick={(event, value) => {
+                            <ToggleButton sx={{ width: "" + (101 / yearList.length) + "%" }} key={year} value={year} onClick={(event, value) => {
                                 setYear(value);
                             }}>
                                 {year}
@@ -106,7 +106,7 @@ const ContributorList = (data) => {
                 }
             </ToggleButtonGroup>
             <CardHeader title="Contributors List" />
-            <Stack spacing={3} sx={{ p: 3, pr: 0 }}>
+            <Stack spacing={3} sx={{ p: 3, pr: 0 ,height: "355px", overflowY: "scroll"}}>
                 {coreContributorList.map((coreContributor) => {
                     return (
                         <Contributor key={coreContributor["contributor"]} contributor={coreContributor} />
@@ -140,19 +140,15 @@ const Contribute = (data) => {
 
     const yearCoreContributorCount = {};
     for(var i in data){
-        var sum = 0;
-        for(var j in data[i].coreContributor){
-            sum += data[i].coreContributor[j].commit;
-        }
-        yearCoreContributorCount[data[i].year] = sum;
+        yearCoreContributorCount[data[i].year] = data[i].coreContributor.length;
     }
 
     return (
-        <Grid container spacing={3}>
+        <Grid container  spacing={3}>
             <Grid item xs={9}>
                 <CoreContribute data={yearCoreContributorCount} />
             </Grid>
-            <Grid sx={{ maxHeight: "100%" }} item xs={3} >
+            <Grid item xs={3}>
                 <ContributorList {...data}  />
             </Grid>
         </Grid>

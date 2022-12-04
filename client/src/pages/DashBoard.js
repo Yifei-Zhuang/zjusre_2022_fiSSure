@@ -161,7 +161,7 @@ export default function DashboardApp() {
                 <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
                     <Typography variant="h4">contribute</Typography>
                 </Box>
-                <Box >
+                <Box sx={{ height: 520, width: '100%' }}>
                     <Contribute {...coreContributorByYear}/>
                 </Box>
                 <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
