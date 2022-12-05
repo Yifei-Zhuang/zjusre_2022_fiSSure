@@ -14,6 +14,7 @@ const PullUtil = require('../utils/pull');
 const IssueCommentUtil = require('../utils/issueComment');
 const pull = require('../models/pull');
 const { GetCoreContributorByYear1 } = require('../utils/CoreContributor');
+const RedisClient = require('../utils/Redis')
 const octokit = new Octokit({
   auth: process.env.GITHUB_ACCESS_TOKEN || config.GITHUB_ACCESS_TOKEN,
 });
@@ -31,7 +32,8 @@ const GetMessage = async (req, res) => {
       .catch(err => {
         console.log(err);
       });
-
+    // 清空缓存
+    await RedisClient.remove(`${owner}/${repo}`)
     //      获取仓库的commit，issue，pull信息
     await CommitUtil.GetCommitInfo(owner, repo);
 
@@ -84,24 +86,42 @@ const GetMessage = async (req, res) => {
       })(),
     ]);
     try {
-      const CreateRepo = await RepoSchema.create({
+      let preRepo = await RepoSchema.findOne({
         name: repoMessage.data.name,
-        owner: repoMessage.data.owner.login,
-        uploader: req.body.user,
-        forks: repoMessage.data.forks,
-        stars: repoMessage.data.watchers,
-        open_issues: repoMessage.data.open_issues,
-        commit_frequency: commit_frequency,
-        issue_frequency: issue_frequency,
-        contributors: contributors,
-        timeline: {
-          created_at: repoMessage.data.created_at,
-          updated_at: repoMessage.data.updated_at,
-          pushed_at: repoMessage.data.pushed_at,
-          recent_released_at: recent_released_at,
-        },
-        language: language,
+        owner: repoMessage.data.owner.login
       });
+      if (preRepo) {
+        preRepo.forks = repoMessage.data.forks;
+        preRepo.stars = repoMessage.data.stars;
+        preRepo.open_issues = repoMessage.data.open_issues;
+        preRepo.open_issues = repoMessage.data.open_issues;
+        preRepo.commit_frequency = commit_frequency;
+        preRepo.issue_frequency = issue_frequency;
+        preRepo.contributors = contributors;
+        preRepo.timeline.updated_at = repoMessage.data.updated_at;
+        preRepo.timeline.recent_released_at = recent_released_at;
+        preRepo.language = language;
+        await preRepo.save();
+      } else {
+        const CreateRepo = await RepoSchema.create({
+          name: repoMessage.data.name,
+          owner: repoMessage.data.owner.login,
+          uploader: req.body.user,
+          forks: repoMessage.data.forks,
+          stars: repoMessage.data.watchers,
+          open_issues: repoMessage.data.open_issues,
+          commit_frequency: commit_frequency,
+          issue_frequency: issue_frequency,
+          contributors: contributors,
+          timeline: {
+            created_at: repoMessage.data.created_at,
+            updated_at: repoMessage.data.updated_at,
+            pushed_at: repoMessage.data.pushed_at,
+            recent_released_at: recent_released_at,
+          },
+          language: language,
+        });
+      }
     } catch (e) {
       console.log(e);
       throw e;
@@ -154,6 +174,12 @@ const GetDashboard = async (req, res) => {
     try {
       let owner = detail.owner;
       let repo = detail.name;
+      if (await RedisClient.exists(`${owner}/${repo}`)) {
+        let cache = await RedisClient.get(`${owner}/${repo}`)
+        cache = JSON.parse(cache)
+        res.status(201).json(cache);
+        return;
+      }
       let commit_frequency;
       let pull_frequency;
       let issue_frequency;
@@ -263,7 +289,9 @@ const GetDashboard = async (req, res) => {
       console.log(new Date(), 'compute coreContributorByYear begin');
       let coreContributorByYear = await GetCoreContributorByYear1(owner, repo);
       console.log(new Date(), 'compute coreContributorByYear finish');
-
+      let total_commit_count
+        = await CommitSchema.count({ repo_owner: owner, repo_name: repo })
+      let total_issue_count = await IssueSchema.count({ repo_owner: owner, repo_name: repo })
       try {
         detail = {
           ...detail._doc,
@@ -272,7 +300,10 @@ const GetDashboard = async (req, res) => {
           ...issue_frequency,
           ...issue_comment_frequency,
           coreContributorByYear,
+          commits: total_commit_count,
+          issues: total_issue_count
         };
+        await RedisClient.set(`${owner}/${repo}`, detail);
         res.status(201).json(detail);
       } catch (e) {
         console.log(e);

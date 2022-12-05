@@ -8,7 +8,6 @@ const connectDB = require('./db/connect');
 const notFound = require('./middleware/notfound');
 const errorHandlerMiddleware = require('./middleware/error-handler');
 const config = require('./config');
-
 require('dotenv').config();
 
 app.use(xss());
