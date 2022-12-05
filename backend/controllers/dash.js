@@ -274,8 +274,8 @@ const GetDashboard = async (req, res) => {
           ...issue_frequency,
           ...issue_comment_frequency,
           coreContributorByYear,
-          total_issue_count,
-          total_commit_count
+          commits: total_commit_count,
+          issues: total_issue_count
         };
         res.status(201).json(detail);
       } catch (e) {
