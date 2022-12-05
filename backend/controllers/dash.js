@@ -14,6 +14,7 @@ const PullUtil = require('../utils/pull');
 const IssueCommentUtil = require('../utils/issueComment');
 const pull = require('../models/pull');
 const { GetCoreContributorByYear1 } = require('../utils/CoreContributor');
+const RedisClient = require('../utils/Redis')
 const octokit = new Octokit({
   auth: process.env.GITHUB_ACCESS_TOKEN || config.GITHUB_ACCESS_TOKEN,
 });
@@ -31,7 +32,8 @@ const GetMessage = async (req, res) => {
       .catch(err => {
         console.log(err);
       });
-
+    // 清空缓存
+    await RedisClient.remove(`${owner}/${repo}`)
     //      获取仓库的commit，issue，pull信息
     await CommitUtil.GetCommitInfo(owner, repo);
 
@@ -172,6 +174,12 @@ const GetDashboard = async (req, res) => {
     try {
       let owner = detail.owner;
       let repo = detail.name;
+      if (await RedisClient.exists(`${owner}/${repo}`)) {
+        let cache = await RedisClient.get(`${owner}/${repo}`)
+        cache = JSON.parse(cache)
+        res.status(201).json(cache);
+        return;
+      }
       let commit_frequency;
       let pull_frequency;
       let issue_frequency;
@@ -295,6 +303,7 @@ const GetDashboard = async (req, res) => {
           commits: total_commit_count,
           issues: total_issue_count
         };
+        await RedisClient.set(`${owner}/${repo}`, detail);
         res.status(201).json(detail);
       } catch (e) {
         console.log(e);
