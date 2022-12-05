@@ -263,7 +263,9 @@ const GetDashboard = async (req, res) => {
       console.log(new Date(), 'compute coreContributorByYear begin');
       let coreContributorByYear = await GetCoreContributorByYear1(owner, repo);
       console.log(new Date(), 'compute coreContributorByYear finish');
-
+      let total_commit_count
+        = await CommitSchema.count({ repo_owner: owner, repo_name: repo })
+      let total_issue_count = await IssueSchema.count({ repo_owner: owner, repo_name: repo })
       try {
         detail = {
           ...detail._doc,
@@ -272,6 +274,8 @@ const GetDashboard = async (req, res) => {
           ...issue_frequency,
           ...issue_comment_frequency,
           coreContributorByYear,
+          total_issue_count,
+          total_commit_count
         };
         res.status(201).json(detail);
       } catch (e) {
