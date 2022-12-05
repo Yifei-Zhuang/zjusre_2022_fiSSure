@@ -84,24 +84,42 @@ const GetMessage = async (req, res) => {
       })(),
     ]);
     try {
-      const CreateRepo = await RepoSchema.create({
+      let preRepo = await RepoSchema.findOne({
         name: repoMessage.data.name,
-        owner: repoMessage.data.owner.login,
-        uploader: req.body.user,
-        forks: repoMessage.data.forks,
-        stars: repoMessage.data.watchers,
-        open_issues: repoMessage.data.open_issues,
-        commit_frequency: commit_frequency,
-        issue_frequency: issue_frequency,
-        contributors: contributors,
-        timeline: {
-          created_at: repoMessage.data.created_at,
-          updated_at: repoMessage.data.updated_at,
-          pushed_at: repoMessage.data.pushed_at,
-          recent_released_at: recent_released_at,
-        },
-        language: language,
+        owner: repoMessage.data.owner.login
       });
+      if (preRepo) {
+        preRepo.forks = repoMessage.data.forks;
+        preRepo.stars = repoMessage.data.stars;
+        preRepo.open_issues = repoMessage.data.open_issues;
+        preRepo.open_issues = repoMessage.data.open_issues;
+        preRepo.commit_frequency = commit_frequency;
+        preRepo.issue_frequency = issue_frequency;
+        preRepo.contributors = contributors;
+        preRepo.timeline.updated_at = repoMessage.data.updated_at;
+        preRepo.timeline.recent_released_at = recent_released_at;
+        preRepo.language = language;
+        await preRepo.save();
+      } else {
+        const CreateRepo = await RepoSchema.create({
+          name: repoMessage.data.name,
+          owner: repoMessage.data.owner.login,
+          uploader: req.body.user,
+          forks: repoMessage.data.forks,
+          stars: repoMessage.data.watchers,
+          open_issues: repoMessage.data.open_issues,
+          commit_frequency: commit_frequency,
+          issue_frequency: issue_frequency,
+          contributors: contributors,
+          timeline: {
+            created_at: repoMessage.data.created_at,
+            updated_at: repoMessage.data.updated_at,
+            pushed_at: repoMessage.data.pushed_at,
+            recent_released_at: recent_released_at,
+          },
+          language: language,
+        });
+      }
     } catch (e) {
       console.log(e);
       throw e;
