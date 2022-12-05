@@ -2936,7 +2936,7 @@
 
 ## 4. CoreContributor
 
-### 4.1
+### 4.1 获取给定的仓库在 2019-2022 年间的核心贡献者和其公司分布
 
 > 获取 2019-2022 四年间每年的核心贡献者（定义为贡献了 80% 的 commits 的人群）及其公司分布，未在个人资料中标记公司的，记为 `other` 。
 >
@@ -3200,4 +3200,556 @@
 >     ]
 > }
 > ```
+
+### 4.2 获取对应主题的 issue 和 pr 在一定时间段内的总数
+
+> GET http://beet.asia:9200/doublec_pytorch/_search
 >
+> 不同主题需要不同的 body，body 形式如下：
+>
+> ```json
+> {
+>   "min_score": 0,
+>   "query":{
+>     "bool": {
+>       "should": [
+>         {
+>           "query_string": {
+>             "query": "docs"
+>           }
+>         },
+>         {
+>           "query_string": {
+>             "query": "typo"
+>           }
+>         }
+>       ], 
+>       "minimum_should_match": 1, 
+>       "filter": [
+>         {
+>           "terms": {
+>             "_type": ["issues", "pulls"]
+>           }
+>         },
+>         {
+>           "term": {
+>             "repos_id": 65600975
+>           }
+>         },
+>         {
+>           "range": {
+>             "created_at": {
+>               "gte": "2022-01-01 04:00:00", 
+>               "lte": "2023-01-01 04:59:59",
+>               "format": "yyyy-MM-dd HH:mm:ss"
+>             }
+> 	        }
+>         }
+>       ]
+>     }
+>   }
+> }
+> ```
+>
+> 需要将 `created_at` 内的开始/结束时间修改为需要的值，`repos_id` 为仓库 id。
+>
+> `should` 内的关键词为区分不同主题的方法，不同主题的 `should` 如下，建议将其保存为常量后调用：
+>
+> + 代码
+>
+>   ```json
+>   [
+>       {
+>           "query_string": {
+>               "query": "dependency"
+>           }
+>       },
+>       {
+>           "query_string": {
+>               "query": "rebuild"
+>           }
+>       },
+>       {
+>           "query_string": {
+>               "query": "add"
+>           }
+>       },
+>       {
+>           "query_string": {
+>               "query": "implement"
+>           }
+>       },
+>       {
+>           "query_string": {
+>               "query": "restruct"
+>           }
+>       },
+>       {
+>           "query_string": {
+>               "query": "construct"
+>           }
+>       },
+>       {
+>           "query_string": {
+>               "query": "feature"
+>           }
+>       }
+>   ]
+>   ```
+>
+> + 可维护性
+>
+>   ```json
+>   {
+>       "query_string": {
+>           "query": "support"
+>       }
+>   },
+>   {
+>       "query_string": {
+>           "query": "standard"
+>       }
+>   },
+>   {
+>       "query_string": {
+>           "query": "format"
+>       }
+>   }
+>   ```
+>
+> + 鲁棒性
+>
+>   ```json
+>   [
+>       {
+>           "query_string": {
+>               "query": "robust"
+>           }
+>       },
+>       {
+>           "query_string": {
+>               "query": "error"
+>           }
+>       },
+>       {
+>           "query_string": {
+>               "query": "fail"
+>           }
+>       },
+>       {
+>           "query_string": {
+>               "query": "bug"
+>           }
+>       }
+>   ]
+>   ```
+>
+> + 性能
+>
+>   ```json
+>   [
+>       {
+>           "query_string": {
+>               "query": "boost"
+>           }
+>       },
+>       {
+>           "query_string": {
+>               "query": "speed"
+>           }
+>       },
+>       {
+>           "query_string": {
+>               "query": "performance"
+>           }
+>       }
+>   ]
+>   ```
+>
+> + 配置
+>
+>   ```json
+>   [
+>       {
+>           "query_string": {
+>               "query": "config"
+>           }
+>       },
+>       {
+>           "query_string": {
+>               "query": "property"
+>           }
+>       },
+>       {
+>           "query_string": {
+>               "query": "attribute"
+>           }
+>       }
+>   ]
+>   ```
+>
+> + 文档
+>
+>   ```json
+>   [
+>       {
+>           "query_string": {
+>               "query": "docs"
+>           }
+>       },
+>       {
+>           "query_string": {
+>               "query": "typo"
+>           }
+>       }
+>   ]
+>   ```
+>
+> + 测试
+>
+>   ```json
+>   [
+>       {
+>           "query_string": {
+>               "query": "Unit Test"
+>           }
+>       },
+>       {
+>           "query_string": {
+>               "query": "CI"
+>           }
+>       },
+>       {
+>           "query_string": {
+>               "query": "Integration Test"
+>           }
+>       },
+>       {
+>           "query_string": {
+>               "query": "Regression Test"
+>           }
+>       },
+>       {
+>           "query_string": {
+>               "query": "pass"
+>           }
+>       }
+>   ]
+>   ```
+>
+> 你将获得的结果，从最开头获取 `hits.total` 即为命中的 issue/pr 总数：
+>
+> ```json
+> {
+>     "took": 10,
+>     "timed_out": false,
+>     "_shards": {
+>         "total": 5,
+>         "successful": 5,
+>         "skipped": 0,
+>         "failed": 0
+>     },
+>     "hits": {
+>         "total": 1476,
+>         "max_score": 12.6008415,
+>         "hits": [
+>             {
+>                 "_index": "doublec_pytorch",
+>                 "_type": "issues",
+>                 "_id": "6384e747c366720f19c291bb",
+>                 "_score": 12.6008415,
+>                 "_source": {
+>                     "id": 1154262142,
+>                     "number": 73511,
+>                     "url": "https://github.com/pytorch/pytorch/pull/73511",
+>                     "title": "pytorch: fix typo in quantization docs",
+>                     "state": "closed",
+>                     "body": "Stack from [ghstack](https://github.com/ezyang/ghstack):\n* **#73511 pytorch: fix typo in quantization docs**\n\nSummary:\n\nFixes typo in describing the `torch.qint32` data type.\n\nTest plan: CI\n\nDifferential Revision: [D34522741](https://our.internmc.facebook.com/intern/diff/D34522741)",
+>                     "created_at": "2022-02-28T15:58:44Z",
+>                     "updated_at": "2022-03-04T16:35:51Z",
+>                     "closed_at": "2022-02-28T23:12:00Z",
+>                     "repos_id": 65600975,
+>                     "user_id": 1622561,
+>                     "user_name": "vkuzo",
+>                     "comment_count": 3,
+>                     "repo_owner": "pytorch",
+>                     "repo_name": "pytorch",
+>                     "__v": 1,
+>                     "labels": [
+>                         "cla signed",
+>                         "release notes: quantization",
+>                         "topic: documentation"
+>                     ]
+>                 }
+>             },
+>             {
+>                 "_index": "doublec_pytorch",
+>                 "_type": "pulls",
+>                 "_id": "6384e7fcc366720f19c325da",
+>                 "_score": 12.59544,
+>                 "_source": {
+>                     "id": 1096818166,
+>                     "url": "https://github.com/pytorch/pytorch/pull/87583",
+>                     "number": 87583,
+>                     "state": "closed",
+>                     "title": "Fix typo under docs directory",
+>                     "isLocked": false,
+>                     "body": "This PR fixes typo in `.rst` files under docs directory\r\n",
+>                     "created_at": "2022-10-24T02:18:56Z",
+>                     "updated_at": "2022-10-25T04:43:18Z",
+>                     "closed_at": "2022-10-25T04:43:18Z",
+>                     "is_merged": false,
+>                     "repos_id": 65600975,
+>                     "user_id": "1315079",
+>                     "repo_owner": "pytorch",
+>                     "repo_name": "pytorch",
+>                     "__v": 1,
+>                     "labels": [
+>                         "open source",
+>                         "Merged",
+>                         "ciflow/trunk"
+>                     ]
+>                 }
+>             },
+>             {
+>                 "_index": "doublec_pytorch",
+>                 "_type": "pulls",
+>                 "_id": "6384e80ec366720f19c3337b",
+>                 "_score": 12.59544,
+>                 "_source": {
+>                     "id": 1071531512,
+>                     "url": "https://github.com/pytorch/pytorch/pull/85896",
+>                     "number": 85896,
+>                     "state": "closed",
+>                     "title": "Fix typo under docs directory and RELEASE.md",
+>                     "isLocked": false,
+>                     "body": "This PR fixes typo in rst files under docs directory and `RELEASE.md`.\r\n",
+>                     "created_at": "2022-09-29T15:45:30Z",
+>                     "updated_at": "2022-09-30T01:03:17Z",
+>                     "closed_at": "2022-09-30T01:03:17Z",
+>                     "is_merged": false,
+>                     "repos_id": 65600975,
+>                     "user_id": "1315079",
+>                     "repo_owner": "pytorch",
+>                     "repo_name": "pytorch",
+>                     "__v": 1,
+>                     "labels": [
+>                         "open source",
+>                         "Merged",
+>                         "cla signed",
+>                         "ciflow/trunk"
+>                     ]
+>                 }
+>             },
+>             {
+>                 "_index": "doublec_pytorch",
+>                 "_type": "pulls",
+>                 "_id": "638b743796996c3be29998c9",
+>                 "_score": 12.523436,
+>                 "_source": {
+>                     "id": 866936979,
+>                     "url": "https://github.com/pytorch/pytorch/pull/73511",
+>                     "number": 73511,
+>                     "state": "closed",
+>                     "title": "pytorch: fix typo in quantization docs",
+>                     "isLocked": false,
+>                     "body": "Stack from [ghstack](https://github.com/ezyang/ghstack):\n* **#73511 pytorch: fix typo in quantization docs**\n\nSummary:\n\nFixes typo in describing the `torch.qint32` data type.\n\nTest plan: CI\n\nDifferential Revision: [D34522741](https://our.internmc.facebook.com/intern/diff/D34522741)",
+>                     "created_at": "2022-02-28T15:58:43Z",
+>                     "updated_at": "2022-03-04T16:35:51Z",
+>                     "closed_at": "2022-02-28T23:12:00Z",
+>                     "is_merged": false,
+>                     "repos_id": 65600975,
+>                     "user_id": "1622561",
+>                     "labels": [
+>                         "cla signed",
+>                         "release notes: quantization",
+>                         "topic: documentation"
+>                     ],
+>                     "repo_owner": "pytorch",
+>                     "repo_name": "pytorch",
+>                     "__v": 0
+>                 }
+>             },
+>             {
+>                 "_index": "doublec_pytorch",
+>                 "_type": "issues",
+>                 "_id": "6384e6bfc366720f19c2013d",
+>                 "_score": 12.376833,
+>                 "_source": {
+>                     "id": 1397945561,
+>                     "number": 86273,
+>                     "url": "https://github.com/pytorch/pytorch/pull/86273",
+>                     "title": "Docs: fix typo",
+>                     "state": "closed",
+>                     "body": "Typo in torch.fx.Interpreter.fetch_attr docs",
+>                     "created_at": "2022-10-05T15:00:31Z",
+>                     "updated_at": "2022-10-06T22:39:42Z",
+>                     "closed_at": "2022-10-06T22:39:02Z",
+>                     "repos_id": 65600975,
+>                     "user_id": 33100427,
+>                     "user_name": "cherrywoods",
+>                     "comment_count": 6,
+>                     "repo_owner": "pytorch",
+>                     "repo_name": "pytorch",
+>                     "__v": 1,
+>                     "labels": [
+>                         "open source",
+>                         "Merged",
+>                         "ciflow/trunk",
+>                         "release notes: fx",
+>                         "fx"
+>                     ]
+>                 }
+>             },
+>             {
+>                 "_index": "doublec_pytorch",
+>                 "_type": "issues",
+>                 "_id": "6384e742c366720f19c28d96",
+>                 "_score": 12.376833,
+>                 "_source": {
+>                     "id": 1162190164,
+>                     "number": 73901,
+>                     "url": "https://github.com/pytorch/pytorch/issues/73901",
+>                     "title": "[torchrec] Minor typo",
+>                     "state": "open",
+>                     "body": "### 📚 The doc issue\n\nMinor typo\r\nIn TORCHREC.DATASETS docs, \"pr-eprocessing\" -> \"pre-processing\"\n\n### Suggest a potential alternative/fix\n\n_No response_\n\ncc @brianjo @mruberry",
+>                     "created_at": "2022-03-08T04:00:44Z",
+>                     "updated_at": "2022-03-08T21:57:17Z",
+>                     "repos_id": 65600975,
+>                     "user_id": 36599490,
+>                     "user_name": "cieske",
+>                     "comment_count": 0,
+>                     "repo_owner": "pytorch",
+>                     "repo_name": "pytorch",
+>                     "__v": 1,
+>                     "labels": [
+>                         "module: docs",
+>                         "triaged"
+>                     ]
+>                 }
+>             },
+>             {
+>                 "_index": "doublec_pytorch",
+>                 "_type": "pulls",
+>                 "_id": "6384e80cc366720f19c33187",
+>                 "_score": 12.28946,
+>                 "_source": {
+>                     "id": 1077476614,
+>                     "url": "https://github.com/pytorch/pytorch/pull/86273",
+>                     "number": 86273,
+>                     "state": "closed",
+>                     "title": "Docs: fix typo",
+>                     "isLocked": false,
+>                     "body": "Typo in torch.fx.Interpreter.fetch_attr docs",
+>                     "created_at": "2022-10-05T15:00:31Z",
+>                     "updated_at": "2022-10-06T22:39:42Z",
+>                     "closed_at": "2022-10-06T22:39:42Z",
+>                     "is_merged": false,
+>                     "repos_id": 65600975,
+>                     "user_id": "33100427",
+>                     "repo_owner": "pytorch",
+>                     "repo_name": "pytorch",
+>                     "__v": 1,
+>                     "labels": [
+>                         "open source",
+>                         "Merged",
+>                         "ciflow/trunk",
+>                         "release notes: fx",
+>                         "fx"
+>                     ]
+>                 }
+>             },
+>             {
+>                 "_index": "doublec_pytorch",
+>                 "_type": "issues",
+>                 "_id": "6384e6c2c366720f19c203ba",
+>                 "_score": 12.259321,
+>                 "_source": {
+>                     "id": 1391092640,
+>                     "number": 85896,
+>                     "url": "https://github.com/pytorch/pytorch/pull/85896",
+>                     "title": "Fix typo under docs directory and RELEASE.md",
+>                     "state": "closed",
+>                     "body": "This PR fixes typo in rst files under docs directory and `RELEASE.md`.\r\n",
+>                     "created_at": "2022-09-29T15:45:30Z",
+>                     "updated_at": "2022-09-30T01:03:17Z",
+>                     "closed_at": "2022-09-29T21:42:13Z",
+>                     "repos_id": 65600975,
+>                     "user_id": 1315079,
+>                     "user_name": "kiszk",
+>                     "comment_count": 5,
+>                     "repo_owner": "pytorch",
+>                     "repo_name": "pytorch",
+>                     "__v": 1,
+>                     "labels": [
+>                         "open source",
+>                         "Merged",
+>                         "cla signed",
+>                         "ciflow/trunk"
+>                     ]
+>                 }
+>             },
+>             {
+>                 "_index": "doublec_pytorch",
+>                 "_type": "issues",
+>                 "_id": "6384e6b1c366720f19c1f06e",
+>                 "_score": 12.21888,
+>                 "_source": {
+>                     "id": 1420082779,
+>                     "number": 87583,
+>                     "url": "https://github.com/pytorch/pytorch/pull/87583",
+>                     "title": "Fix typo under docs directory",
+>                     "state": "closed",
+>                     "body": "This PR fixes typo in `.rst` files under docs directory\r\n",
+>                     "created_at": "2022-10-24T02:18:56Z",
+>                     "updated_at": "2022-10-25T04:43:18Z",
+>                     "closed_at": "2022-10-24T23:52:49Z",
+>                     "repos_id": 65600975,
+>                     "user_id": 1315079,
+>                     "user_name": "kiszk",
+>                     "comment_count": 5,
+>                     "repo_owner": "pytorch",
+>                     "repo_name": "pytorch",
+>                     "__v": 1,
+>                     "labels": [
+>                         "open source",
+>                         "Merged",
+>                         "ciflow/trunk"
+>                     ]
+>                 }
+>             },
+>             {
+>                 "_index": "doublec_pytorch",
+>                 "_type": "pulls",
+>                 "_id": "6384e864c366720f19c36e23",
+>                 "_score": 12.086642,
+>                 "_source": {
+>                     "id": 956673575,
+>                     "url": "https://github.com/pytorch/pytorch/pull/78784",
+>                     "number": 78784,
+>                     "state": "closed",
+>                     "title": "[FSDP][Docs] Fix typo in `full_optim_state_dict()`",
+>                     "isLocked": false,
+>                     "body": "Stack from [ghstack](https://github.com/ezyang/ghstack):\r\n* #78599 [FSDP] Allow different `optim_input` orders across ranks\r\n* **#78784 [FSDP][Docs] Fix typo in `full_optim_state_dict()`**\r\n\r\nThis fixes a typo in the docstring of `full_optim_state_dict()`, where `False` and `True` were incorrectly mixed.",
+>                     "created_at": "2022-06-03T00:17:00Z",
+>                     "updated_at": "2022-06-07T00:34:48Z",
+>                     "closed_at": "2022-06-07T00:34:48Z",
+>                     "is_merged": false,
+>                     "repos_id": 65600975,
+>                     "user_id": "31054793",
+>                     "repo_owner": "pytorch",
+>                     "repo_name": "pytorch",
+>                     "__v": 1,
+>                     "labels": [
+>                         "oncall: distributed",
+>                         "Merged",
+>                         "cla signed",
+>                         "release notes: distributed (fsdp)",
+>                         "topic: documentation"
+>                     ]
+>                 }
+>             }
+>         ]
+>     }
+> }
+> ```
