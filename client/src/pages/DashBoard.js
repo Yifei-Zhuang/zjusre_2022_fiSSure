@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { useAppContext } from "../context/appContext";
 import Loading from "../components/Loading";
 import { useParams } from "react-router-dom";
-import { Box, Grid, Container, Typography, Button } from "@mui/material";
+import { Card, CardHeader, Box, Grid, Container, Typography, 
+    Button, InputLabel, FormControl, Select, MenuItem } from "@mui/material";
 import {
     CommitNumber,
     IssueNumber,
@@ -34,11 +35,12 @@ export default function DashboardApp() {
 
 
     // 使用请求的detail数据
-    // const { isLoading, detail, getDashBoard } = useAppContext();
+    // const { isLoading, detail, getDashBoard, repos } = useAppContext();
 
     //使用死数据
-    const { isLoading, getDashBoard } = useAppContext();
+    const { isLoading, getDashBoard, repos } = useAppContext();
     const [visible, setVisible] = useState(false);
+    const [compareRepo, setCompareRepo] = useState("");
     const {
         forks,
         stars,
@@ -92,34 +94,60 @@ export default function DashboardApp() {
         return (
             visible ? (
                 <Container maxWidth="xl">
-                <Box sx={{ pb: 5, display: "flex", justifyContent: "space-between" }}>
-                    <Typography variant="h4">Compare</Typography>
-                    <Button
-                        variant="contained" sx={{ mr: "0%" }}
-                        onClick={() => {
-                            setVisible(false);
-                            console.log(visible);
-                        }}>
-                        Report
-                    </Button>
-                </Box>
-                <Compare />
-            </Container>
-                
+                    <Box sx={{ pb: 5, display: "flex", justifyContent: "space-between" }}>
+                        <Typography variant="h4">Compare To {compareRepo}</Typography>
+                        <Button
+                            variant="contained" sx={{ mr: "0%" }}
+                            onClick={() => {
+                                setVisible(false);
+                                console.log(visible);
+                            }}>
+                            Report
+                        </Button>
+                    </Box>
+                    <Compare compareRepo={compareRepo} />
+                </Container>
+
             )
                 :
                 (
                     <Container maxWidth="xl">
                         <Box sx={{ pb: 5, display: "flex", justifyContent: "space-between" }}>
                             <Typography variant="h4">Report</Typography>
-                            <Button
-                                variant="contained" sx={{ mr: "0%" }}
-                                onClick={() => {
-                                    setVisible(true);
-                                    console.log(visible);
-                                }}>
-                                Compare
-                            </Button>
+                            <div>
+                                <FormControl variant="standard" sx={{ mt: "-10px", mr: "20px", minWidth: 240 }}>
+                                    <InputLabel id="demo-simple-select-filled-label">Repo</InputLabel>
+                                    <Select
+                                        labelId="demo-simple-select-filled-label"
+                                        id="demo-simple-select-filled"
+                                        value={compareRepo}
+                                        onChange={(event) => { setCompareRepo(event.target.value) }}
+                                    >
+                                        {
+                                            repos.map(
+                                                (repo) => {
+                                                    return (
+                                                        <MenuItem
+                                                            value={repo.owner + "/" + repo.name}
+                                                            key={repo.owner + "/" + repo.name}
+                                                        >
+                                                            {repo.owner + "/" + repo.name}
+                                                        </MenuItem>
+                                                    )
+                                                }
+                                            )
+                                        }
+                                    </Select>
+                                </FormControl>
+                                <Button
+                                    variant="contained" sx={{ mr: "0%" }}
+                                    onClick={() => {
+                                        setVisible(true);
+                                        console.log(visible);
+                                    }}>
+                                    Compare
+                                </Button>
+                            </div>
                         </Box>
                         <Box>
                             <Grid container spacing={3}>
@@ -140,7 +168,10 @@ export default function DashboardApp() {
                                     <TimeLine {...timeline} />
                                 </Grid>
                                 <Grid item xs={12} sm={6} md={8}>
-                                    <Language {...language} />
+                                    <Card>
+                                        <CardHeader title="Language" />
+                                        <Language {...language} />
+                                    </Card>
                                 </Grid>
                             </Grid>
                         </Box>

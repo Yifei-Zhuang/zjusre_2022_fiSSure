@@ -3,6 +3,7 @@ const detail = {
     "name": "pytorch",
     "owner": "pytorch",
     "uploader": "brtest",
+    "commits": 542000,
     "forks": 16909,
     "stars": 60711,
     "open_issues": 10648,
