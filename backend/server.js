@@ -8,13 +8,23 @@ const connectDB = require('./db/connect');
 const notFound = require('./middleware/notfound');
 const errorHandlerMiddleware = require('./middleware/error-handler');
 const config = require('./config');
-
 require('dotenv').config();
 
 app.use(xss());
 app.use(cors());
 app.use(helmet());
 app.use(express.json());
+app.use((req, res, next) => {
+  let time = new Date();
+  const log = `
+  ------------------------------------
+  1) method ${req.method}
+  2) path ${req.path}
+  3) time ${time}
+  `
+  console.log(log)
+  next();
+})
 
 app.use('/', dashboard);
 
@@ -28,7 +38,7 @@ const MONGO_PORT = 27017;
 const MONGO_DB_NAME = 'DoubleC';
 const MONGO_URI = config.DEBUG
   ? process.env.MONGO_URI ||
-    'mongodb://' + MONGO_HOST + ':' + MONGO_PORT + '/' + MONGO_DB_NAME
+  'mongodb://' + MONGO_HOST + ':' + MONGO_PORT + '/' + MONGO_DB_NAME
   : config.MONGO_URI;
 
 const start = async () => {

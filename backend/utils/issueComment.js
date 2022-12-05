@@ -151,12 +151,17 @@ const getFirstResponseTimeMap = async (owner, repo) => {
   cacheArray.forEach(cache => {
     fromCacheSet.add(cache.month);
   });
+  let maxMonth = '2016-01-01';
+  if (cacheArray.length) {
+    maxMonth = cacheArray[0].created_at;
+  }
   FROMCACHESET = fromCacheSet;
   // console.log(FROMCACHESET);
   let mmap = new ConcurrentMap();
   const issues = await IssueSchema.find({
     repo_owner: owner,
     repo_name: repo,
+    created_at: {$gt: maxMonth},
   }).sort([['created_at', -1]]);
   const issueCommentsCache = await IssueCommentSchema.find({
     repo_owner: owner,

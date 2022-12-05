@@ -1,18 +1,25 @@
 const IssueSchema = require('../models/issue');
-const {Octokit} = require('@octokit/core');
+const { Octokit } = require('@octokit/core');
 const config = require('../config');
-const {default: mongoose} = require('mongoose');
+const IssueYearUpdateCacheSchema = require('../models/issue-year-update-cache')
+const IssueYearCreateCacheSchema = require('../models/issue-year-create-cache')
+const IssueYearCloseCacheSchema = require('../models/issue-year-close-cache')
+const IssueMonthUpdateCacheSchema = require('../models/issue-month-update-cache')
+const IssueMonthCreateCacheSchema = require('../models/issue-month-create-cache')
+const IssueMonthCloseCacheSchema = require('../models/issue-month-close-cache')
+const IssuersCacheSchema = require('../models/issuers-cache')
+const { default: mongoose } = require('mongoose');
 const {
   YearCounter,
   MonthCounter,
   DayCounter,
   AsyncFunctionWrapper,
 } = require('./index');
-const {createCustomError} = require('../errors/custom-error');
+const { createCustomError } = require('../errors/custom-error');
 const octokit = new Octokit({
   auth: process.env.GITHUB_ACCESS_TOKEN || config.GITHUB_ACCESS_TOKEN,
 });
-const {Mutex} = require('async-mutex');
+const { Mutex } = require('async-mutex');
 
 let PageMutex = new Mutex();
 let PAGE_NUM = 0;
@@ -133,18 +140,57 @@ const GetIssueInfo = async (owner, repo) => {
  */
 const GetRepoIssueUpdateFrequencyByYear = async (owner, repo) => {
   try {
+    console.log(new Date(), 'begin GetRepoIssueUpdateFrequencyByYear')
     if (!owner || !repo) {
       throw 'missing body data';
+    }
+    let map = new Map();
+    const cache = await IssueYearUpdateCacheSchema.findOne({
+      repo_owner: owner,
+      repo_name: repo
+    })
+    let maxYear = '1970-01-01';
+    if (cache) {
+      for (const key in cache.issue_year_update_frequency) {
+        maxYear = maxYear > key ? maxYear : key;
+        map.set(key, cache.issue_year_update_frequency[key]);
+      }
     }
     const IssueInRange = await IssueSchema.find({
       repo_owner: owner,
       repo_name: repo,
-    }).sort([['updated_at', 1]]);
+      created_at: { $gt: maxYear }
+    }).sort([['created_at', 1]]);
     if (IssueInRange.length == 0) {
       return {};
     }
     const begin = IssueInRange[0].created_at;
-    return await YearCounter(IssueInRange, 'updated_at', begin);
+    let result = await YearCounter(IssueInRange, 'updated_at', begin, null, map);
+    let temp = {};
+    // 去掉最后一年
+    const curYear = `${new Date().getUTCFullYear()}-01-01`;
+    for (const key in result) {
+      if (key === curYear) {
+        continue;
+      }
+      temp[key] = result[key];
+    }
+    if (cache) {
+      if (!(cache.issue_year_update_frequency)) {
+        cache.issue_year_update_frequency = {};
+      }
+      // 更新计算结果
+      Object.assign(cache.issue_year_update_frequency, temp);
+      cache.save();
+    } else {
+      IssueYearUpdateCacheSchema.create({
+        issue_year_update_frequency: temp,
+        repo_owner: owner,
+        repo_name: repo,
+      });
+    }
+    console.log(new Date(), 'end GetRepoIssueUpdateFrequencyByYear')
+    return { ...(cache ? cache?.issue_year_update_frequency : {}), ...result };
   } catch (e) {
     throw createCustomError(e, 500);
   }
@@ -165,18 +211,57 @@ const GetRepoIssueUpdateFrequencyByYear = async (owner, repo) => {
  */
 const GetRepoIssueCreateFrequencyByYear = async (owner, repo) => {
   try {
+    console.log(new Date(), 'begin GetRepoIssueCreateFrequencyByYear')
     if (!owner || !repo) {
       throw 'missing body data';
     }
+    let map = new Map();
+    const cache = await IssueYearCreateCacheSchema.findOne({
+      repo_owner: owner,
+      repo_name: repo
+    })
+    let maxYear = '1970-01-01';
+    if (cache) {
+      for (const key in cache.issue_year_create_frequency) {
+        maxYear = maxYear > key ? maxYear : key;
+        map.set(key, cache.issue_year_create_frequency[key]);
+      }
+    }
+
     const IssueInRange = await IssueSchema.find({
       repo_owner: owner,
       repo_name: repo,
+      created_at: { $gt: maxYear }
     }).sort([['created_at', 1]]);
     if (IssueInRange.length == 0) {
       return {};
     }
     const begin = IssueInRange[0].created_at;
-    return await YearCounter(IssueInRange, 'created_at', begin);
+    let result = await YearCounter(IssueInRange, 'created_at', begin, null, map);
+    // 去掉最后一年
+    let temp = {};
+    const curYear = `${new Date().getUTCFullYear()}-01-01`;
+    for (const key in result) {
+      if (key === curYear) {
+        continue;
+      }
+      temp[key] = result[key];
+    }
+    if (cache) {
+      if (!(cache.issue_year_create_frequency)) {
+        cache.issue_year_create_frequency = {};
+      }
+      // 更新计算结果
+      Object.assign(cache.issue_year_create_frequency, temp);
+      cache.save();
+    } else {
+      IssueYearCreateCacheSchema.create({
+        issue_year_create_frequency: temp,
+        repo_owner: owner,
+        repo_name: repo,
+      });
+    }
+    return { ...(cache ? cache?.issue_year_create_frequency : {}), ...result };
   } catch (e) {
     throw createCustomError(e, 500);
   }
@@ -197,18 +282,59 @@ const GetRepoIssueCreateFrequencyByYear = async (owner, repo) => {
  */
 const GetRepoIssueCloseFrequencyByYear = async (owner, repo) => {
   try {
+    console.log(new Date(), 'start GetRepoIssueCloseFrequencyByYear');
+
     if (!owner || !repo) {
       throw 'missing body data';
     }
+    let map = new Map();
+    const cache = await IssueYearCloseCacheSchema.findOne({
+      repo_owner: owner,
+      repo_name: repo
+    })
+    let maxYear = '1970-01-01';
+    if (cache) {
+      for (const key in cache.issue_year_close_frequency) {
+        maxYear = maxYear > key ? maxYear : key;
+        map.set(key, cache.issue_year_close_frequency[key]);
+      }
+    }
+
     const IssueInRange = await IssueSchema.find({
       repo_owner: owner,
       repo_name: repo,
+      closed_at: { $exists: true, $ne: null, $gt: maxYear }
     }).sort([['closed_at', 1]]);
     if (IssueInRange.length == 0) {
       return {};
     }
     const begin = IssueInRange[0].created_at;
-    return await YearCounter(IssueInRange, 'closed_at', begin);
+    let result = await YearCounter(IssueInRange, 'closed_at', begin, null, map);
+    let temp = {};
+    // 去掉最后一年
+    const curYear = `${new Date().getUTCFullYear()}-01-01`;
+    for (const key in result) {
+      if (key === curYear) {
+        continue;
+      }
+      temp[key] = result[key];
+    }
+    if (cache) {
+      if (!(cache.issue_year_close_frequency)) {
+        cache.issue_year_close_frequency = {};
+      }
+      // 更新计算结果
+      Object.assign(cache.issue_year_close_frequency, temp);
+      cache.save();
+    } else {
+      IssueYearCloseCacheSchema.create({
+        issue_year_close_frequency: temp,
+        repo_owner: owner,
+        repo_name: repo,
+      });
+    }
+    console.log(new Date(), 'end GetRepoIssueCloseFrequencyByYear');
+    return { ...(cache ? cache.issue_year_close_frequency : {}), ...result };
   } catch (e) {
     throw createCustomError(e, 500);
   }
@@ -229,18 +355,59 @@ const GetRepoIssueCloseFrequencyByYear = async (owner, repo) => {
  */
 const GetRepoIssueUpdateFrequencyByMonth = async (owner, repo) => {
   try {
+    console.log(new Date(), 'begin GetRepoIssueUpdateFrequencyByMonth')
     if (!owner || !repo) {
       throw 'missing body data';
+    }
+    let map = new Map();
+    const cache = await IssueMonthUpdateCacheSchema.findOne({
+      repo_owner: owner,
+      repo_name: repo
+    })
+    let maxMonth = '1970-01-01';
+    if (cache) {
+      for (const key in cache.issue_month_update_frequency) {
+        maxMonth = maxMonth > key ? maxYear : key;
+        map.set(key, cache.issue_month_update_frequency[key]);
+      }
     }
     const IssueInRange = await IssueSchema.find({
       repo_owner: owner,
       repo_name: repo,
+      created_at: { $gt: maxMonth }
     }).sort([['updated_at', 1]]);
     if (IssueInRange.length == 0) {
       return {};
     }
     const begin = IssueInRange[0].created_at;
-    return await MonthCounter(IssueInRange, 'updated_at', begin);
+    let result = await MonthCounter(IssueInRange, 'updated_at', begin, null, map);
+    // 存储计算结果
+    let temp = {};
+    // 去掉最后一年
+    const curMonth = `${new Date().getUTCFullYear()}-${new Date().toISOString().split('-')[1]
+      }-01`;
+    for (const key in result) {
+      if (key === curMonth) {
+        continue;
+      }
+      temp[key] = result[key];
+    }
+    if (cache) {
+      if (!cache.issue_month_update_frequency) {
+        cache.issue_month_update_frequency = {};
+      }
+      // 更新计算结果
+      Object.assign(cache.issue_month_update_frequency, temp);
+      cache.save();
+    } else {
+      IssueMonthUpdateCacheSchema.create({
+        issue_month_update_frequency: temp,
+        repo_owner: owner,
+        repo_name: repo,
+      });
+    }
+    console.log(new Date(), 'begin GetRepoIssueUpdateFrequencyByMonth')
+    return { ...(cache ? cache?.issue_month_update_frequency : {}), ...result };
   } catch (e) {
     throw createCustomError(e, 500);
   }
@@ -261,18 +428,61 @@ const GetRepoIssueUpdateFrequencyByMonth = async (owner, repo) => {
  */
 const GetRepoIssueCreateFrequencyByMonth = async (owner, repo) => {
   try {
+    console.log(new Date(), 'begin GetRepoIssueCreateFrequencyByMonth')
+
     if (!owner || !repo) {
       throw 'missing body data';
     }
+    let map = new Map();
+    const cache = await IssueMonthCreateCacheSchema.findOne({
+      repo_owner: owner,
+      repo_name: repo
+    })
+    let maxMonth = '1970-01-01';
+    if (cache) {
+      for (const key in cache.issue_month_create_frequency) {
+        maxMonth = maxMonth > key ? maxYear : key;
+        map.set(key, cache.issue_month_create_frequency[key]);
+      }
+    }
+
     const IssueInRange = await IssueSchema.find({
       repo_owner: owner,
       repo_name: repo,
+      created_at: { $gt: maxMonth }
     }).sort([['created_at', 1]]);
     if (IssueInRange.length == 0) {
       return {};
     }
     const begin = IssueInRange[0].created_at;
-    return await MonthCounter(IssueInRange, 'created_at', begin);
+    let result = await MonthCounter(IssueInRange, 'created_at', begin, null, map);
+    // 存储计算结果
+    let temp = {};
+    // 去掉最后一年
+    const curMonth = `${new Date().getUTCFullYear()}-${new Date().toISOString().split('-')[1]
+      }-01`;
+    for (const key in result) {
+      if (key === curMonth) {
+        continue;
+      }
+      temp[key] = result[key];
+    }
+    if (cache) {
+      if (!cache.issue_month_create_frequency) {
+        cache.issue_month_create_frequency = {};
+      }
+      // 更新计算结果
+      Object.assign(cache.issue_month_create_frequency, temp);
+      cache.save();
+    } else {
+      IssueMonthCreateCacheSchema.create({
+        issue_month_create_frequency: temp,
+        repo_owner: owner,
+        repo_name: repo,
+      });
+    }
+    console.log(new Date(), 'end GetRepoIssueCreateFrequencyByMonth')
+    return { ...(cache ? cache?.issue_month_create_frequency : {}), ...result };
   } catch (e) {
     throw createCustomError(e, 500);
   }
@@ -293,18 +503,58 @@ const GetRepoIssueCreateFrequencyByMonth = async (owner, repo) => {
  */
 const GetRepoIssueCloseFrequencyByMonth = async (owner, repo) => {
   try {
+    console.log(new Date(), 'begin GetRepoIssueCloseFrequencyByMonth')
     if (!owner || !repo) {
       throw 'missing body data';
+    }
+    let map = new Map();
+    const cache = await IssueMonthCloseCacheSchema.findOne({
+      repo_owner: owner,
+      repo_name: repo
+    })
+    let maxMonth = '1970-01-01';
+    if (cache) {
+      for (const key in cache.issue_month_close_frequency) {
+        maxMonth = maxMonth > key ? maxYear : key;
+        map.set(key, cache.issue_month_close_frequency[key]);
+      }
     }
     const IssueInRange = await IssueSchema.find({
       repo_owner: owner,
       repo_name: repo,
+      closed_at: { $exists: true, $ne: null, $gt: maxMonth }
     }).sort([['closed_at', 1]]);
     if (IssueInRange.length == 0) {
       return {};
     }
     const begin = IssueInRange[0].created_at;
-    return await MonthCounter(IssueInRange, 'closed_at', begin);
+    let result = await MonthCounter(IssueInRange, 'closed_at', begin, null, map);
+    let temp = {};
+    // 去掉最后一年
+    const curMonth = `${new Date().getUTCFullYear()}-${new Date().toISOString().split('-')[1]
+      }-01`;
+    for (const key in result) {
+      if (key === curMonth) {
+        continue;
+      }
+      temp[key] = result[key];
+    }
+    if (cache) {
+      if (!cache.issue_month_close_frequency) {
+        cache.issue_month_close_frequency = {};
+      }
+      // 更新计算结果
+      Object.assign(cache.issue_month_close_frequency, temp);
+      cache.save();
+    } else {
+      IssueMonthCloseCacheSchema.create({
+        issue_month_close_frequency: temp,
+        repo_owner: owner,
+        repo_name: repo,
+      });
+    }
+    console.log(new Date(), 'end GetRepoIssueCloseFrequencyByMonth')
+    return { ...(cache ? cache?.issue_month_close_frequency : {}), ...result };
   } catch (e) {
     throw createCustomError(e, 500);
   }
@@ -417,13 +667,27 @@ const GetRepoIssueCloseFrequencyByDay = async (owner, repo) => {
  */
 const GetIssuersCountInRange = async (owner, repo) => {
   try {
+    console.log(new Date(), 'begin GetIssuersCountInRange')
     if (!owner || !repo) {
       throw 'missing body data';
     }
+    let cache = await IssuersCacheSchema.findOne({
+      repo_owner: owner,
+      repo_name: repo
+    })
+    let arr = { base: 0 };
+    if (cache) {
+      arr = { ...arr, ...cache?.issuer_count }
+    }
+    let maxMonth =
+      Object.keys(arr).at(-1) === 'base'
+        ? '2011-01-01'
+        : Object.keys(arr).at(-1);
     const IssueInRange = await IssueSchema.find({
       repo_owner: owner,
       repo_name: repo,
-    }).sort([['updated_at', 1]]);
+      created_at: { $gt: maxMonth }
+    }).sort([['created_at', 1]]);
     if (IssueInRange.length == 0) {
       return {};
     }
@@ -433,7 +697,7 @@ const GetIssuersCountInRange = async (owner, repo) => {
     const LastYear = new Date().getUTCFullYear();
     const LastMonth = new Date().toISOString().split('-')[1];
     const set = new Set();
-    const arr = {base: 0};
+
     let pre = 0;
     try {
       for (
@@ -464,15 +728,15 @@ const GetIssuersCountInRange = async (owner, repo) => {
           for (let x = pre; x < IssueInRange.length; x++) {
             const issue = IssueInRange[x];
             if (
-              issue['updated_at'] &&
-              curMonth <= Date.parse(issue['updated_at']) &&
-              nextMonth >= Date.parse(issue['updated_at']) &&
+              issue['created_at'] &&
+              curMonth <= Date.parse(issue['created_at']) &&
+              nextMonth >= Date.parse(issue['created_at']) &&
               !set.has(issue.user_id)
             ) {
               count++;
               pre++;
               set.add(issue.user_id, true);
-            } else if (nextMonth < Date.parse(issue['updated_at'])) {
+            } else if (nextMonth < Date.parse(issue['created_at'])) {
               pre = x;
               break;
             }
@@ -491,6 +755,20 @@ const GetIssuersCountInRange = async (owner, repo) => {
       console.log(e);
     }
     delete arr.base;
+    let copy = arr;
+    let lastMonth = Object.keys(copy).at(-1)
+    delete copy[lastMonth]
+    if (cache) {
+      cache.issuer_count = copy;
+      cache.save();
+    } else {
+      IssuersCacheSchema.create({
+        issuer_count: copy,
+        repo_name: repo,
+        repo_owner: owner
+      })
+    }
+    console.log(new Date(), 'end GetIssuersCountInRange')
     return arr;
   } catch (e) {
     throw createCustomError(e, 500);
