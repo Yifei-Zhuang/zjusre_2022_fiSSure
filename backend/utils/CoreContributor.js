@@ -105,28 +105,28 @@ const GetContributorIndex = async maxIndex => {
   }
   return returnVal;
 };
-let mapMutex = new Mutex();
 // !一把大锁加上，应该不会死锁
 class ConcurrentMap extends Map {
+  mapMutex = new Mutex();
   has = async value => {
-    let release = await mapMutex.acquire();
+    let release = await this.mapMutex.acquire();
     let returnVal = super.has(value);
     release();
     return returnVal;
   };
   get = async value => {
-    let release = await mapMutex.acquire();
+    let release = await this.mapMutex.acquire();
     let returnVal = super.get(value);
     release();
     return returnVal;
   };
   set = async (key, value) => {
-    let release = await mapMutex.acquire();
+    let release = await this.mapMutex.acquire();
     super.set(key, value);
     release();
   };
 }
-
+const helperMap = new ConcurrentMap();
 const AsyncFetchUserInfo = async (
   coreContributor,
   contributorCompanyMap,
@@ -159,14 +159,25 @@ const AsyncFetchUserInfo = async (
       if (company == null || company === undefined || company == '') {
         company = 'other';
       }
+      if (company.charAt(0) === '@') {
+        company = company.substring(1);
+      }
+      let convertCompanyName = company.toUpperCase().trim().split(/[\s,]+/).join(' ')
+      let companyOriginalName = await helperMap.get(convertCompanyName);
+      // console.log(company, convertCompanyName, companyOriginalName)
+      // console.log({ company, convertCompanyName })
       // console.log(company);
-      if (await contributorCompanyMap.has(company)) {
+      if (companyOriginalName) {
+        let pre = await contributorCompanyMap.get(companyOriginalName);
         await contributorCompanyMap.set(
-          company,
-          (await contributorCompanyMap.get(company)) + 1,
+          companyOriginalName,
+          (pre ? pre + 1 : 1),
         );
       } else {
-        await contributorCompanyMap.set(company, 1);
+        await Promise.all([
+          (async () => await contributorCompanyMap.set(company, 1))(),
+          (async () => helperMap.set(convertCompanyName, company))()
+        ])
       }
       // console.log(contributorCompanyMap.size);
       // console.log(contributorCompany);
