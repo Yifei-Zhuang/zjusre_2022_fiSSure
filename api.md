@@ -3201,7 +3201,9 @@
 > }
 > ```
 
-### 4.2 获取对应主题的 issue 和 pr 在一定时间段内的总数
+## 5. PopularTopics
+
+### 5.1 获取对应主题的 issue 和 pr 在一定时间段内的总数
 
 > GET http://beet.asia:9200/doublec_pytorch/_search
 >
