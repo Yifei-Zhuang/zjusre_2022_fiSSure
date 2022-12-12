@@ -25,6 +25,7 @@ const { Mutex } = require('async-mutex');
 let PageMutex = new Mutex();
 // 最终交付的时候，只搜索最近20000条
 const UPDATE_THRESHOLD = 200;
+let PAGE_NUM = 0;
 const GetPageNum = async () => {
   let release = await PageMutex.acquire();
   let returnVal = PAGE_NUM;
