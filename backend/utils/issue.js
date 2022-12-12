@@ -22,6 +22,8 @@ const octokit = new Octokit({
 const { Mutex } = require('async-mutex');
 
 let PageMutex = new Mutex();
+// 最终交付的时候，只搜索最近20000条
+const UPDATE_THRESHOLD = 200;
 let PAGE_NUM = 0;
 const GetPageNum = async () => {
   let release = await PageMutex.acquire();
@@ -38,6 +40,10 @@ const AsyncFetchIssueInfo = async (owner, repo) => {
   });
   while (1) {
     const page_num = await GetPageNum();
+    if (page_num >= UPDATE_THRESHOLD) {
+      console.log(`fetch issue msg finish! total ${page_num} pages`);
+      break;
+    }
     const per_page = 100;
     let issueMessage = null;
     try {
