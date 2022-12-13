@@ -16,13 +16,19 @@ const IssuerFrequency = (data) => {
   }
   const CHART_DATA = [
     {
-      name: "commiter count",
+      name: "issuer count",
       type: "area",
       data: number,
     },
+    {
+      name: "issuer monthly count",
+      type: "line",
+      data: number.map((_, i) => { return i ? number[i] - number[i - 1] : 0 }),
+    }
   ];
   const chartOptions = merge(BaseOptionChart(), {
     chart: {
+      id: 'chartIssuerFrequency',
       type: 'area',
       stacked: false,
       zoom: {
@@ -43,6 +49,52 @@ const IssuerFrequency = (data) => {
         ...labels
       ]
     },
+    yaxis: [{
+      min: 0,
+      axisTicks: {
+        show: true,
+      },
+      axisBorder: {
+        show: true,
+        color: '#008FFB'
+      },
+      labels: {
+        style: {
+          colors: '#008FFB',
+        }
+      },
+      title: {
+        text: "issuer count",
+        style: {
+          color: '#008FFB',
+        }
+      },
+      tooltip: {
+        enabled: true
+      }
+    }, {
+      seriesName: 'issuer monthly count',
+      opposite: true,
+      axisTicks: {
+        show: true,
+      },
+      axisBorder: {
+        show: true,
+        color: '#00E396'
+      },
+      labels: {
+        style: {
+          colors: '#00E396',
+        }
+      },
+      title: {
+        text: "issuer monthly count",
+        style: {
+          color: '#00E396',
+        }
+      },
+    },
+    ],
     tooltip: {
       shared: true,
       intersect: false,
@@ -56,15 +108,64 @@ const IssuerFrequency = (data) => {
       },
     },
   });
-
+  const bottomChartOptions = merge(BaseOptionChart(), {
+    chart: {
+      id: "_chartIssuerFrequency",
+      height: 130,
+      type: "bar",
+      foreColor: "#ccc",
+      brush: {
+        target: "chartIssuerFrequency",
+        enabled: true
+      },
+      selection: {
+        enabled: true,
+        fill: {
+          color: "#fff",
+          opacity: 0.4
+        },
+      }
+    },
+    colors: ["#FF0080"],
+    series: [
+      {
+        data: data
+      }
+    ],
+    stroke: {
+      width: 2
+    },
+    grid: {
+      borderColor: "#444"
+    },
+    markers: {
+      size: 0
+    },
+    xaxis: {
+      categories: [
+        ...labels
+      ],
+      tooltip: {
+        enabled: false
+      }
+    },
+    yaxis: {
+      tickAmount: 2
+    }
+  });
   return (
     <Card>
-      <CardHeader title="issuerer change" />
+      <CardHeader title="issuer change" />
       <Box sx={{ p: 3, pb: 1 }} dir="ltr">
         <ReactApexChart
           series={CHART_DATA}
           options={chartOptions}
           height={355}
+        />
+        <ReactApexChart
+          series={CHART_DATA}
+          options={bottomChartOptions}
+          height={200}
         />
       </Box>
     </Card>
