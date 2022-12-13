@@ -17,6 +17,10 @@
   },
   "dependencies": {
     "apexcharts": "^3.36.3",
-    "react-apexcharts": "^1.4.0"
+    "axios": "^1.2.1",
+    "echarts": "^5.4.1",
+    "echarts-for-react": "^3.0.2",
+    "react-apexcharts": "^1.4.0",
+    "redis": "^4.5.1"
   }
 }
