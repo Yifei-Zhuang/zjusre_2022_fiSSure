@@ -2,7 +2,7 @@ var config = {
 
     DEBUG: false,
 
-    MONGO_URI: "mongodb://120.26.195.57:27017/doublec",
+    MONGO_URI: "mongodb://120.26.195.57:27017/DoubleC",
 
     // MONGO_URI: "mongodb://beet.asia:27017/doublec_pytorch?directConnection=true",
 
