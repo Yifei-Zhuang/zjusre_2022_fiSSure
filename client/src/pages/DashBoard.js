@@ -2,10 +2,8 @@ import { useEffect, useState } from "react";
 import { useAppContext } from "../context/appContext";
 import Loading from "../components/Loading";
 import { useParams } from "react-router-dom";
-import {
-    Card, CardHeader, Box, Grid, Container, Typography,
-    Button, InputLabel, FormControl, Select, MenuItem
-} from "@mui/material";
+import { Card, CardHeader, Box, Grid, Container, Typography, 
+    Button, InputLabel, FormControl, Select, MenuItem } from "@mui/material";
 import {
     CommitNumber,
     IssueNumber,
@@ -22,7 +20,8 @@ import {
     IssueClose,
     PullFrequency,
     PullerFrequency,
-    Compare
+    Compare,
+    HeatMap
 } from "../components/DashBoard";
 import detail from "../context/staticData"
 
@@ -245,7 +244,17 @@ export default function DashboardApp() {
                         </Box>
 
 
-                        
+                        <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
+                            <Typography variant="h4">HeatMap</Typography>
+                        </Box>
+                        <Box>
+                            <Grid container spacing={3}>
+                                <Grid item xs={12} sm={12} md={12}>
+                                    <HeatMap />
+                                </Grid>
+
+                            </Grid>
+                        </Box>
                         <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
                             <Typography variant="h4">Design</Typography>
                         </Box>
