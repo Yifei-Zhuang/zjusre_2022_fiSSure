@@ -4,56 +4,110 @@ import { Card, CardHeader, Box } from "@mui/material";
 import BaseOptionChart from "./BaseOptionChart";
 import * as echarts from "echarts";
 import { useEffect } from "react";
+import axios from 'axios'
 
 // ----------------------------------------------------------------------
 
 const HeatMap = () => {
-    useEffect(()=>{
-    async function Data(){
-      fetch(`http://beet.asia:9200/doublec_pytorch/_search`,{method:'POST', body:{
-       "min_score": 0,
-       "query":{
-         "bool": {
-           "should": [
-             {
-               "query_string": {
-                 "query": "docs"
-               }
-             },
-             {
-               "query_string": {
-                 "query": "typo"
-               }
-             }
-           ], 
-           "minimum_should_match": 1, 
-           "filter": [
-             {
-               "terms": {
-                 "_type": ["issues", "pulls"]
-               }
-            },
-             {
-               "term": {
-                 "repos_id": 65600975
-               }
-             },
-             {
-               "range": {
-                 "created_at": {
-                   "gte": "2022-01-01 04:00:00", 
-                   "lte": "2023-01-01 04:59:59",
-                   "format": "yyyy-MM-dd HH:mm:ss"
-                 }
-     	        }
-             }
-           ]
-         }
-       }
-     }}).then((response)=>{console.log(response)});
+//     useEffect(()=>{
+//     async function Data(){
+//       fetch(`http://beet.asia:9200/doublec_pytorch/_search`,{method:'POST', body:{
+//        "min_score": 0,
+//        "query":{
+//          "bool": {
+//            "should": [
+//              {
+//                "query_string": {
+//                  "query": "docs"
+//                }
+//              },
+//              {
+//                "query_string": {
+//                  "query": "typo"
+//                }
+//              }
+//            ], 
+//            "minimum_should_match": 1, 
+//            "filter": [
+//              {
+//                "terms": {
+//                  "_type": ["issues", "pulls"]
+//                }
+//             },
+//              {
+//                "term": {
+//                  "repos_id": 65600975
+//                }
+//              },
+//              {
+//                "range": {
+//                  "created_at": {
+//                    "gte": "2022-01-01 04:00:00", 
+//                    "lte": "2023-01-01 04:59:59",
+//                    "format": "yyyy-MM-dd HH:mm:ss"
+//                  }
+//      	        }
+//              }
+//            ]
+//          }
+//        }
+//      }}).then((response)=>{console.log(response)});
+//     }
+//     Data()
+// },[])
+const axios = require("axios");
+axios({
+    method: "get",
+    url: 'http://beet.asia:9200/doublec_pytorch/_search',
+    data: {
+        "min_score": 0,
+        "query": {
+            "bool": {
+                "should": [
+                    {
+                        "query_string": {
+                            "query": "docs"
+                        }
+                    },
+                    {
+                        "query_string": {
+                            "query": "typo"
+                        }
+                    }
+                ],
+                "minimum_should_match": 1,
+                "filter": [
+                    {
+                        "terms": {
+                            "_type": ["issues", "pulls"]
+                        }
+                    },
+                    {
+                        "term": {
+                            "repos_id": 65600975
+                        }
+                    },
+                    {
+                        "range": {
+                            "created_at": {
+                                "gte": "2022-01-01 04:00:00",
+                                "lte": "2023-01-01 04:59:59",
+                                "format": "yyyy-MM-dd HH:mm:ss"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
     }
-    Data()
-},[])
+}).then(res => {
+    const hits = res.data.hits.hits;
+    hits.forEach(item => {
+        console.log(item)
+    })
+}).catch(e => {
+    console.log('err', e)
+})
 
         
     var days_pie = ['march20', 'march21', 'march22', 'march23', 'march24', 'march25', 'march26', 'march27', 'march28', 'march30', 'march31', 'april1', 'april2', 'april3', 'april4', 'april5', 'april6', 'april7', 'april8', 'april9', 'april10', 'april11', 'april12', 'april13', 'april14', 'april15', 'april16', 'april17', 'april18', 'april28', 'april29', 'april30', 'may1', 'may2', 'may3', 'may4', 'may6', 'may7', 'may8', 'may9', 'may10', 'may11', 'may12', 'may13', 'may14', 'may15', 'may16', 'may17', 'may18', 'may19', 'may20', 'may21', 'may22', 'may23', 'may24', 'may25', 'may26', 'may27', 'may28', 'may29', 'may30', 'may31', 'june1', 'june2', 'june3', 'june4', 'june5', 'june6', 'june7', 'june8', 'june9', 'june10', 'june11', 'june12', 'june13', 'june14', 'june15', 'june16', 'june17', 'june18', 'june19', 'june20', 'june21', 'june22'];

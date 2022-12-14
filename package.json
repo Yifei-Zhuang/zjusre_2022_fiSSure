@@ -23,5 +23,6 @@
     "fetch-jsonp": "^1.2.3",
     "react-apexcharts": "^1.4.0",
     "redis": "^4.5.1"
-  }
+  },
+  "proxy": "http://beet.asia:9200/doublec_pytorch/_search" 
 }

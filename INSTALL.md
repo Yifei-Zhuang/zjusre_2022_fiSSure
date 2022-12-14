@@ -5,7 +5,7 @@
 ```shell
 npm run install-dependencies
 npm install nodemon --save-dev
-npm install http-proxy-middle --save
+npm install axios --save-dev
 npm install --save echarts-for-react
 npm install --save echarts
 ```
