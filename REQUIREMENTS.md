@@ -19,7 +19,9 @@ Recommended:
 Recommend:
 - Ubuntu or Centos linux distribution
 - nodejs higher than 16.0
-- mongodb higher than 6.0.1
+- mongodb higher than 5.0.6
 - npm higher than 9.1.3
-- //TODO ES 版本和其他配套组件版本
-- //TODO 也许可以提交一个docker镜像
+- ElasticSearch 5.6.16 (**no higher than 5.x**)
+- mongo-connector[elastic5]
+- elastic2_doc_manager
+- pymongo 3.12.0 (**no higher than 3.x**)
