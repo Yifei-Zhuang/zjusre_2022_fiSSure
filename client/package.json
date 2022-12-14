@@ -13,6 +13,8 @@
     "axios": "^0.24.0",
     "babel-loader": "^8.1.0",
     "date-fns": "^2.27.0",
+    "echarts": "^5.4.1",
+    "echarts-for-react": "^3.0.2",
     "faker": "^5.5.3",
     "highcharts": "^10.3.2",
     "highcharts-react-official": "^3.1.0",
@@ -55,5 +57,5 @@
   "devDependencies": {
     "@iconify/react": "^3.1.0"
   },
-  "proxy": "http://beet.asia:9200/doublec_pytorch/_search" 
+  "proxy": "http://beet.asia:9200/doublec_pytorch/_search"
 }

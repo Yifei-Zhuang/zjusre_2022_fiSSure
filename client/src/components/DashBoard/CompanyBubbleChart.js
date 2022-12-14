@@ -49,7 +49,7 @@ const CompanyBubbleChart = (props) => {
         },
         plotOptions: {
             packedbubble: {
-                minSize: '40%',
+                minSize: '60%',
                 maxSize: '600%',
                 zMin: 0,
                 zMax: 1000,
