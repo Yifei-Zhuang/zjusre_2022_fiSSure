@@ -33,9 +33,6 @@ export {
   PullFrequency,
   PullerFrequency,
   Compare,
-<<<<<<< HEAD
-  HeatMap
-=======
+  HeatMap,
   CompanyBubbleChart
->>>>>>> 60d0c080183c34412f768519b87b5b10946e4353
 };
