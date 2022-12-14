@@ -14,6 +14,7 @@ import IssueClose from "./IssueClose";
 import PullFrequency from "./PullFrequency"
 import PullerFrequency from "./PullerFrequency"
 import Compare from "./Compare";
+import CompanyBubbleChart from './CompanyBubbleChart'
 export {
   CommitNumber,
   IssueNumber,
@@ -30,5 +31,6 @@ export {
   IssueClose,
   PullFrequency,
   PullerFrequency,
-  Compare
+  Compare,
+  CompanyBubbleChart
 };
