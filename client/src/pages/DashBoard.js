@@ -21,7 +21,8 @@ import {
     PullFrequency,
     PullerFrequency,
     Compare,
-    HeatMap
+    HeatMap,
+    CompanyBubbleChart
 } from "../components/DashBoard";
 import detail from "../context/staticData"
 
@@ -43,6 +44,8 @@ export default function DashboardApp() {
     const [visible, setVisible] = useState(false);
     const [compareRepo, setCompareRepo] = useState("");
     const {
+        name,
+        owner,
         forks,
         stars,
         open_issues,
@@ -244,6 +247,7 @@ export default function DashboardApp() {
                         </Box>
 
 
+
                         <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
                             <Typography variant="h4">HeatMap</Typography>
                         </Box>
@@ -255,6 +259,8 @@ export default function DashboardApp() {
 
                             </Grid>
                         </Box>
+
+                        <CompanyBubbleChart repo_owner={owner} repo_name={name} coreContributorByYear={coreContributorByYear} />
                         <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
                             <Typography variant="h4">Design</Typography>
                         </Box>
