@@ -8,7 +8,7 @@ const CompanyBubbleChart = (props) => {
     let { repoOwner, repoName, coreContributorByYear, isComparing, anotherRepoOwner, anotherRepoName, anotherRepoCoreContributorByYear } = props;
     // 定制表格显示数据
     const [anchorEl, setAnchorEl] = useState(null);
-    if(coreContributorByYear === undefined) {
+    if (coreContributorByYear === undefined) {
         coreContributorByYear = []
     };
     const dataByYears = coreContributorByYear.map(item => {
@@ -54,7 +54,7 @@ const CompanyBubbleChart = (props) => {
     });
     const data = [{
         name: `${repoOwner}/${repoName}`,
-        data: (map.get(currentType)===undefined ? map.get(currentType) : map.get(currentType).at(0))
+        data: (map.get(currentType) === undefined ? map.get(currentType) : map.get(currentType).at(0))
     }, (isComparing ? {
         name: `${anotherRepoOwner}/${anotherRepoName}`,
         data: map.get(currentType).at(1)
@@ -77,7 +77,7 @@ const CompanyBubbleChart = (props) => {
         plotOptions: {
             packedbubble: {
                 minSize: '30%',
-                maxSize: '1800%',
+                maxSize: '600%',
                 zMin: 0,
                 zMax: 1000,
                 layoutAlgorithm: {
