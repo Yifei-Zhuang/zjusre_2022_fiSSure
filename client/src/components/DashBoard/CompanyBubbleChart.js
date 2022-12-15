@@ -12,7 +12,7 @@ const CompanyBubbleChart = (props) => {
         return {
             year: item.year,
             data: item.coreContributorCompany.map(company => {
-                console.log(company)
+                // console.log(company)
                 return {
                     name: company.company,
                     value: company.coreContributors

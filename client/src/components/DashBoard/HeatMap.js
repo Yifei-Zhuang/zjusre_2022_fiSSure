@@ -86,7 +86,7 @@ const HeatMap = () => {
         }
     }).then(res => {
         code_2017p = res.data.hits.total;
-       console.log("jiscsdknjdc");
+    //    console.log("jiscsdknjdc");
     }).catch(e => {
         console.log('err', e)
     })
@@ -5249,7 +5249,7 @@ function fetchData()
    }
     const newOption = cloneDeep(option);
     newOption.options=[]
-    console.log(option.options.series)
+    // console.log(option.options.series)
     for (var n = 0; n < 12; n++) {
         var res = [];
         for (var j = 0; j < 7; j++) {
