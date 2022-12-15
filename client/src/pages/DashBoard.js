@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { useAppContext } from "../context/appContext";
 import Loading from "../components/Loading";
 import { useParams } from "react-router-dom";
-import { Card, CardHeader, Box, Grid, Container, Typography, 
-    Button, InputLabel, FormControl, Select, MenuItem } from "@mui/material";
+import {
+    Card, CardHeader, Box, Grid, Container, Typography,
+    Button, InputLabel, FormControl, Select, MenuItem
+} from "@mui/material";
 import {
     CommitNumber,
     IssueNumber,
@@ -225,7 +227,7 @@ export default function DashboardApp() {
                         <Box sx={{ height: 520, width: '100%' }}>
                             <Contribute {...coreContributorByYear} />
                         </Box>
-                        <CompanyBubbleChart repo_owner={owner} repo_name={name} coreContributorByYear={coreContributorByYear} />
+                        <CompanyBubbleChart repoOwner={owner} repoName={name} coreContributorByYear={coreContributorByYear} />
 
                         <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
                             <Typography variant="h4">Issue closed and Issue response</Typography>
