@@ -261,12 +261,6 @@ export default function DashboardApp() {
                         </Box>
 
                         <CompanyBubbleChart repo_owner={owner} repo_name={name} coreContributorByYear={coreContributorByYear} />
-                        <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
-                            <Typography variant="h4">Design</Typography>
-                        </Box>
-                        <Box>
-                            {/* TODO: 设计相关模块 */}
-                        </Box>
                     </Container>
                 )
 
