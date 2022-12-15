@@ -41,7 +41,7 @@ const CompanyBubbleChart = (props) => {
             height: '100%',
         },
         title: {
-            text: '公司贡献占比',
+            text: 'Contribution Percentage of Company',
         },
         tooltip: {
             useHTML: true,
