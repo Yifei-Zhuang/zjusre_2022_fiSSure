@@ -5,9 +5,12 @@ import { Card, CardHeader, Box, Button, Popover, List, ListItemButton } from '@m
 require("highcharts/highcharts-more")(Highcharts);
 
 const CompanyBubbleChart = (props) => {
-    const { repo_owner, repo_name, coreContributorByYear } = props;
+    let { repo_owner, repo_name, coreContributorByYear } = props;
     // 定制表格显示数据
     const [anchorEl, setAnchorEl] = useState(null);
+    if(coreContributorByYear === undefined) {
+        coreContributorByYear = []
+    };
     const dataByYears = coreContributorByYear.map(item => {
         return {
             year: item.year,
@@ -19,7 +22,8 @@ const CompanyBubbleChart = (props) => {
                 }
             })
         }
-    })
+    });
+         
     let map = new Map()
     dataByYears.forEach(item => {
         map.set(item.year, item.data)

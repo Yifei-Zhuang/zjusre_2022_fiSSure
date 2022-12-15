@@ -172,8 +172,8 @@ const AppProvider = ({ children }) => {
   const getDashBoard = async (id) => {
     dispatch({ type: GET_DETAIL_BEGIN });
     try {
-      const { data } = await authFetch.post("/dashboard", { id });
-      const { detail } = data;
+      const {data} = await authFetch.post("/dashboard", { id });
+      const detail = data
       dispatch({
         type: GET_DETAIL_SUCCESS,
         payload: {

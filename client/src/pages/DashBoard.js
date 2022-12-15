@@ -24,23 +24,20 @@ import {
     HeatMap,
     CompanyBubbleChart
 } from "../components/DashBoard";
-import detail from "../context/staticData"
+// import detail from "../context/staticData"
 
 export default function DashboardApp() {
-    // 暂时关闭从后端获得数据
-    // useEffect(() => {
-    //     getDashBoard(id);
-    // }, []);
-
+    useEffect(() => {
+        getDashBoard(id);
+    }, []);
 
     const { id } = useParams();
 
-
     // 使用请求的detail数据
-    // const { isLoading, detail, getDashBoard, repos } = useAppContext();
-
+    const { isLoading, detail, getDashBoard, repos } = useAppContext();
+    
     //使用死数据
-    const { isLoading, getDashBoard, repos } = useAppContext();
+    // const { isLoading, getDashBoard, repos } = useAppContext();
     const [visible, setVisible] = useState(false);
     const [compareRepo, setCompareRepo] = useState("");
     const {
@@ -73,11 +70,10 @@ export default function DashboardApp() {
         monthly_count
     } = detail;
 
-
-
     if (isLoading) {
         return <Loading center />;
     } else {
+
         const IssueFrequencyDatas = {
             issue_year_create_frequency,
             Issue_year_update_frequency,
