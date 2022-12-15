@@ -1,6 +1,11 @@
-import { Box, Container, Card, CardHeader, Grid } from "@mui/material";
+import { Box, Container, Card, CardHeader, Grid, Typography, Divider } from "@mui/material";
 import ReactApexChart from "react-apexcharts";
 import detail from "../../context/staticData";
+import CompanyBubbleChart from "./CompanyBubbleChart";
+import CompareCommiterFrequency from "./CompareCommiterFrequency";
+import CompareCommitFrequency from "./CompareCommitFrequency";
+import CompareIssuerCountFrequency from "./CompareIssuerCountFrequency";
+import ComparePullerCountFrequency from "./ComparePullerCountFrequency";
 import Language from "./Language";
 
 const Compare = (compareRepo) => {
@@ -17,7 +22,6 @@ const Compare = (compareRepo) => {
                 detail.commits, detail.forks, detail.stars, detail.open_issues
             ]
         },
-
     ];
     const maxValue = Math.max(...CHART_DATA[0].data.concat(CHART_DATA[1].data))
 
@@ -119,12 +123,25 @@ const Compare = (compareRepo) => {
 
     return (
         <Container maxWidth="xl">
-            <ReactApexChart
-                series={CHART_DATA}
-                options={chartOptions}
-                height='auto'
-                type='bar'
-            />
+            {/* 公司占比 */}
+            <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
+                <Typography variant="h4">公司贡献占比</Typography>
+            </Box>
+            <Box>
+                <CompanyBubbleChart repoOwner={detail.owner} repoName={detail.name} coreContributorByYear={detail.coreContributorByYear} isComparing={true} anotherRepoOwner={compareRepo.compareRepo.split('/')[0]} anotherRepoName={compareRepo.compareRepo.split('/')[1]} anotherRepoCoreContributorByYear={detail.coreContributorByYear} />
+            </Box>
+            <Box>
+                <Grid container spacing={3}>
+                    <Grid item xs={12} sm={12} md={12}>
+                        <ReactApexChart
+                            series={CHART_DATA}
+                            options={chartOptions}
+                            height='auto'
+                            type='bar'
+                        />
+                    </Grid>
+                </Grid>
+            </Box>
             <Box>
                 <Grid container spacing={3}>
                     <Grid item xs={6} >
@@ -141,7 +158,25 @@ const Compare = (compareRepo) => {
                     </Grid>
                 </Grid>
             </Box>
-
+            {/* 
+               //TODO 将输入的数据改为后端获取的数据
+            */}
+            <CompareCommitFrequency sx={{
+                marginTop: 3,
+            }} repoOwner={detail.owner} repoName={detail.name} anotherRepoOwner={compareRepo.compareRepo.split('/')[0]} anotherRepoName={compareRepo.compareRepo.split('/')[1]} data1={detail.commit_month_frequency} data2={detail.commit_month_frequency} />
+            <Divider />
+            {/* 
+               //TODO 将输入的数据改为后端获取的数据
+            */}
+            <CompareCommiterFrequency repoOwner={detail.owner} repoName={detail.name} anotherRepoOwner={compareRepo.compareRepo.split('/')[0]} anotherRepoName={compareRepo.compareRepo.split('/')[1]} data1={detail.commiter_count} data2={detail.commiter_count} />
+            {/* 
+               //TODO 将输入的数据改为后端获取的数据
+            */}
+            <CompareIssuerCountFrequency repoOwner={detail.owner} repoName={detail.name} anotherRepoOwner={compareRepo.compareRepo.split('/')[0]} anotherRepoName={compareRepo.compareRepo.split('/')[1]} data1={detail.Issuer_count} data2={detail.Issuer_count} />
+            {/* 
+               //TODO 将输入的数据改为后端获取的数据
+            */}
+            <ComparePullerCountFrequency repoOwner={detail.owner} repoName={detail.name} anotherRepoOwner={compareRepo.compareRepo.split('/')[0]} anotherRepoName={compareRepo.compareRepo.split('/')[1]} data1={detail.puller_count} data2={detail.puller_count} />
         </Container>
     )
 }

@@ -5,7 +5,7 @@ import { Card, CardHeader, Box, Button, Popover, List, ListItemButton } from '@m
 require("highcharts/highcharts-more")(Highcharts);
 
 const CompanyBubbleChart = (props) => {
-    const { repo_owner, repo_name, coreContributorByYear } = props;
+    const { repoOwner, repoName, coreContributorByYear, isComparing, anotherRepoOwner, anotherRepoName, anotherRepoCoreContributorByYear } = props;
     // 定制表格显示数据
     const [anchorEl, setAnchorEl] = useState(null);
     const dataByYears = coreContributorByYear.map(item => {
@@ -15,26 +15,50 @@ const CompanyBubbleChart = (props) => {
                 // console.log(company)
                 return {
                     name: company.company,
-                    value: company.coreContributors
+                    value: company.company === 'other' ? 0 : company.coreContributors
                 }
             })
         }
     })
+    let anotherRepoDataByYears;
+    if (isComparing) {
+        anotherRepoDataByYears = anotherRepoCoreContributorByYear.map(item => {
+            return {
+                year: item.year,
+                data: item.coreContributorCompany.map(company => {
+                    return {
+                        name: company.company,
+                        value: company.company === 'other' ? 0 : company.coreContributors
+                    }
+                })
+            }
+        })
+    }
     let map = new Map()
     dataByYears.forEach(item => {
-        map.set(item.year, item.data)
+        map.set(item.year, [item.data])
     })
-    const [currentType, setCurrentType] = useState(2019);
+    if (isComparing) {
+        anotherRepoDataByYears.forEach(item => {
+            map.set(item.year, [...map.get(item.year), item.data])
+        })
+    }
+    const [currentType, setCurrentType] = useState(2020);
     const listItems = dataByYears.map((item) => {
         return (
             <ListItemButton key={item.year} onClick={() => setCurrentType(item.year)} selected={item.year === currentType}>{item.year}</ListItemButton>
         )
     });
     const data = [{
-        name: `${repo_owner}/${repo_name}`,
-        data: map.get(currentType)
-    }]
-
+        name: `${repoOwner}/${repoName}`,
+        data: map.get(currentType).at(0)
+    }, (isComparing ? {
+        name: `${anotherRepoOwner}/${anotherRepoName}`,
+        data: map.get(currentType).at(1)
+    } : {})]
+    if (!isComparing) {
+        data.pop()
+    }
     const options = {
         chart: {
             type: 'packedbubble',
@@ -49,8 +73,8 @@ const CompanyBubbleChart = (props) => {
         },
         plotOptions: {
             packedbubble: {
-                minSize: '60%',
-                maxSize: '600%',
+                minSize: '30%',
+                maxSize: '1800%',
                 zMin: 0,
                 zMax: 1000,
                 layoutAlgorithm: {
