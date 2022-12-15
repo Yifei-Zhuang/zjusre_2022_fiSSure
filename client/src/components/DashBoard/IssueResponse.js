@@ -17,16 +17,16 @@ const IssueResponse = (data) => {
         mymid = [],
         mypre75 = [],
         myslowest = [];
-    for (var interval in data) {
+    const keyss = Object.keys(data).reverse()
+    keyss.forEach(interval => {
         labels.push(interval);
-        myfastest.push((data[interval].fastest/ 3.6e6).toFixed(2));
-        mypre25.push((data[interval].pre25/ 3.6e6).toFixed(2));
-        mymid.push((data[interval].mid/ 3.6e6).toFixed(2));
-        mypre75.push((data[interval].pre75/ 3.6e6).toFixed(2));
-        myslowest.push((data[interval].slowest/ 3.6e6).toFixed(2));
-
-    }
-
+        myfastest.push((data[interval].fastest / 3.6e6).toFixed(2));
+        mypre25.push((data[interval].pre25 / 3.6e6).toFixed(2));
+        mymid.push((data[interval].mid / 3.6e6).toFixed(2));
+        mypre75.push((data[interval].pre75 / 3.6e6).toFixed(2));
+        myslowest.push((data[interval].slowest / 3.6e6).toFixed(2));
+    })
+    console.log(labels)
     var tem = []
     for (var i = 0; i < labels.length; i++) {
         tem[i] = {

@@ -751,7 +751,8 @@ const GetPullersCountInRange = async (owner, repo) => {
         } else {
           key = `${i}-${j}-01`;
         }
-        arr[key] = arr[Object.keys(arr)[Object.keys(arr).length - 1]] + count;
+        if (!arr[key])
+          arr[key] = arr[Object.keys(arr)[Object.keys(arr).length - 1]] + count;
       }
     }
     delete arr.base;
@@ -760,9 +761,9 @@ const GetPullersCountInRange = async (owner, repo) => {
     delete copy[lastMonth]
     if (cache) {
       cache.puller_count = copy;
-      cache.save();
+      await cache.save();
     } else {
-      PullerCacheSchema.create({
+      await PullerCacheSchema.create({
         puller_count: copy,
         repo_name: repo,
         repo_owner: owner

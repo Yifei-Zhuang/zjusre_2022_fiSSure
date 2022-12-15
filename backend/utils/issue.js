@@ -754,7 +754,8 @@ const GetIssuersCountInRange = async (owner, repo) => {
           } else {
             key = `${i}-${j}-01`;
           }
-          arr[key] = arr[Object.keys(arr)[Object.keys(arr).length - 1]] + count;
+          if (!arr[key])
+            arr[key] = arr[Object.keys(arr)[Object.keys(arr).length - 1]] + count;
         }
       }
     } catch (e) {
@@ -766,9 +767,9 @@ const GetIssuersCountInRange = async (owner, repo) => {
     delete copy[lastMonth]
     if (cache) {
       cache.issuer_count = copy;
-      cache.save();
+      await cache.save();
     } else {
-      IssuersCacheSchema.create({
+      await IssuersCacheSchema.create({
         issuer_count: copy,
         repo_name: repo,
         repo_owner: owner
