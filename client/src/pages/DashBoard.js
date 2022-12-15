@@ -249,7 +249,7 @@ export default function DashboardApp() {
 
 
                         <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
-                            <Typography variant="h4">HeatMap</Typography>
+                            <Typography variant="h4">Desigh</Typography>
                         </Box>
                         <Box>
                             <Grid container spacing={3}>

@@ -5144,7 +5144,7 @@ var  data_pie=[
             axisType: 'category',
             // realtime: false,
             // loop: false,
-            autoPlay: true,
+            autoPlay: false,
             playInterval: 1000, //0.5s滚动一次
             // realtime = true,
             symbolSize: 1,
@@ -5288,7 +5288,7 @@ useEffect(() => {
 
     <Card>
         
-      <CardHeader title="Issue Response" />
+      <CardHeader title="HeatMap" />
       
       <Box id="Heatmap" sx={{ p: 3, pb: 1 }} dir="ltr"> 
      
