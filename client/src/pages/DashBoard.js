@@ -79,7 +79,6 @@ export default function DashboardApp() {
         return <Loading center />;
     } else {
         const IssueFrequencyDatas = {
-            issue_frequency,
             issue_year_create_frequency,
             Issue_year_update_frequency,
             Issue_year_close_frequency,
