@@ -13,1711 +13,1643 @@ var test_2017p, test_2017l, test_2018p, test_2018l, test_2019p, test_2019l, test
 var robost_2017p, robost_2017l, robost_2018p, robost_2018l, robost_2019p, robost_2019l, robost_2020p, robost_2020l, robost_2021p, robost_2021l, robost_2022p, robost_2022l;
 var maintainability_2017p, maintainability_2017l, maintainability_2018p, maintainability_2018l, maintainability_2019p, maintainability_2019l, maintainability_2020p, maintainability_2020l, maintainability_2021p, maintainability_2021l, maintainability_2022p, maintainability_2022l;
 const HeatMap = () => {
-
-    const axios = require("axios");
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "dependency"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "rebuild"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "add"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "implement"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "restruct"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "construct"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "feature"
-                            }
+    const init = async () => {
+        const axios = require("axios");
+        await Promise.all([
+            axios({
+                method: "post",
+                url: 'http://beet.asia:9200/doublec_pytorch/_search',
+                data: {
+                    "min_score": 0,
+                    "query": {
+                        "bool": {
+                            "should": [
+                                {
+                                    "query_string": {
+                                        "query": "dependency"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "rebuild"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "add"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "implement"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "restruct"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "construct"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "feature"
+                                    }
+                                }
+                            ],
+                            "minimum_should_match": 1,
+                            "filter": [
+                                {
+                                    "terms": {
+                                        "_type": ["issues", "pulls"]
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "repos_id": 65600975
+                                    }
+                                },
+                                {
+                                    "range": {
+                                        "created_at": {
+                                            "gte": "2017-01-01 04:00:00",
+                                            "lte": "2017-06-30 04:59:59",
+                                            "format": "yyyy-MM-dd HH:mm:ss"
+                                        }
+                                    }
+                                }
+                            ]
                         }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2017-01-01 04:00:00",
-                                    "lte": "2017-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                    }
+                }
+            }).then(res => {
+                code_2017p = res.data.hits.total;
+            }).catch(e => {
+                console.log('err', e)
+            }),
+            axios({
+                method: "post",
+                url: 'http://beet.asia:9200/doublec_pytorch/_search',
+                data: {
+                    "min_score": 0,
+                    "query": {
+                        "bool": {
+                            "should": [
+                                {
+                                    "query_string": {
+                                        "query": "dependency"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "rebuild"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "add"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "implement"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "restruct"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "construct"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "feature"
+                                    }
+                                }
+                            ],
+                            "minimum_should_match": 1,
+                            "filter": [
+                                {
+                                    "terms": {
+                                        "_type": ["issues", "pulls"]
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "repos_id": 65600975
+                                    }
+                                },
+                                {
+                                    "range": {
+                                        "created_at": {
+                                            "gte": "2017-07-01 04:00:00",
+                                            "lte": "2018-01-01 04:59:59",
+                                            "format": "yyyy-MM-dd HH:mm:ss"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }).then(res => {
+                code_2017l = res.data.hits.total;
+            }).catch(e => {
+                console.log('err', e)
+            }),
+            axios({
+                method: "post",
+                url: 'http://beet.asia:9200/doublec_pytorch/_search',
+                data: {
+                    "min_score": 0,
+                    "query": {
+                        "bool": {
+                            "should": [
+                                {
+                                    "query_string": {
+                                        "query": "dependency"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "rebuild"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "add"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "implement"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "restruct"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "construct"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "feature"
+                                    }
+                                }
+                            ],
+                            "minimum_should_match": 1,
+                            "filter": [
+                                {
+                                    "terms": {
+                                        "_type": ["issues", "pulls"]
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "repos_id": 65600975
+                                    }
+                                },
+                                {
+                                    "range": {
+                                        "created_at": {
+                                            "gte": "2018-01-01 04:00:00",
+                                            "lte": "2018-06-30 04:59:59",
+                                            "format": "yyyy-MM-dd HH:mm:ss"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }).then(res => {
+                code_2018p = res.data.hits.total;
+            }).catch(e => {
+                console.log('err', e)
+            }),
+            axios({
+                method: "post",
+                url: 'http://beet.asia:9200/doublec_pytorch/_search',
+                data: {
+                    "min_score": 0,
+                    "query": {
+                        "bool": {
+                            "should": [
+                                {
+                                    "query_string": {
+                                        "query": "dependency"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "rebuild"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "add"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "implement"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "restruct"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "construct"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "feature"
+                                    }
+                                }
+                            ],
+                            "minimum_should_match": 1,
+                            "filter": [
+                                {
+                                    "terms": {
+                                        "_type": ["issues", "pulls"]
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "repos_id": 65600975
+                                    }
+                                },
+                                {
+                                    "range": {
+                                        "created_at": {
+                                            "gte": "2018-07-01 04:00:00",
+                                            "lte": "2019-01-01 04:59:59",
+                                            "format": "yyyy-MM-dd HH:mm:ss"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }).then(res => {
+                code_2018l = res.data.hits.total;
+            }).catch(e => {
+                console.log('err', e)
+            }),
+            axios({
+                method: "post",
+                url: 'http://beet.asia:9200/doublec_pytorch/_search',
+                data: {
+                    "min_score": 0,
+                    "query": {
+                        "bool": {
+                            "should": [
+                                {
+                                    "query_string": {
+                                        "query": "dependency"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "rebuild"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "add"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "implement"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "restruct"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "construct"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "feature"
+                                    }
+                                }
+                            ],
+                            "minimum_should_match": 1,
+                            "filter": [
+                                {
+                                    "terms": {
+                                        "_type": ["issues", "pulls"]
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "repos_id": 65600975
+                                    }
+                                },
+                                {
+                                    "range": {
+                                        "created_at": {
+                                            "gte": "2019-01-01 04:00:00",
+                                            "lte": "2019-06-30 04:59:59",
+                                            "format": "yyyy-MM-dd HH:mm:ss"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }).then(res => {
+                code_2019p = res.data.hits.total;
+            }).catch(e => {
+                console.log('err', e)
+            }),
+            axios({
+                method: "post",
+                url: 'http://beet.asia:9200/doublec_pytorch/_search',
+                data: {
+                    "min_score": 0,
+                    "query": {
+                        "bool": {
+                            "should": [
+                                {
+                                    "query_string": {
+                                        "query": "dependency"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "rebuild"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "add"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "implement"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "restruct"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "construct"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "feature"
+                                    }
+                                }
+                            ],
+                            "minimum_should_match": 1,
+                            "filter": [
+                                {
+                                    "terms": {
+                                        "_type": ["issues", "pulls"]
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "repos_id": 65600975
+                                    }
+                                },
+                                {
+                                    "range": {
+                                        "created_at": {
+                                            "gte": "2019-07-01 04:00:00",
+                                            "lte": "2020-01-01 04:59:59",
+                                            "format": "yyyy-MM-dd HH:mm:ss"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }).then(res => {
+                code_2019l = res.data.hits.total;
+            }).catch(e => {
+                console.log('err', e)
+            })])
+        await Promise.all([
+            axios({
+                method: "post",
+                url: 'http://beet.asia:9200/doublec_pytorch/_search',
+                data: {
+                    "min_score": 0,
+                    "query": {
+                        "bool": {
+                            "should": [
+                                {
+                                    "query_string": {
+                                        "query": "dependency"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "rebuild"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "add"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "implement"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "restruct"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "construct"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "feature"
+                                    }
+                                }
+                            ],
+                            "minimum_should_match": 1,
+                            "filter": [
+                                {
+                                    "terms": {
+                                        "_type": ["issues", "pulls"]
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "repos_id": 65600975
+                                    }
+                                },
+                                {
+                                    "range": {
+                                        "created_at": {
+                                            "gte": "2020-01-01 04:00:00",
+                                            "lte": "2020-06-30 04:59:59",
+                                            "format": "yyyy-MM-dd HH:mm:ss"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }).then(res => {
+                code_2020p = res.data.hits.total;
+            }).catch(e => {
+                console.log('err', e)
+            }),
+            axios({
+                method: "post",
+                url: 'http://beet.asia:9200/doublec_pytorch/_search',
+                data: {
+                    "min_score": 0,
+                    "query": {
+                        "bool": {
+                            "should": [
+                                {
+                                    "query_string": {
+                                        "query": "dependency"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "rebuild"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "add"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "implement"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "restruct"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "construct"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "feature"
+                                    }
+                                }
+                            ],
+                            "minimum_should_match": 1,
+                            "filter": [
+                                {
+                                    "terms": {
+                                        "_type": ["issues", "pulls"]
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "repos_id": 65600975
+                                    }
+                                },
+                                {
+                                    "range": {
+                                        "created_at": {
+                                            "gte": "2020-07-01 04:00:00",
+                                            "lte": "2021-01-01 04:59:59",
+                                            "format": "yyyy-MM-dd HH:mm:ss"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }).then(res => {
+                code_2020l = res.data.hits.total;
+
+
+            }).catch(e => {
+                console.log('err', e)
+            }),
+            axios({
+                method: "post",
+                url: 'http://beet.asia:9200/doublec_pytorch/_search',
+                data: {
+                    "min_score": 0,
+                    "query": {
+                        "bool": {
+                            "should": [
+                                {
+                                    "query_string": {
+                                        "query": "dependency"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "rebuild"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "add"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "implement"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "restruct"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "construct"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "feature"
+                                    }
+                                }
+                            ],
+                            "minimum_should_match": 1,
+                            "filter": [
+                                {
+                                    "terms": {
+                                        "_type": ["issues", "pulls"]
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "repos_id": 65600975
+                                    }
+                                },
+                                {
+                                    "range": {
+                                        "created_at": {
+                                            "gte": "2021-01-01 04:00:00",
+                                            "lte": "2021-07-01 04:59:59",
+                                            "format": "yyyy-MM-dd HH:mm:ss"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }).then(res => {
+                code_2021p = res.data.hits.total;
+
+
+            }).catch(e => {
+                console.log('err', e)
+            }),
+            axios({
+                method: "post",
+                url: 'http://beet.asia:9200/doublec_pytorch/_search',
+                data: {
+                    "min_score": 0,
+                    "query": {
+                        "bool": {
+                            "should": [
+                                {
+                                    "query_string": {
+                                        "query": "dependency"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "rebuild"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "add"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "implement"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "restruct"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "construct"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "feature"
+                                    }
+                                }
+                            ],
+                            "minimum_should_match": 1,
+                            "filter": [
+                                {
+                                    "terms": {
+                                        "_type": ["issues", "pulls"]
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "repos_id": 65600975
+                                    }
+                                },
+                                {
+                                    "range": {
+                                        "created_at": {
+                                            "gte": "2021-07-01 04:00:00",
+                                            "lte": "2022-01-01 04:59:59",
+                                            "format": "yyyy-MM-dd HH:mm:ss"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }).then(res => {
+                code_2021l = res.data.hits.total;
+
+
+            }).catch(e => {
+                console.log('err', e)
+            }),
+            axios({
+                method: "post",
+                url: 'http://beet.asia:9200/doublec_pytorch/_search',
+                data: {
+                    "min_score": 0,
+                    "query": {
+                        "bool": {
+                            "should": [
+                                {
+                                    "query_string": {
+                                        "query": "dependency"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "rebuild"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "add"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "implement"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "restruct"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "construct"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "feature"
+                                    }
+                                }
+                            ],
+                            "minimum_should_match": 1,
+                            "filter": [
+                                {
+                                    "terms": {
+                                        "_type": ["issues", "pulls"]
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "repos_id": 65600975
+                                    }
+                                },
+                                {
+                                    "range": {
+                                        "created_at": {
+                                            "gte": "2022-01-01 04:00:00",
+                                            "lte": "2022-06-30 04:59:59",
+                                            "format": "yyyy-MM-dd HH:mm:ss"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }).then(res => {
+                code_2022p = res.data.hits.total;
+
+
+            }).catch(e => {
+                console.log('err', e)
+            }),
+            axios({
+                method: "post",
+                url: 'http://beet.asia:9200/doublec_pytorch/_search',
+                data: {
+                    "min_score": 0,
+                    "query": {
+                        "bool": {
+                            "should": [
+                                {
+                                    "query_string": {
+                                        "query": "dependency"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "rebuild"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "add"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "implement"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "restruct"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "construct"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "feature"
+                                    }
+                                }
+                            ],
+                            "minimum_should_match": 1,
+                            "filter": [
+                                {
+                                    "terms": {
+                                        "_type": ["issues", "pulls"]
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "repos_id": 65600975
+                                    }
+                                },
+                                {
+                                    "range": {
+                                        "created_at": {
+                                            "gte": "2022-07-01 04:00:00",
+                                            "lte": "2023-01-30 04:59:59",
+                                            "format": "yyyy-MM-dd HH:mm:ss"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }).then(res => {
+                code_2022l = res.data.hits.total;
+
+
+            }).catch(e => {
+                console.log('err', e)
+            }),
+            axios({
+                method: "post",
+                url: 'http://beet.asia:9200/doublec_pytorch/_search',
+                data: {
+                    "min_score": 0,
+                    "query": {
+                        "bool": {
+                            "should": [{
+                                "query_string": {
+                                    "query": "support"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "standard"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "format"
+                                }
+                            },
+                            ],
+                            "minimum_should_match": 1,
+                            "filter": [
+                                {
+                                    "terms": {
+                                        "_type": ["issues", "pulls"]
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "repos_id": 65600975
+                                    }
+                                },
+                                {
+                                    "range": {
+                                        "created_at": {
+                                            "gte": "2017-01-01 04:00:00",
+                                            "lte": "2017-06-30 04:59:59",
+                                            "format": "yyyy-MM-dd HH:mm:ss"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }).then(res => {
+                maintainability_2017p = res.data.hits.total;
+
+
+            }).catch(e => {
+                console.log('err', e)
+            })])
+        await Promise.all([
+            axios({
+                method: "post",
+                url: 'http://beet.asia:9200/doublec_pytorch/_search',
+                data: {
+                    "min_score": 0,
+                    "query": {
+                        "bool": {
+                            "should": [
+                                {
+                                    "query_string": {
+                                        "query": "support"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "standard"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "format"
+                                    }
+                                },
+                            ],
+                            "minimum_should_match": 1,
+                            "filter": [
+                                {
+                                    "terms": {
+                                        "_type": ["issues", "pulls"]
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "repos_id": 65600975
+                                    }
+                                },
+                                {
+                                    "range": {
+                                        "created_at": {
+                                            "gte": "2017-01-01 04:00:00",
+                                            "lte": "2017-06-30 04:59:59",
+                                            "format": "yyyy-MM-dd HH:mm:ss"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }).then(res => {
+                maintainability_2017p = res.data.hits.total;
+
+
+            }).catch(e => {
+                console.log('err', e)
+            }),
+            axios({
+                method: "post",
+                url: 'http://beet.asia:9200/doublec_pytorch/_search',
+                data: {
+                    "min_score": 0,
+                    "query": {
+                        "bool": {
+                            "should": [
+                                {
+                                    "query_string": {
+                                        "query": "support"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "standard"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "format"
+                                    }
+                                },
+                            ],
+                            "minimum_should_match": 1,
+                            "filter": [
+                                {
+                                    "terms": {
+                                        "_type": ["issues", "pulls"]
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "repos_id": 65600975
+                                    }
+                                },
+                                {
+                                    "range": {
+                                        "created_at": {
+                                            "gte": "2017-07-01 04:00:00",
+                                            "lte": "2018-01-01 04:59:59",
+                                            "format": "yyyy-MM-dd HH:mm:ss"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }).then(res => {
+                maintainability_2017l = res.data.hits.total;
+
+
+            }).catch(e => {
+                console.log('err', e)
+            }),
+            axios({
+                method: "post",
+                url: 'http://beet.asia:9200/doublec_pytorch/_search',
+                data: {
+                    "min_score": 0,
+                    "query": {
+                        "bool": {
+                            "should": [
+                                {
+                                    "query_string": {
+                                        "query": "support"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "standard"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "format"
+                                    }
+                                },
+                            ],
+                            "minimum_should_match": 1,
+                            "filter": [
+                                {
+                                    "terms": {
+                                        "_type": ["issues", "pulls"]
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "repos_id": 65600975
+                                    }
+                                },
+                                {
+                                    "range": {
+                                        "created_at": {
+                                            "gte": "2018-01-01 04:00:00",
+                                            "lte": "2018-06-30 04:59:59",
+                                            "format": "yyyy-MM-dd HH:mm:ss"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }).then(res => {
+                maintainability_2018p = res.data.hits.total;
+
+
+            }).catch(e => {
+                console.log('err', e)
+            }),
+            axios({
+                method: "post",
+                url: 'http://beet.asia:9200/doublec_pytorch/_search',
+                data: {
+                    "min_score": 0,
+                    "query": {
+                        "bool": {
+                            "should": [
+                                {
+                                    "query_string": {
+                                        "query": "support"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "standard"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "format"
+                                    }
+                                },
+                            ],
+                            "minimum_should_match": 1,
+                            "filter": [
+                                {
+                                    "terms": {
+                                        "_type": ["issues", "pulls"]
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "repos_id": 65600975
+                                    }
+                                },
+                                {
+                                    "range": {
+                                        "created_at": {
+                                            "gte": "2018-07-01 04:00:00",
+                                            "lte": "2019-01-01 04:59:59",
+                                            "format": "yyyy-MM-dd HH:mm:ss"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }).then(res => {
+                maintainability_2018l = res.data.hits.total;
+
+
+            }).catch(e => {
+                console.log('err', e)
+            }),
+            axios({
+                method: "post",
+                url: 'http://beet.asia:9200/doublec_pytorch/_search',
+                data: {
+                    "min_score": 0,
+                    "query": {
+                        "bool": {
+                            "should": [
+                                {
+                                    "query_string": {
+                                        "query": "support"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "standard"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "format"
+                                    }
+                                },
+                            ],
+                            "minimum_should_match": 1,
+                            "filter": [
+                                {
+                                    "terms": {
+                                        "_type": ["issues", "pulls"]
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "repos_id": 65600975
+                                    }
+                                },
+                                {
+                                    "range": {
+                                        "created_at": {
+                                            "gte": "2019-01-01 04:00:00",
+                                            "lte": "2019-06-30 04:59:59",
+                                            "format": "yyyy-MM-dd HH:mm:ss"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }).then(res => {
+                maintainability_2019p = res.data.hits.total;
+
+
+            }).catch(e => {
+                console.log('err', e)
+            }),
+            axios({
+                method: "post",
+                url: 'http://beet.asia:9200/doublec_pytorch/_search',
+                data: {
+                    "min_score": 0,
+                    "query": {
+                        "bool": {
+                            "should": [
+                                {
+                                    "query_string": {
+                                        "query": "support"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "standard"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "format"
+                                    }
+                                },
+                            ],
+                            "minimum_should_match": 1,
+                            "filter": [
+                                {
+                                    "terms": {
+                                        "_type": ["issues", "pulls"]
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "repos_id": 65600975
+                                    }
+                                },
+                                {
+                                    "range": {
+                                        "created_at": {
+                                            "gte": "2019-07-01 04:00:00",
+                                            "lte": "2020-01-01 04:59:59",
+                                            "format": "yyyy-MM-dd HH:mm:ss"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }).then(res => {
+                maintainability_2019l = res.data.hits.total;
+
+
+            }).catch(e => {
+                console.log('err', e)
+            }),
+            axios({
+                method: "post",
+                url: 'http://beet.asia:9200/doublec_pytorch/_search',
+                data: {
+                    "min_score": 0,
+                    "query": {
+                        "bool": {
+                            "should": [
+                                {
+                                    "query_string": {
+                                        "query": "support"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "standard"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "format"
+                                    }
+                                },
+                            ],
+                            "minimum_should_match": 1,
+                            "filter": [
+                                {
+                                    "terms": {
+                                        "_type": ["issues", "pulls"]
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "repos_id": 65600975
+                                    }
+                                },
+                                {
+                                    "range": {
+                                        "created_at": {
+                                            "gte": "2020-01-01 04:00:00",
+                                            "lte": "2020-06-30 04:59:59",
+                                            "format": "yyyy-MM-dd HH:mm:ss"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }).then(res => {
+                maintainability_2020p = res.data.hits.total;
+
+
+            }).catch(e => {
+                console.log('err', e)
+            }),
+            axios({
+                method: "post",
+                url: 'http://beet.asia:9200/doublec_pytorch/_search',
+                data: {
+                    "min_score": 0,
+                    "query": {
+                        "bool": {
+                            "should": [
+                                {
+                                    "query_string": {
+                                        "query": "support"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "standard"
+                                    }
+                                },
+                                {
+                                    "query_string": {
+                                        "query": "format"
+                                    }
+                                },
+                            ],
+                            "minimum_should_match": 1,
+                            "filter": [
+                                {
+                                    "terms": {
+                                        "_type": ["issues", "pulls"]
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "repos_id": 65600975
+                                    }
+                                },
+                                {
+                                    "range": {
+                                        "created_at": {
+                                            "gte": "2020-07-01 04:00:00",
+                                            "lte": "2021-01-01 04:59:59",
+                                            "format": "yyyy-MM-dd HH:mm:ss"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }).then(res => {
+                maintainability_2020l = res.data.hits.total;
+
+
+            }).catch(e => {
+                console.log('err', e)
+            })])
+        await Promise.all([axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "support"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "standard"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "format"
+                                }
+                            },
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2021-01-01 04:00:00",
+                                        "lte": "2021-07-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        code_2017p = res.data.hits.total;
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "dependency"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "rebuild"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "add"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "implement"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "restruct"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "construct"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "feature"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2017-07-01 04:00:00",
-                                    "lte": "2018-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+        }).then(res => {
+            maintainability_2021p = res.data.hits.total;
+
+
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "support"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "standard"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "format"
+                                }
+                            },
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2021-07-01 04:00:00",
+                                        "lte": "2022-01-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        code_2017l = res.data.hits.total;
+        }).then(res => {
+            maintainability_2021l = res.data.hits.total;
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "dependency"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "rebuild"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "add"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "implement"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "restruct"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "construct"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "feature"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2018-01-01 04:00:00",
-                                    "lte": "2018-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "support"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "standard"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "format"
+                                }
+                            },
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2022-01-01 04:00:00",
+                                        "lte": "2022-06-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        code_2018p = res.data.hits.total;
+        }).then(res => {
+            maintainability_2022p = res.data.hits.total;
 
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "dependency"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "rebuild"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "add"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "implement"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "restruct"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "construct"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "feature"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2018-07-01 04:00:00",
-                                    "lte": "2019-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "support"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "standard"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "format"
+                                }
+                            },
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2022-07-01 04:00:00",
+                                        "lte": "2023-01-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        code_2018l = res.data.hits.total;
+        }).then(res => {
+            maintainability_2022l = res.data.hits.total;
 
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "dependency"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "rebuild"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "add"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "implement"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "restruct"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "construct"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "feature"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2019-01-01 04:00:00",
-                                    "lte": "2019-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
-                                }
-                            }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        code_2019p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "dependency"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "rebuild"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "add"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "implement"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "restruct"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "construct"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "feature"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2019-07-01 04:00:00",
-                                    "lte": "2020-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
-                                }
-                            }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        code_2019l = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "dependency"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "rebuild"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "add"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "implement"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "restruct"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "construct"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "feature"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2020-01-01 04:00:00",
-                                    "lte": "2020-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
-                                }
-                            }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        code_2020p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "dependency"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "rebuild"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "add"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "implement"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "restruct"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "construct"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "feature"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2020-07-01 04:00:00",
-                                    "lte": "2021-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
-                                }
-                            }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        code_2020l = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "dependency"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "rebuild"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "add"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "implement"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "restruct"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "construct"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "feature"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2021-01-01 04:00:00",
-                                    "lte": "2021-07-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
-                                }
-                            }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        code_2021p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "dependency"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "rebuild"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "add"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "implement"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "restruct"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "construct"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "feature"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2021-07-01 04:00:00",
-                                    "lte": "2022-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
-                                }
-                            }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        code_2021l = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "dependency"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "rebuild"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "add"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "implement"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "restruct"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "construct"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "feature"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2022-01-01 04:00:00",
-                                    "lte": "2022-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
-                                }
-                            }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        code_2022p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "dependency"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "rebuild"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "add"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "implement"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "restruct"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "construct"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "feature"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2022-07-01 04:00:00",
-                                    "lte": "2023-01-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
-                                }
-                            }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        code_2022l = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [{
-                        "query_string": {
-                            "query": "support"
-                        }
-                    },
-                    {
-                        "query_string": {
-                            "query": "standard"
-                        }
-                    },
-                    {
-                        "query_string": {
-                            "query": "format"
-                        }
-                    },
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2017-01-01 04:00:00",
-                                    "lte": "2017-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
-                                }
-                            }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        maintainability_2017p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "support"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "standard"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "format"
-                            }
-                        },
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2017-01-01 04:00:00",
-                                    "lte": "2017-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
-                                }
-                            }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        maintainability_2017p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "support"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "standard"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "format"
-                            }
-                        },
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2017-07-01 04:00:00",
-                                    "lte": "2018-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
-                                }
-                            }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        maintainability_2017l = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "support"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "standard"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "format"
-                            }
-                        },
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2018-01-01 04:00:00",
-                                    "lte": "2018-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
-                                }
-                            }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        maintainability_2018p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "support"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "standard"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "format"
-                            }
-                        },
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2018-07-01 04:00:00",
-                                    "lte": "2019-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
-                                }
-                            }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        maintainability_2018l = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "support"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "standard"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "format"
-                            }
-                        },
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2019-01-01 04:00:00",
-                                    "lte": "2019-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
-                                }
-                            }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        maintainability_2019p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "support"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "standard"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "format"
-                            }
-                        },
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2019-07-01 04:00:00",
-                                    "lte": "2020-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
-                                }
-                            }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        maintainability_2019l = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "support"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "standard"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "format"
-                            }
-                        },
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2020-01-01 04:00:00",
-                                    "lte": "2020-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
-                                }
-                            }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        maintainability_2020p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "support"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "standard"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "format"
-                            }
-                        },
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2020-07-01 04:00:00",
-                                    "lte": "2021-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
-                                }
-                            }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        maintainability_2020l = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "support"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "standard"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "format"
-                            }
-                        },
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2021-01-01 04:00:00",
-                                    "lte": "2021-07-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
-                                }
-                            }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        maintainability_2021p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "support"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "standard"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "format"
-                            }
-                        },
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2021-07-01 04:00:00",
-                                    "lte": "2022-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
-                                }
-                            }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        maintainability_2021l = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "support"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "standard"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "format"
-                            }
-                        },
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2022-01-01 04:00:00",
-                                    "lte": "2022-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
-                                }
-                            }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        maintainability_2022p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "support"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "standard"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "format"
-                            }
-                        },
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2022-07-01 04:00:00",
-                                    "lte": "2023-01-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
-                                }
-                            }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        maintainability_2022l = res.data.hits.total;
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [{
-                        "query_string": {
-                            "query": "robust"
-                        }
-                    },
-                    {
-                        "query_string": {
-                            "query": "error"
-                        }
-                    },
-                    {
-                        "query_string": {
-                            "query": "fail"
-                        }
-                    },
-                    {
-                        "query_string": {
-                            "query": "bug"
-                        }
-                    }],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2017-01-01 04:00:00",
-                                    "lte": "2017-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
-                                }
-                            }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        robost_2017p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [{
                             "query_string": {
                                 "query": "robust"
                             }
@@ -1736,712 +1668,717 @@ const HeatMap = () => {
                             "query_string": {
                                 "query": "bug"
                             }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2017-07-01 04:00:00",
-                                    "lte": "2018-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                        }],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2017-01-01 04:00:00",
+                                        "lte": "2017-06-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        robost_2017l = res.data.hits.total;
+        }).then(res => {
+            robost_2017p = res.data.hits.total;
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "robust"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "error"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "fail"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "bug"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2018-01-01 04:00:00",
-                                    "lte": "2018-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "robust"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "error"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "fail"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "bug"
                                 }
                             }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        robost_2018p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "robust"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "error"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "fail"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "bug"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2018-07-01 04:00:00",
-                                    "lte": "2019-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2017-07-01 04:00:00",
+                                        "lte": "2018-01-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        robost_2018l = res.data.hits.total;
+        }).then(res => {
+            robost_2017l = res.data.hits.total;
 
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "robust"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "error"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "fail"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "bug"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2019-01-01 04:00:00",
-                                    "lte": "2019-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "robust"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "error"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "fail"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "bug"
                                 }
                             }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        robost_2019p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "robust"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "error"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "fail"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "bug"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2019-07-01 04:00:00",
-                                    "lte": "2020-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2018-01-01 04:00:00",
+                                        "lte": "2018-06-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        robost_2019l = res.data.hits.total;
+        }).then(res => {
+            robost_2018p = res.data.hits.total;
 
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "robust"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "error"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "fail"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "bug"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2020-01-01 04:00:00",
-                                    "lte": "2020-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "robust"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "error"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "fail"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "bug"
                                 }
                             }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        robost_2020p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "robust"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "error"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "fail"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "bug"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2020-07-01 04:00:00",
-                                    "lte": "2021-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2018-07-01 04:00:00",
+                                        "lte": "2019-01-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        robost_2020l = res.data.hits.total;
+        }).then(res => {
+            robost_2018l = res.data.hits.total;
 
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "robust"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "error"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "fail"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "bug"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2021-01-01 04:00:00",
-                                    "lte": "2021-07-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "robust"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "error"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "fail"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "bug"
                                 }
                             }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        robost_2021p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "robust"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "error"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "fail"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "bug"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2021-07-01 04:00:00",
-                                    "lte": "2022-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2019-01-01 04:00:00",
+                                        "lte": "2019-06-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        robost_2021l = res.data.hits.total;
+        }).then(res => {
+            robost_2019p = res.data.hits.total;
 
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "robust"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "error"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "fail"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "bug"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2022-01-01 04:00:00",
-                                    "lte": "2022-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "robust"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "error"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "fail"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "bug"
                                 }
                             }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        robost_2022p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "robust"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "error"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "fail"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "bug"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2022-07-01 04:00:00",
-                                    "lte": "2023-01-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2019-07-01 04:00:00",
+                                        "lte": "2020-01-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        robost_2022l = res.data.hits.total;
+        }).then(res => {
+            robost_2019l = res.data.hits.total;
 
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [{
-                        "query_string": {
-                            "query": "boost"
-                        }
-                    },
-                    {
-                        "query_string": {
-                            "query": "speed"
-                        }
-                    },
-                    {
-                        "query_string": {
-                            "query": "performance"
-                        }
-                    }],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2017-01-01 04:00:00",
-                                    "lte": "2017-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "robust"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "error"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "fail"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "bug"
                                 }
                             }
-                        }
-                    ]
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2020-01-01 04:00:00",
+                                        "lte": "2020-06-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        ability_2017p = res.data.hits.total;
+        }).then(res => {
+            robost_2020p = res.data.hits.total;
 
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "robust"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "error"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "fail"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "bug"
+                                }
+                            }
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2020-07-01 04:00:00",
+                                        "lte": "2021-01-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }).then(res => {
+            robost_2020l = res.data.hits.total;
+
+
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "robust"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "error"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "fail"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "bug"
+                                }
+                            }
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2021-01-01 04:00:00",
+                                        "lte": "2021-07-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }).then(res => {
+            robost_2021p = res.data.hits.total;
+
+
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "robust"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "error"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "fail"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "bug"
+                                }
+                            }
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2021-07-01 04:00:00",
+                                        "lte": "2022-01-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }).then(res => {
+            robost_2021l = res.data.hits.total;
+
+
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "robust"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "error"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "fail"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "bug"
+                                }
+                            }
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2022-01-01 04:00:00",
+                                        "lte": "2022-06-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }).then(res => {
+            robost_2022p = res.data.hits.total;
+
+
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "robust"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "error"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "fail"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "bug"
+                                }
+                            }
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2022-07-01 04:00:00",
+                                        "lte": "2023-01-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }).then(res => {
+            robost_2022l = res.data.hits.total;
+
+
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [{
                             "query_string": {
                                 "query": "boost"
                             }
@@ -2455,662 +2392,663 @@ const HeatMap = () => {
                             "query_string": {
                                 "query": "performance"
                             }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2017-07-01 04:00:00",
-                                    "lte": "2018-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                        }],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2017-01-01 04:00:00",
+                                        "lte": "2017-06-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        ability_2017l = res.data.hits.total;
+        }).then(res => {
+            ability_2017p = res.data.hits.total;
 
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "boost"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "speed"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "performance"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2018-01-01 04:00:00",
-                                    "lte": "2018-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "boost"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "speed"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "performance"
                                 }
                             }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        ability_2018p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "boost"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "speed"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "performance"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2018-07-01 04:00:00",
-                                    "lte": "2019-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2017-07-01 04:00:00",
+                                        "lte": "2018-01-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        ability_2018l = res.data.hits.total;
+        }).then(res => {
+            ability_2017l = res.data.hits.total;
 
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "boost"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "speed"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "performance"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2019-01-01 04:00:00",
-                                    "lte": "2019-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "boost"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "speed"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "performance"
                                 }
                             }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        ability_2019p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "boost"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "speed"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "performance"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2019-07-01 04:00:00",
-                                    "lte": "2020-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2018-01-01 04:00:00",
+                                        "lte": "2018-06-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        ability_2019l = res.data.hits.total;
+        }).then(res => {
+            ability_2018p = res.data.hits.total;
 
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "boost"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "speed"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "performance"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2020-01-01 04:00:00",
-                                    "lte": "2020-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+        }).catch(e => {
+            console.log('err', e)
+        })])
+        await Promise.all([axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "boost"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "speed"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "performance"
                                 }
                             }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        ability_2020p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "boost"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "speed"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "performance"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2020-07-01 04:00:00",
-                                    "lte": "2021-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2018-07-01 04:00:00",
+                                        "lte": "2019-01-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        ability_2020l = res.data.hits.total;
+        }).then(res => {
+            ability_2018l = res.data.hits.total;
 
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "boost"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "speed"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "performance"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2021-01-01 04:00:00",
-                                    "lte": "2021-07-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "boost"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "speed"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "performance"
                                 }
                             }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        ability_2021p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "boost"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "speed"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "performance"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2021-07-01 04:00:00",
-                                    "lte": "2022-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2019-01-01 04:00:00",
+                                        "lte": "2019-06-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        ability_2021l = res.data.hits.total;
+        }).then(res => {
+            ability_2019p = res.data.hits.total;
 
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "boost"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "speed"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "performance"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2022-01-01 04:00:00",
-                                    "lte": "2022-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "boost"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "speed"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "performance"
                                 }
                             }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        ability_2022p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "boost"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "speed"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "performance"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2022-07-01 04:00:00",
-                                    "lte": "2023-01-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2019-07-01 04:00:00",
+                                        "lte": "2020-01-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        ability_2022l = res.data.hits.total;
+        }).then(res => {
+            ability_2019l = res.data.hits.total;
 
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [{
-                        "query_string": {
-                            "query": "config"
-                        }
-                    },
-                    {
-                        "query_string": {
-                            "query": "property"
-                        }
-                    },
-                    {
-                        "query_string": {
-                            "query": "attribute"
-                        }
-                    }],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2017-01-01 04:00:00",
-                                    "lte": "2017-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "boost"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "speed"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "performance"
                                 }
                             }
-                        }
-                    ]
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2020-01-01 04:00:00",
+                                        "lte": "2020-06-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        config_2017p = res.data.hits.total;
+        }).then(res => {
+            ability_2020p = res.data.hits.total;
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
+
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "boost"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "speed"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "performance"
+                                }
+                            }
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2020-07-01 04:00:00",
+                                        "lte": "2021-01-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }).then(res => {
+            ability_2020l = res.data.hits.total;
+
+
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "boost"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "speed"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "performance"
+                                }
+                            }
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2021-01-01 04:00:00",
+                                        "lte": "2021-07-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }).then(res => {
+            ability_2021p = res.data.hits.total;
+
+
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "boost"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "speed"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "performance"
+                                }
+                            }
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2021-07-01 04:00:00",
+                                        "lte": "2022-01-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }).then(res => {
+            ability_2021l = res.data.hits.total;
+
+
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "boost"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "speed"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "performance"
+                                }
+                            }
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2022-01-01 04:00:00",
+                                        "lte": "2022-06-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }).then(res => {
+            ability_2022p = res.data.hits.total;
+
+
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "boost"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "speed"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "performance"
+                                }
+                            }
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2022-07-01 04:00:00",
+                                        "lte": "2023-01-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }).then(res => {
+            ability_2022l = res.data.hits.total;
+
+
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [{
                             "query_string": {
                                 "query": "config"
                             }
@@ -3124,658 +3062,662 @@ const HeatMap = () => {
                             "query_string": {
                                 "query": "attribute"
                             }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2017-07-01 04:00:00",
-                                    "lte": "2018-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                        }],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2017-01-01 04:00:00",
+                                        "lte": "2017-06-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        config_2017l = res.data.hits.total;
+        }).then(res => {
+            config_2017p = res.data.hits.total;
 
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "config"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "property"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "attribute"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2018-01-01 04:00:00",
-                                    "lte": "2018-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "config"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "property"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "attribute"
                                 }
                             }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        config_2018p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "config"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "property"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "attribute"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2018-07-01 04:00:00",
-                                    "lte": "2019-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2017-07-01 04:00:00",
+                                        "lte": "2018-01-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        config_2018l = res.data.hits.total;
+        }).then(res => {
+            config_2017l = res.data.hits.total;
 
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "config"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "property"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "attribute"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2019-01-01 04:00:00",
-                                    "lte": "2019-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "config"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "property"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "attribute"
                                 }
                             }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        config_2019p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "config"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "property"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "attribute"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2019-07-01 04:00:00",
-                                    "lte": "2020-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2018-01-01 04:00:00",
+                                        "lte": "2018-06-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        config_2019l = res.data.hits.total;
+        }).then(res => {
+            config_2018p = res.data.hits.total;
 
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "config"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "property"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "attribute"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2020-01-01 04:00:00",
-                                    "lte": "2020-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "config"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "property"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "attribute"
                                 }
                             }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        config_2020p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "config"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "property"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "attribute"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2020-07-01 04:00:00",
-                                    "lte": "2021-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2018-07-01 04:00:00",
+                                        "lte": "2019-01-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        config_2020l = res.data.hits.total;
+        }).then(res => {
+            config_2018l = res.data.hits.total;
 
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "config"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "property"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "attribute"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2021-01-01 04:00:00",
-                                    "lte": "2021-07-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "config"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "property"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "attribute"
                                 }
                             }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        config_2021p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "config"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "property"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "attribute"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2021-07-01 04:00:00",
-                                    "lte": "2022-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2019-01-01 04:00:00",
+                                        "lte": "2019-06-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        config_2021l = res.data.hits.total;
+        }).then(res => {
+            config_2019p = res.data.hits.total;
 
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "config"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "property"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "attribute"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2022-01-01 04:00:00",
-                                    "lte": "2022-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "config"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "property"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "attribute"
                                 }
                             }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        config_2022p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "config"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "property"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "attribute"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2022-07-01 04:00:00",
-                                    "lte": "2023-01-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2019-07-01 04:00:00",
+                                        "lte": "2020-01-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        config_2022l = res.data.hits.total;
+        }).then(res => {
+            config_2019l = res.data.hits.total;
 
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [{
-                        "query_string": {
-                            "query": "docs"
-                        }
-                    },
-                    {
-                        "query_string": {
-                            "query": "typo"
-                        }
-                    }],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2017-01-01 04:00:00",
-                                    "lte": "2017-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "config"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "property"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "attribute"
                                 }
                             }
-                        }
-                    ]
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2020-01-01 04:00:00",
+                                        "lte": "2020-06-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        doc_2017p = res.data.hits.total;
+        }).then(res => {
+            config_2020p = res.data.hits.total;
 
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "config"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "property"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "attribute"
+                                }
+                            }
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2020-07-01 04:00:00",
+                                        "lte": "2021-01-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }).then(res => {
+            config_2020l = res.data.hits.total;
+
+
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "config"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "property"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "attribute"
+                                }
+                            }
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2021-01-01 04:00:00",
+                                        "lte": "2021-07-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }).then(res => {
+            config_2021p = res.data.hits.total;
+
+
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "config"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "property"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "attribute"
+                                }
+                            }
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2021-07-01 04:00:00",
+                                        "lte": "2022-01-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }).then(res => {
+            config_2021l = res.data.hits.total;
+
+
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "config"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "property"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "attribute"
+                                }
+                            }
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2022-01-01 04:00:00",
+                                        "lte": "2022-06-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }).then(res => {
+            config_2022p = res.data.hits.total;
+
+
+        }).catch(e => {
+            console.log('err', e)
+        })])
+        await Promise.all([axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "config"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "property"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "attribute"
+                                }
+                            }
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2022-07-01 04:00:00",
+                                        "lte": "2023-01-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }).then(res => {
+            config_2022l = res.data.hits.total;
+
+
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [{
                             "query_string": {
                                 "query": "docs"
                             }
@@ -3784,623 +3726,608 @@ const HeatMap = () => {
                             "query_string": {
                                 "query": "typo"
                             }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2017-07-01 04:00:00",
-                                    "lte": "2018-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                        }],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2017-01-01 04:00:00",
+                                        "lte": "2017-06-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        doc_2017l = res.data.hits.total;
+        }).then(res => {
+            doc_2017p = res.data.hits.total;
 
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "docs"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "typo"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2018-01-01 04:00:00",
-                                    "lte": "2018-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "docs"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "typo"
                                 }
                             }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        doc_2018p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "docs"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "typo"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2018-07-01 04:00:00",
-                                    "lte": "2019-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2017-07-01 04:00:00",
+                                        "lte": "2018-01-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        doc_2018l = res.data.hits.total;
+        }).then(res => {
+            doc_2017l = res.data.hits.total;
 
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "docs"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "typo"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2019-01-01 04:00:00",
-                                    "lte": "2019-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "docs"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "typo"
                                 }
                             }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        doc_2019p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "docs"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "typo"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2019-07-01 04:00:00",
-                                    "lte": "2020-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2018-01-01 04:00:00",
+                                        "lte": "2018-06-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        doc_2019l = res.data.hits.total;
+        }).then(res => {
+            doc_2018p = res.data.hits.total;
 
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "docs"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "typo"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2020-01-01 04:00:00",
-                                    "lte": "2020-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "docs"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "typo"
                                 }
                             }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        doc_2020p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "docs"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "typo"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2020-07-01 04:00:00",
-                                    "lte": "2021-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2018-07-01 04:00:00",
+                                        "lte": "2019-01-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        doc_2020l = res.data.hits.total;
+        }).then(res => {
+            doc_2018l = res.data.hits.total;
 
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "docs"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "typo"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2021-01-01 04:00:00",
-                                    "lte": "2021-07-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "docs"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "typo"
                                 }
                             }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        doc_2021p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "docs"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "typo"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2021-07-01 04:00:00",
-                                    "lte": "2022-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2019-01-01 04:00:00",
+                                        "lte": "2019-06-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        doc_2021l = res.data.hits.total;
+        }).then(res => {
+            doc_2019p = res.data.hits.total;
 
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "docs"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "typo"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2022-01-01 04:00:00",
-                                    "lte": "2022-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "docs"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "typo"
                                 }
                             }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        doc_2022p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "docs"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "typo"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2022-07-01 04:00:00",
-                                    "lte": "2023-01-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2019-07-01 04:00:00",
+                                        "lte": "2020-01-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        doc_2022l = res.data.hits.total;
+        }).then(res => {
+            doc_2019l = res.data.hits.total;
 
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [{
-                        "query_string": {
-                            "query": "Unit Test"
-                        }
-                    },
-                    {
-                        "query_string": {
-                            "query": "CI"
-                        }
-                    },
-                    {
-                        "query_string": {
-                            "query": "Integration Test"
-                        }
-                    },
-                    {
-                        "query_string": {
-                            "query": "Regression Test"
-                        }
-                    },
-                    {
-                        "query_string": {
-                            "query": "pass"
-                        }
-                    }],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2017-01-01 04:00:00",
-                                    "lte": "2017-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "docs"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "typo"
                                 }
                             }
-                        }
-                    ]
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2020-01-01 04:00:00",
+                                        "lte": "2020-06-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        test_2017p = res.data.hits.total;
+        }).then(res => {
+            doc_2020p = res.data.hits.total;
 
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "docs"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "typo"
+                                }
+                            }
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2020-07-01 04:00:00",
+                                        "lte": "2021-01-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }).then(res => {
+            doc_2020l = res.data.hits.total;
+
+
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "docs"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "typo"
+                                }
+                            }
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2021-01-01 04:00:00",
+                                        "lte": "2021-07-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }).then(res => {
+            doc_2021p = res.data.hits.total;
+
+
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "docs"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "typo"
+                                }
+                            }
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2021-07-01 04:00:00",
+                                        "lte": "2022-01-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }).then(res => {
+            doc_2021l = res.data.hits.total;
+
+
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "docs"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "typo"
+                                }
+                            }
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2022-01-01 04:00:00",
+                                        "lte": "2022-06-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }).then(res => {
+            doc_2022p = res.data.hits.total;
+
+
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "docs"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "typo"
+                                }
+                            }
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2022-07-01 04:00:00",
+                                        "lte": "2023-01-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }).then(res => {
+            doc_2022l = res.data.hits.total;
+
+
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [{
                             "query_string": {
                                 "query": "Unit Test"
                             }
@@ -4424,700 +4351,765 @@ const HeatMap = () => {
                             "query_string": {
                                 "query": "pass"
                             }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2017-07-01 04:00:00",
-                                    "lte": "2018-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                        }],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2017-01-01 04:00:00",
+                                        "lte": "2017-06-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        test_2017l = res.data.hits.total;
+        }).then(res => {
+            test_2017p = res.data.hits.total;
 
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "Unit Test"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "CI"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "Integration Test"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "Regression Test"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "pass"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2018-01-01 04:00:00",
-                                    "lte": "2018-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "Unit Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "CI"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "Integration Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "Regression Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "pass"
                                 }
                             }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        test_2018p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "Unit Test"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "CI"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "Integration Test"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "Regression Test"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "pass"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2018-07-01 04:00:00",
-                                    "lte": "2019-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2017-07-01 04:00:00",
+                                        "lte": "2018-01-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        test_2018l = res.data.hits.total;
+        }).then(res => {
+            test_2017l = res.data.hits.total;
 
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "Unit Test"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "CI"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "Integration Test"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "Regression Test"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "pass"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2019-01-01 04:00:00",
-                                    "lte": "2019-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "Unit Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "CI"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "Integration Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "Regression Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "pass"
                                 }
                             }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        test_2019p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "Unit Test"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "CI"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "Integration Test"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "Regression Test"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "pass"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2019-07-01 04:00:00",
-                                    "lte": "2020-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2018-01-01 04:00:00",
+                                        "lte": "2018-06-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        test_2019l = res.data.hits.total;
+        }).then(res => {
+            test_2018p = res.data.hits.total;
 
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "Unit Test"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "CI"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "Integration Test"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "Regression Test"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "pass"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2020-01-01 04:00:00",
-                                    "lte": "2020-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "Unit Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "CI"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "Integration Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "Regression Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "pass"
                                 }
                             }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        test_2020p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "Unit Test"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "CI"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "Integration Test"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "Regression Test"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "pass"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2020-07-01 04:00:00",
-                                    "lte": "2021-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2018-07-01 04:00:00",
+                                        "lte": "2019-01-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        test_2020l = res.data.hits.total;
+        }).then(res => {
+            test_2018l = res.data.hits.total;
 
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "Unit Test"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "CI"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "Integration Test"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "Regression Test"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "pass"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2021-01-01 04:00:00",
-                                    "lte": "2021-07-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "Unit Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "CI"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "Integration Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "Regression Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "pass"
                                 }
                             }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        test_2021p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "Unit Test"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "CI"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "Integration Test"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "Regression Test"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "pass"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2021-07-01 04:00:00",
-                                    "lte": "2022-01-01 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2019-01-01 04:00:00",
+                                        "lte": "2019-06-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        test_2021l = res.data.hits.total;
+        }).then(res => {
+            test_2019p = res.data.hits.total;
 
 
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "Unit Test"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "CI"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "Integration Test"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "Regression Test"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "pass"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2022-01-01 04:00:00",
-                                    "lte": "2022-06-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "Unit Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "CI"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "Integration Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "Regression Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "pass"
                                 }
                             }
-                        }
-                    ]
-                }
-            }
-        }
-    }).then(res => {
-        test_2022p = res.data.hits.total;
-
-
-    }).catch(e => {
-        console.log('err', e)
-    })
-    axios({
-        method: "post",
-        url: 'http://beet.asia:9200/doublec_pytorch/_search',
-        data: {
-            "min_score": 0,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "query_string": {
-                                "query": "Unit Test"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "CI"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "Integration Test"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "Regression Test"
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "pass"
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {
-                            "terms": {
-                                "_type": ["issues", "pulls"]
-                            }
-                        },
-                        {
-                            "term": {
-                                "repos_id": 65600975
-                            }
-                        },
-                        {
-                            "range": {
-                                "created_at": {
-                                    "gte": "2022-07-01 04:00:00",
-                                    "lte": "2023-01-30 04:59:59",
-                                    "format": "yyyy-MM-dd HH:mm:ss"
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2019-07-01 04:00:00",
+                                        "lte": "2020-01-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-    }).then(res => {
-        test_2022l = res.data.hits.total;
-    }).catch(e => {
-        console.log('err', e)
-    })
+        }).then(res => {
+            test_2019l = res.data.hits.total;
 
 
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "Unit Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "CI"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "Integration Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "Regression Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "pass"
+                                }
+                            }
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2020-01-01 04:00:00",
+                                        "lte": "2020-06-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }).then(res => {
+            test_2020p = res.data.hits.total;
+
+
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "Unit Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "CI"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "Integration Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "Regression Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "pass"
+                                }
+                            }
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2020-07-01 04:00:00",
+                                        "lte": "2021-01-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }).then(res => {
+            test_2020l = res.data.hits.total;
+
+
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "Unit Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "CI"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "Integration Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "Regression Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "pass"
+                                }
+                            }
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2021-01-01 04:00:00",
+                                        "lte": "2021-07-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }).then(res => {
+            test_2021p = res.data.hits.total;
+
+
+        }).catch(e => {
+            console.log('err', e)
+        })])
+
+        await Promise.all([axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "Unit Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "CI"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "Integration Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "Regression Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "pass"
+                                }
+                            }
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2021-07-01 04:00:00",
+                                        "lte": "2022-01-01 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }).then(res => {
+            test_2021l = res.data.hits.total;
+
+
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "Unit Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "CI"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "Integration Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "Regression Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "pass"
+                                }
+                            }
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2022-01-01 04:00:00",
+                                        "lte": "2022-06-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }).then(res => {
+            test_2022p = res.data.hits.total;
+
+
+        }).catch(e => {
+            console.log('err', e)
+        }),
+        axios({
+            method: "post",
+            url: 'http://beet.asia:9200/doublec_pytorch/_search',
+            data: {
+                "min_score": 0,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "query_string": {
+                                    "query": "Unit Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "CI"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "Integration Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "Regression Test"
+                                }
+                            },
+                            {
+                                "query_string": {
+                                    "query": "pass"
+                                }
+                            }
+                        ],
+                        "minimum_should_match": 1,
+                        "filter": [
+                            {
+                                "terms": {
+                                    "_type": ["issues", "pulls"]
+                                }
+                            },
+                            {
+                                "term": {
+                                    "repos_id": 65600975
+                                }
+                            },
+                            {
+                                "range": {
+                                    "created_at": {
+                                        "gte": "2022-07-01 04:00:00",
+                                        "lte": "2023-01-30 04:59:59",
+                                        "format": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }).then(res => {
+            test_2022l = res.data.hits.total;
+        }).catch(e => {
+            console.log('err', e)
+        })])
+    }
     var days_pie = ['2017-1', '2017-6', '2018-1', '2018-6', '2019-1', '2019-6', '2020-1', '2020-6', '2021-1', '2021-6', '2022-1', '2022-6'];
     // 数据[时间[相应评论条数]]
 
@@ -5222,7 +5214,7 @@ const HeatMap = () => {
         });
     }
     const [option, setOption] = useState(DEFAULT_OPTION);
-    function fetchData() {
+    async function fetchData() {
         var newdata_pie = [];
         var code = [], maintainability = [], robost = [], ability = [], config = [], doc = [], test = [];
         code.push(code_2017p); code.push(code_2017l); code.push(code_2018p); code.push(code_2018l); code.push(code_2019p); code.push(code_2019l); code.push(code_2020p); code.push(code_2020l); code.push(code_2021p); code.push(code_2021l); code.push(code_2022p); code.push(code_2022l);
@@ -5242,11 +5234,9 @@ const HeatMap = () => {
             newdata_pie[i].push(config[i]);
             newdata_pie[i].push(doc[i]);
             newdata_pie[i].push(test[i]);
-
         }
         const newOption = cloneDeep(option);
         newOption.options = []
-        console.log(option.options.series)
         for (var n = 0; n < 12; n++) {
             var res = [];
             for (var j = 0; j < 7; j++) {
@@ -5276,10 +5266,14 @@ const HeatMap = () => {
         setOption(newOption);
     }
     useEffect(() => {
-        setTimeout(() => {
-            fetchData()
-        }, 3000);
-    });
+        // setTimeout(() => {
+        const inner = async () => {
+            await init();
+            await fetchData()
+        }
+        inner()
+        // }, 3000);
+    }, []);
 
     return (
 
