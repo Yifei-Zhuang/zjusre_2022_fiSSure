@@ -26,23 +26,20 @@ import {
     HeatMap,
     CompanyBubbleChart
 } from "../components/DashBoard";
-import detail from "../context/staticData"
+// import detail from "../context/staticData"
 
 export default function DashboardApp() {
-    // 暂时关闭从后端获得数据
-    // useEffect(() => {
-    //     getDashBoard(id);
-    // }, []);
-
+    useEffect(() => {
+        getDashBoard(id);
+    }, []);
 
     const { id } = useParams();
 
-
     // 使用请求的detail数据
-    // const { isLoading, detail, getDashBoard, repos } = useAppContext();
-
+    const { isLoading, detail, getDashBoard, repos } = useAppContext();
+    
     //使用死数据
-    const { isLoading, getDashBoard, repos } = useAppContext();
+    // const { isLoading, getDashBoard, repos } = useAppContext();
     const [visible, setVisible] = useState(false);
     const [compareRepo, setCompareRepo] = useState("");
     const {
@@ -75,11 +72,10 @@ export default function DashboardApp() {
         monthly_count
     } = detail;
 
-
-
     if (isLoading) {
         return <Loading center />;
     } else {
+
         const IssueFrequencyDatas = {
             issue_year_create_frequency,
             Issue_year_update_frequency,
@@ -100,7 +96,7 @@ export default function DashboardApp() {
             visible ? (
                 <Container maxWidth="xl">
                     <Box sx={{ pb: 5, display: "flex", justifyContent: "space-between" }}>
-                        <Typography variant="h4">Compare To {compareRepo}</Typography>
+                        <Typography variant="h4">{owner}/{name} Compare To {compareRepo}</Typography>
                         <Button
                             variant="contained" sx={{ mr: "0%" }}
                             onClick={() => {
@@ -231,7 +227,7 @@ export default function DashboardApp() {
                         <Box sx={{ height: 520, width: '100%' }}>
                             <Contribute {...coreContributorByYear} />
                         </Box>
-                        <CompanyBubbleChart repo_owner={owner} repo_name={name} coreContributorByYear={coreContributorByYear} />
+                        <CompanyBubbleChart repoOwner={owner} repoName={name} coreContributorByYear={coreContributorByYear} />
 
                         <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
                             <Typography variant="h4">Issue closed and Issue response</Typography>

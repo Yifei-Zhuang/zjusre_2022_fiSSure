@@ -123,60 +123,85 @@ const Compare = (compareRepo) => {
 
     return (
         <Container maxWidth="xl">
+            <Grid container spacing={3}>
+                <Grid item xs={12} sm={12} md={12}>
+                    <Card>
+                        <Box sx={{ p: 3, pb: 1 }} dir="ltr">
+                            <ReactApexChart
+                                series={CHART_DATA}
+                                options={chartOptions}
+                                height='auto'
+                                type='bar'
+                            />
+                        </Box>
+                    </Card>
+                </Grid>
+                <Grid item xs={6} >
+                    <Card>
+                        <CardHeader title={detail.owner + "/" + detail.name + " Language"} />
+                        <Language {...detail.language} />
+                    </Card>
+                </Grid>
+                <Grid item xs={6}>
+                    <Card>
+                        <CardHeader title={compareRepo.compareRepo + " Language"} />
+                        <Language {...newLanguage.language} />
+                    </Card>
+                </Grid>
+            </Grid>
+
+            {/* 
+               //TODO 将输入的数据改为后端获取的数据
+            */}
+            <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
+                <Typography variant="h4">Commit Compare</Typography>
+            </Box>
+            <Grid container spacing={3}>
+                <Grid item xs={12} sm={12} md={12}>
+                    <CompareCommitFrequency sx={{
+                        marginTop: 3,
+                    }} repoOwner={detail.owner} repoName={detail.name} anotherRepoOwner={compareRepo.compareRepo.split('/')[0]} anotherRepoName={compareRepo.compareRepo.split('/')[1]} data1={detail.commit_month_frequency} data2={detail.commit_month_frequency} />
+                    <Divider />
+                </Grid>
+
+                {/* 
+                //TODO 将输入的数据改为后端获取的数据
+                */}
+                <Grid item xs={12} sm={12} md={12}>
+                    <CompareCommiterFrequency repoOwner={detail.owner} repoName={detail.name} anotherRepoOwner={compareRepo.compareRepo.split('/')[0]} anotherRepoName={compareRepo.compareRepo.split('/')[1]} data1={detail.commiter_count} data2={detail.commiter_count} />
+                </Grid>
+            </Grid>
+            {/* 
+               //TODO 将输入的数据改为后端获取的数据
+            */}
+
+            <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
+                <Typography variant="h4">Issue Compare</Typography>
+            </Box>
+            <Grid container spacing={3}>
+                <Grid item xs={12} sm={12} md={12}>
+                    <CompareIssuerCountFrequency repoOwner={detail.owner} repoName={detail.name} anotherRepoOwner={compareRepo.compareRepo.split('/')[0]} anotherRepoName={compareRepo.compareRepo.split('/')[1]} data1={detail.Issuer_count} data2={detail.Issuer_count} />
+                </Grid>
+            </Grid>
+
+            {/* 
+               //TODO 将输入的数据改为后端获取的数据
+            */}
+            <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
+                <Typography variant="h4">Pull Request Compare</Typography>
+            </Box>
+            <Grid container spacing={3}>
+                <Grid item xs={12} sm={12} md={12}>
+                    <ComparePullerCountFrequency repoOwner={detail.owner} repoName={detail.name} anotherRepoOwner={compareRepo.compareRepo.split('/')[0]} anotherRepoName={compareRepo.compareRepo.split('/')[1]} data1={detail.puller_count} data2={detail.puller_count} />
+                </Grid>
+            </Grid>
             {/* 公司占比 */}
             <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
-                <Typography variant="h4">公司贡献占比</Typography>
+                <Typography variant="h4">Contribution Percentage of Company</Typography>
             </Box>
             <Box>
                 <CompanyBubbleChart repoOwner={detail.owner} repoName={detail.name} coreContributorByYear={detail.coreContributorByYear} isComparing={true} anotherRepoOwner={compareRepo.compareRepo.split('/')[0]} anotherRepoName={compareRepo.compareRepo.split('/')[1]} anotherRepoCoreContributorByYear={detail.coreContributorByYear} />
             </Box>
-            <Box>
-                <Grid container spacing={3}>
-                    <Grid item xs={12} sm={12} md={12}>
-                        <ReactApexChart
-                            series={CHART_DATA}
-                            options={chartOptions}
-                            height='auto'
-                            type='bar'
-                        />
-                    </Grid>
-                </Grid>
-            </Box>
-            <Box>
-                <Grid container spacing={3}>
-                    <Grid item xs={6} >
-                        <Card>
-                            <CardHeader title={detail.owner + "/" + detail.name + " Language"} />
-                            <Language {...detail.language} />
-                        </Card>
-                    </Grid>
-                    <Grid item xs={6}>
-                        <Card>
-                            <CardHeader title={compareRepo.compareRepo + " Language"} />
-                            <Language {...newLanguage.language} />
-                        </Card>
-                    </Grid>
-                </Grid>
-            </Box>
-            {/* 
-               //TODO 将输入的数据改为后端获取的数据
-            */}
-            <CompareCommitFrequency sx={{
-                marginTop: 3,
-            }} repoOwner={detail.owner} repoName={detail.name} anotherRepoOwner={compareRepo.compareRepo.split('/')[0]} anotherRepoName={compareRepo.compareRepo.split('/')[1]} data1={detail.commit_month_frequency} data2={detail.commit_month_frequency} />
-            <Divider />
-            {/* 
-               //TODO 将输入的数据改为后端获取的数据
-            */}
-            <CompareCommiterFrequency repoOwner={detail.owner} repoName={detail.name} anotherRepoOwner={compareRepo.compareRepo.split('/')[0]} anotherRepoName={compareRepo.compareRepo.split('/')[1]} data1={detail.commiter_count} data2={detail.commiter_count} />
-            {/* 
-               //TODO 将输入的数据改为后端获取的数据
-            */}
-            <CompareIssuerCountFrequency repoOwner={detail.owner} repoName={detail.name} anotherRepoOwner={compareRepo.compareRepo.split('/')[0]} anotherRepoName={compareRepo.compareRepo.split('/')[1]} data1={detail.Issuer_count} data2={detail.Issuer_count} />
-            {/* 
-               //TODO 将输入的数据改为后端获取的数据
-            */}
-            <ComparePullerCountFrequency repoOwner={detail.owner} repoName={detail.name} anotherRepoOwner={compareRepo.compareRepo.split('/')[0]} anotherRepoName={compareRepo.compareRepo.split('/')[1]} data1={detail.puller_count} data2={detail.puller_count} />
         </Container>
     )
 }
