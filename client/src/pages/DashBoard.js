@@ -79,7 +79,6 @@ export default function DashboardApp() {
         return <Loading center />;
     } else {
         const IssueFrequencyDatas = {
-            issue_frequency,
             issue_year_create_frequency,
             Issue_year_update_frequency,
             Issue_year_close_frequency,
@@ -230,6 +229,8 @@ export default function DashboardApp() {
                         <Box sx={{ height: 520, width: '100%' }}>
                             <Contribute {...coreContributorByYear} />
                         </Box>
+                        <CompanyBubbleChart repo_owner={owner} repo_name={name} coreContributorByYear={coreContributorByYear} />
+
                         <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
                             <Typography variant="h4">Issue closed and Issue response</Typography>
                         </Box>
@@ -260,7 +261,6 @@ export default function DashboardApp() {
                             </Grid>
                         </Box>
 
-                        <CompanyBubbleChart repo_owner={owner} repo_name={name} coreContributorByYear={coreContributorByYear} />
                     </Container>
                 )
 

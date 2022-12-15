@@ -13,13 +13,13 @@ const IssueFrequency = data => {
   // 定制表格显示数据
   const [anchorEl, setAnchorEl] = useState(null);
   const issueDataTypes = [
-    'issue_frequency',
-    'issue_year_create_frequency',
-    'Issue_year_update_frequency',
-    'Issue_year_close_frequency',
     'Issue_month_create_frequency',
     'Issue_month_update_frequency',
     'Issue_month_close_frequency',
+    'issue_year_create_frequency',
+    'Issue_year_update_frequency',
+    'Issue_year_close_frequency',
+    
   ]
   const [currentType, setCurrentType] = useState(issueDataTypes[0]);
   const listItems = issueDataTypes.map((type) => {
