@@ -16,8 +16,11 @@ Operations below are all based on centos 8.4.0. Please first check os before you
    - Then you should run `sudo yum install -y mongodb-org` and add `exclude=mongodb-org,mongodb-org-database,mongodb-org-server,mongodb-mongosh,mongodb-org-mongos,mongodb-org-tools` to your `~/.zshrc` or `~/.bashrc`
    - Then you should run `mongo --version;mongod --version` to check whether mongodb is correctly installed.The output should like this.
    - ![](https://hutao-image-bed.oss-cn-hangzhou.aliyuncs.com/uPic/tnfFtZ.png)
+   - exec `mongo` to enter mongo cli. then run `use admin;
+ db.createUser( {user: "admin",pwd: "ZJUSRE",roles: [ { role: "userAdminAnyDatabase", db: "admin" } ]})` to create admin user.
+   - exit mongo cli. running `killall mongo` (or other commands to stop mongodb), then relaunch mongodb.enter mongo cli, type `use admin; db.auth('admin','ZJUSRE') to check whether user has been created successfully.
 
-2. Then you should install nodejs. Also, you can refer to https://www.jianshu.com/p/959ca0e5495a. I'll only include minimum steps below.
+1. Then you should install nodejs. Also, you can refer to https://www.jianshu.com/p/959ca0e5495a. I'll only include minimum steps below.
 
    - first run `wget https://nodejs.org/dist/v16.13.2/node-v16.13.2-linux-x64.tar.xz` in any dir.
    - then run ` xz -d node-v16.13.2-linux-x64.tar.xz` to extract it (if bash or zsh cannot find xz, please run `yum install xz.x86_64`)
@@ -26,7 +29,7 @@ Operations below are all based on centos 8.4.0. Please first check os before you
    - Add `/usr/local/nodejs/bin` to your `~/.bashrc` or `~/.zshrc`,source it. Then run node -v, npm -v to check version. It should output like this.(node version here is v18.12.1, but version 16.13.2 is also ok, the same for npm)
      ![](https://hutao-image-bed.oss-cn-hangzhou.aliyuncs.com/uPic/FXtDL7.png)
 
-3. Then you should install ElasticSearch and it's synchronizer for MongoDB. Under Ubuntu you can refer to [配置 MongoDB 数据库更新同步到 ElasticSearch | 甜菜地 (beet.asia)](http://beet.asia/2022/12/04/配置MongoDB数据更新同步到ElasticSearch/#安装并配置-ElasticSearch) which is our own blog. Under other Linux versions, roughly you need to:
+2. Then you should install ElasticSearch and it's synchronizer for MongoDB. Under Ubuntu you can refer to [配置 MongoDB 数据库更新同步到 ElasticSearch | 甜菜地 (beet.asia)](http://beet.asia/2022/12/04/配置MongoDB数据更新同步到ElasticSearch/#安装并配置-ElasticSearch) which is our own blog. Under other Linux versions, roughly you need to:
 
    - add ElasticSearch 5.x 's source to your package manager (apt, yum and so on).
    - install ElasticSearch 5.x and use `systemctl` or `service` to start it.
