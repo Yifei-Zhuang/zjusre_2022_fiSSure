@@ -96,7 +96,7 @@ export default function DashboardApp() {
             visible ? (
                 <Container maxWidth="xl">
                     <Box sx={{ pb: 5, display: "flex", justifyContent: "space-between" }}>
-                        <Typography variant="h4">Compare To {compareRepo}</Typography>
+                        <Typography variant="h4">{owner}/{name} Compare To {compareRepo}</Typography>
                         <Button
                             variant="contained" sx={{ mr: "0%" }}
                             onClick={() => {
