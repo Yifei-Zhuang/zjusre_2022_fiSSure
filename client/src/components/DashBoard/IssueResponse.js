@@ -26,7 +26,6 @@ const IssueResponse = (data) => {
         mypre75.push((data[interval].pre75 / 3.6e6).toFixed(2));
         myslowest.push((data[interval].slowest / 3.6e6).toFixed(2));
     })
-    console.log(labels)
     var tem = []
     for (var i = 0; i < labels.length; i++) {
         tem[i] = {

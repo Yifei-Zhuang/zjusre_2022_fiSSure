@@ -163,19 +163,22 @@ const AsyncFetchUserInfo = async (
         company = company.substring(1);
       }
       let convertCompanyName = company.toUpperCase().trim().split(/[\s,]+/).join(' ')
+      if (convertCompanyName.includes('FACEBOOK') || convertCompanyName.includes('META')) {
+        convertCompanyName = 'FACEBOOK'
+      }
       let companyOriginalName = await helperMap.get(convertCompanyName);
       // console.log(company, convertCompanyName, companyOriginalName)
       // console.log({ company, convertCompanyName })
       // console.log(company);
       if (companyOriginalName) {
-        let pre = await contributorCompanyMap.get(companyOriginalName);
+        let pre = await contributorCompanyMap.get(convertCompanyName);
         await contributorCompanyMap.set(
-          companyOriginalName,
+          convertCompanyName,
           (pre ? pre + 1 : 1),
         );
       } else {
         await Promise.all([
-          (async () => await contributorCompanyMap.set(company, 1))(),
+          (async () => await contributorCompanyMap.set(convertCompanyName, 1))(),
           (async () => helperMap.set(convertCompanyName, company))()
         ])
       }

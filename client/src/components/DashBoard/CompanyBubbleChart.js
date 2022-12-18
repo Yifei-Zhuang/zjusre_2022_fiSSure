@@ -18,7 +18,7 @@ const CompanyBubbleChart = (props) => {
                 // console.log(company)
                 return {
                     name: company.company,
-                    value: company.company === 'other' ? 0 : company.coreContributors
+                    value: company.company === 'OTHER' ? 0 : company.coreContributors
                 }
             })
         }
@@ -31,7 +31,7 @@ const CompanyBubbleChart = (props) => {
                 data: item.coreContributorCompany.map(company => {
                     return {
                         name: company.company,
-                        value: company.company === 'other' ? 0 : company.coreContributors
+                        value: company.company === 'OTHER' ? 0 : company.coreContributors
                     }
                 })
             }
