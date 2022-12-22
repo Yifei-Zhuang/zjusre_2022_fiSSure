@@ -37,11 +37,12 @@ export default function DashboardApp() {
 
     // 使用请求的detail数据
     const { isLoading, detail, getDashBoard, repos } = useAppContext();
-    
+
     //使用死数据
     // const { isLoading, getDashBoard, repos } = useAppContext();
     const [visible, setVisible] = useState(false);
     const [compareRepo, setCompareRepo] = useState("");
+    const [compareId, setCompareId] = useState("");
     const {
         name,
         owner,
@@ -106,7 +107,8 @@ export default function DashboardApp() {
                             Report
                         </Button>
                     </Box>
-                    <Compare compareRepo={compareRepo} />
+                    {/* //TODO 传compareId即可 */}
+                    <Compare compareRepo={compareRepo} compareId={compareId} currentId={id} />
                 </Container>
 
             )
@@ -131,6 +133,7 @@ export default function DashboardApp() {
                                                         <MenuItem
                                                             value={repo.owner + "/" + repo.name}
                                                             key={repo.owner + "/" + repo.name}
+                                                            onClick={() => { setCompareId(repo['_id']) }}
                                                         >
                                                             {repo.owner + "/" + repo.name}
                                                         </MenuItem>
@@ -259,7 +262,7 @@ export default function DashboardApp() {
                             </Grid>
                         </Box>
 
-                    </Container>
+                    </Container >
                 )
 
         );

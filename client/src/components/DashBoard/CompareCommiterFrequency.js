@@ -14,31 +14,44 @@ const CompareCommiterFrequency = (props) => {
     let labels2 = [], number2 = [];
     for (let interval in data1) {
         labels1.push(interval);
-        number1.push(data1[interval]);
     }
     for (let interval in data2) {
         labels2.push(interval);
-        number2.push(data2[interval]);
+    }
+    let minLabels = labels1[0] < labels2[0] ? labels1 : labels2;
+    if (minLabels == labels1) {
+        for (let i = 0; i < minLabels.length; i++) {
+            number2.push(data2[minLabels[i]] ? data2[minLabels[i]] : 0);
+            number1.push(data1[minLabels[i]]);
+        }
+    } else {
+        for (let i = 0; i < minLabels.length; i++) {
+            number1.push(data1[minLabels[i]] ? data1[minLabels[i]] : 0);
+            number2.push(data2[minLabels[i]]);
+        }
     }
     const CHART_DATA = [
         {
             name: `${repoOwner}/${repoName} commiter count`,
-            type: "line",
+            // type: "line",
             data: number1,
         },
         {
             name: `${anotherRepoOwner}/${anotherRepoName} commiter count`,
-            type: "line",
+            // type: "line",
             data: number2,
         }
     ];
-    console
-        .log(CHART_DATA)
     const chartOptions = merge(BaseOptionChart(), {
         chart: {
-            id: 'chartCommiterFrequency',
             type: 'line',
             stacked: false,
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                width: [1, 1, 4]
+            },
             zoom: {
                 type: 'x',
                 enabled: true,
@@ -50,60 +63,18 @@ const CompareCommiterFrequency = (props) => {
         },
         stroke: { width: [3, 2] },
         plotOptions: { bar: { columnWidth: "11%", borderRadius: 4 } },
-        fill: { type: ["gradient", "solid"] },
-        labels: labels1,
+        labels: minLabels,
         xaxis: {
             categories: [
-                ...labels1
+                ...minLabels,
             ]
         },
-        yaxis: [{
-            min: 0,
-            axisTicks: {
-                show: true,
-            },
-            axisBorder: {
-                show: true,
-                color: '#008FFB'
-            },
-            labels: {
-                style: {
-                    colors: '#008FFB',
-                }
-            },
-            title: {
-                text: `${repoOwner}/${repoName} commiter count`,
-                style: {
-                    color: '#008FFB',
-                }
-            },
-            tooltip: {
-                enabled: true
-            }
-        }, {
-            seriesName: `${anotherRepoOwner}/${anotherRepoName} commiter count`,
-            opposite: true,
-            axisTicks: {
-                show: true,
-            },
-            axisBorder: {
-                show: true,
-                color: '#00E396'
-            },
-            labels: {
-                style: {
-                    colors: '#00E396',
-                }
-            },
-            title: {
-                text: `${anotherRepoOwner}/${anotherRepoName}  commiter count`,
-                style: {
-                    color: '#00E396',
-                }
-            },
+        fill: {
+            type: "solid",
+            fillOpacity: 0.7
         },
-        ],
         tooltip: {
+            enabled: true,
             shared: true,
             intersect: false,
             y: {
