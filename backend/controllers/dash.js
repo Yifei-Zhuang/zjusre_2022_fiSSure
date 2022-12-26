@@ -8,13 +8,13 @@ const res = require('express/lib/response');
 const config = require('../config');
 const CommitSchema = require('../models/commit');
 const IssueSchema = require('../models/issue');
+const DashBoardCacheSchema = require('../models/dashboardCache')
 const CommitUtil = require('../utils/commit');
 const IssueUtil = require('../utils/issue');
 const PullUtil = require('../utils/pull');
 const IssueCommentUtil = require('../utils/issueComment');
 const pull = require('../models/pull');
 const { GetCoreContributorByYear1 } = require('../utils/CoreContributor');
-const RedisClient = require('../utils/Redis')
 const octokit = new Octokit({
   auth: process.env.GITHUB_ACCESS_TOKEN || config.GITHUB_ACCESS_TOKEN,
 });
@@ -33,7 +33,7 @@ const GetMessage = async (req, res) => {
         console.log(err);
       });
     // 清空缓存
-    await RedisClient.remove(`${owner}/${repo}`)
+    await DashBoardCacheSchema.remove({ repo_owner: owner, repo_name: repo })
     //      获取仓库的commit，issue，pull信息
     await CommitUtil.GetCommitInfo(owner, repo);
 
@@ -92,7 +92,7 @@ const GetMessage = async (req, res) => {
       });
       if (preRepo) {
         preRepo.forks = repoMessage.data.forks;
-        preRepo.stars = repoMessage.data.stars;
+        preRepo.stars = repoMessage.data.watchers;
         preRepo.open_issues = repoMessage.data.open_issues;
         preRepo.open_issues = repoMessage.data.open_issues;
         preRepo.commit_frequency = commit_frequency;
@@ -174,10 +174,12 @@ const GetDashboard = async (req, res) => {
     try {
       let owner = detail.owner;
       let repo = detail.name;
-      if (await RedisClient.exists(`${owner}/${repo}`)) {
-        let cache = await RedisClient.get(`${owner}/${repo}`)
-        cache = JSON.parse(cache)
-        res.status(201).json(cache);
+      let cache = await DashBoardCacheSchema.findOne({
+        repo_owner: owner,
+        repo_name: repo
+      })
+      if (cache) {
+        res.status(200).json(cache.data);
         return;
       }
       let commit_frequency;
@@ -285,7 +287,6 @@ const GetDashboard = async (req, res) => {
         };
         console.log(new Date(), 'compute comment finish');
       })();
-      console.log(new Date(), 'compute comment begin');
       console.log(new Date(), 'compute coreContributorByYear begin');
       let coreContributorByYear = await GetCoreContributorByYear1(owner, repo);
       console.log(new Date(), 'compute coreContributorByYear finish');
@@ -303,7 +304,11 @@ const GetDashboard = async (req, res) => {
           commits: total_commit_count,
           issues: total_issue_count
         };
-        await RedisClient.set(`${owner}/${repo}`, detail);
+        await DashBoardCacheSchema.create({
+          repo_owner: owner,
+          repo_name: repo,
+          data: detail,
+        })
         res.status(201).json(detail);
       } catch (e) {
         console.log(e);

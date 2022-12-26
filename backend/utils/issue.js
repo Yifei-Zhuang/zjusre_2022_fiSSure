@@ -22,6 +22,8 @@ const octokit = new Octokit({
 const { Mutex } = require('async-mutex');
 
 let PageMutex = new Mutex();
+// 最终交付的时候，只搜索最近20000条
+const UPDATE_THRESHOLD = 200;
 let PAGE_NUM = 0;
 const GetPageNum = async () => {
   let release = await PageMutex.acquire();
@@ -38,6 +40,10 @@ const AsyncFetchIssueInfo = async (owner, repo) => {
   });
   while (1) {
     const page_num = await GetPageNum();
+    if (page_num >= UPDATE_THRESHOLD) {
+      console.log(`fetch issue msg finish! total ${page_num} pages`);
+      break;
+    }
     const per_page = 100;
     let issueMessage = null;
     try {
@@ -46,10 +52,7 @@ const AsyncFetchIssueInfo = async (owner, repo) => {
         repo: repo,
         state: 'all',
         page: page_num,
-        per_page: 100,
-        since: new Date(
-          new Date().getTime() - 365 * 24 * 60 * 60 * 1000,
-        ).toString(),
+        per_page: per_page,
       });
     } catch (e) {
       console.log(e);
@@ -62,6 +65,11 @@ const AsyncFetchIssueInfo = async (owner, repo) => {
     }
 
     for (const issue of issueMessage.data) {
+      const arr = issue.html_url.split('/');
+      const type = arr[arr.length - 2];
+      if (type === 'pull') {
+        continue;
+      }
       let issueObject;
       try {
         issueObject = await IssueSchema.findOne({
@@ -748,7 +756,8 @@ const GetIssuersCountInRange = async (owner, repo) => {
           } else {
             key = `${i}-${j}-01`;
           }
-          arr[key] = arr[Object.keys(arr)[Object.keys(arr).length - 1]] + count;
+          if (!arr[key])
+            arr[key] = arr[Object.keys(arr)[Object.keys(arr).length - 1]] + count;
         }
       }
     } catch (e) {
@@ -760,9 +769,9 @@ const GetIssuersCountInRange = async (owner, repo) => {
     delete copy[lastMonth]
     if (cache) {
       cache.issuer_count = copy;
-      cache.save();
+      await cache.save();
     } else {
-      IssuersCacheSchema.create({
+      await IssuersCacheSchema.create({
         issuer_count: copy,
         repo_name: repo,
         repo_owner: owner

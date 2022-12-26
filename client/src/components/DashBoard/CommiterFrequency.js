@@ -20,10 +20,16 @@ const CommiterFrequency = (data) => {
       type: "area",
       data: number,
     },
+    {
+      name: "commiter monthly count",
+      type: "line",
+      data: number.map((_, i) => { return i ? number[i] - number[i - 1] : 0 }),
+    }
   ];
   const chartOptions = merge(BaseOptionChart(), {
     chart: {
-      type: 'area',
+      id: 'chartCommiterFrequency',
+      type: 'line',
       stacked: false,
       zoom: {
         type: 'x',
@@ -43,6 +49,52 @@ const CommiterFrequency = (data) => {
         ...labels
       ]
     },
+    yaxis: [{
+      min: 0,
+      axisTicks: {
+        show: true,
+      },
+      axisBorder: {
+        show: true,
+        color: '#008FFB'
+      },
+      labels: {
+        style: {
+          colors: '#008FFB',
+        }
+      },
+      title: {
+        text: "commiter count",
+        style: {
+          color: '#008FFB',
+        }
+      },
+      tooltip: {
+        enabled: true
+      }
+    }, {
+      seriesName: 'commiter monthly count',
+      opposite: true,
+      axisTicks: {
+        show: true,
+      },
+      axisBorder: {
+        show: true,
+        color: '#00E396'
+      },
+      labels: {
+        style: {
+          colors: '#00E396',
+        }
+      },
+      title: {
+        text: "commiter monthly count",
+        style: {
+          color: '#00E396',
+        }
+      },
+    },
+    ],
     tooltip: {
       shared: true,
       intersect: false,
@@ -56,7 +108,51 @@ const CommiterFrequency = (data) => {
       },
     },
   });
-
+  const bottomChartOptions = merge(BaseOptionChart(), {
+    chart: {
+      id: "chartCommiterFrequency_",
+      height: 130,
+      type: "bar",
+      foreColor: "#ccc",
+      brush: {
+        target: "chartCommiterFrequency",
+        enabled: true
+      },
+      selection: {
+        enabled: true,
+        fill: {
+          color: "#fff",
+          opacity: 0.4
+        },
+      }
+    },
+    colors: ["#FF0080"],
+    series: [
+      {
+        data: data
+      }
+    ],
+    stroke: {
+      width: 2
+    },
+    grid: {
+      borderColor: "#444"
+    },
+    markers: {
+      size: 0
+    },
+    xaxis: {
+      categories: [
+        ...labels
+      ],
+      tooltip: {
+        enabled: false
+      }
+    },
+    yaxis: {
+      tickAmount: 2
+    }
+  });
   return (
     <Card>
       <CardHeader title="Commiter change" />
@@ -65,6 +161,11 @@ const CommiterFrequency = (data) => {
           series={CHART_DATA}
           options={chartOptions}
           height={355}
+        />
+        <ReactApexChart
+          series={CHART_DATA}
+          options={bottomChartOptions}
+          height={200}
         />
       </Box>
     </Card>

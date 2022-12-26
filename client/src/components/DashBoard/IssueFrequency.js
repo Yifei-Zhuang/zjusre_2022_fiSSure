@@ -13,13 +13,13 @@ const IssueFrequency = data => {
   // 定制表格显示数据
   const [anchorEl, setAnchorEl] = useState(null);
   const issueDataTypes = [
-    'issue_frequency',
-    'issue_year_create_frequency',
-    'Issue_year_update_frequency',
-    'Issue_year_close_frequency',
     'Issue_month_create_frequency',
     'Issue_month_update_frequency',
     'Issue_month_close_frequency',
+    'issue_year_create_frequency',
+    'Issue_year_update_frequency',
+    'Issue_year_close_frequency',
+    
   ]
   const [currentType, setCurrentType] = useState(issueDataTypes[0]);
   const listItems = issueDataTypes.map((type) => {
@@ -43,6 +43,7 @@ const IssueFrequency = data => {
   ];
   const chartOptions = merge(BaseOptionChart(), {
     chart: {
+      id: 'chartIssueFrequency',
       type: 'line',
       stacked: true,
       zoom: {
@@ -63,6 +64,31 @@ const IssueFrequency = data => {
         ...labels
       ]
     },
+    yaxis: [{
+      min: 0,
+      axisTicks: {
+        show: true,
+      },
+      axisBorder: {
+        show: true,
+        color: '#008FFB'
+      },
+      labels: {
+        style: {
+          colors: '#008FFB',
+        }
+      },
+      title: {
+        text: currentType.split('_').map(i => i.toUpperCase()).join(' '),
+        style: {
+          color: '#008FFB',
+        }
+      },
+      tooltip: {
+        enabled: true
+      }
+    },
+    ],
     tooltip: {
       shared: true,
       intersect: false,
@@ -75,6 +101,51 @@ const IssueFrequency = data => {
         },
       },
     },
+  });
+  const bottomChartOptions = merge(BaseOptionChart(), {
+    chart: {
+      id: "_chartCommiterFrequency",
+      height: 130,
+      type: "bar",
+      foreColor: "#ccc",
+      brush: {
+        target: "chartIssueFrequency",
+        enabled: true
+      },
+      selection: {
+        enabled: true,
+        fill: {
+          color: "#fff",
+          opacity: 0.4
+        },
+      }
+    },
+    colors: ["#FF0080"],
+    series: [
+      {
+        data: data
+      }
+    ],
+    stroke: {
+      width: 2
+    },
+    grid: {
+      borderColor: "#444"
+    },
+    markers: {
+      size: 0
+    },
+    xaxis: {
+      categories: [
+        ...labels
+      ],
+      tooltip: {
+        enabled: false
+      }
+    },
+    yaxis: {
+      tickAmount: 2
+    }
   });
   return (
     <Box position={'relative'}>
@@ -111,6 +182,11 @@ const IssueFrequency = data => {
             series={CHART_DATA}
             options={chartOptions}
             height={364}
+          />
+          <ReactApexChart
+            series={CHART_DATA}
+            options={bottomChartOptions}
+            height={200}
           />
         </Box>
       </Card>

@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { useAppContext } from "../context/appContext";
 import Loading from "../components/Loading";
 import { useParams } from "react-router-dom";
-import { Card, CardHeader, Box, Grid, Container, Typography, 
-    Button, InputLabel, FormControl, Select, MenuItem } from "@mui/material";
+import {
+    Card, CardHeader, Box, Grid, Container, Typography,
+    Button, InputLabel, FormControl, Select, MenuItem
+} from "@mui/material";
 import {
     CommitNumber,
     IssueNumber,
@@ -20,28 +22,30 @@ import {
     IssueClose,
     PullFrequency,
     PullerFrequency,
-    Compare
+    Compare,
+    HeatMap,
+    CompanyBubbleChart
 } from "../components/DashBoard";
-import detail from "../context/staticData"
+// import detail from "../context/staticData"
 
 export default function DashboardApp() {
-    // 暂时关闭从后端获得数据
-    // useEffect(() => {
-    //     getDashBoard(id);
-    // }, []);
-
+    useEffect(() => {
+        getDashBoard(id);
+    }, []);
 
     const { id } = useParams();
 
-
     // 使用请求的detail数据
-    // const { isLoading, detail, getDashBoard, repos } = useAppContext();
+    const { isLoading, detail, getDashBoard, repos } = useAppContext();
 
     //使用死数据
-    const { isLoading, getDashBoard, repos } = useAppContext();
+    // const { isLoading, getDashBoard, repos } = useAppContext();
     const [visible, setVisible] = useState(false);
     const [compareRepo, setCompareRepo] = useState("");
+    const [compareId, setCompareId] = useState("");
     const {
+        name,
+        owner,
         forks,
         stars,
         open_issues,
@@ -69,13 +73,11 @@ export default function DashboardApp() {
         monthly_count
     } = detail;
 
-
-
     if (isLoading) {
         return <Loading center />;
     } else {
+
         const IssueFrequencyDatas = {
-            issue_frequency,
             issue_year_create_frequency,
             Issue_year_update_frequency,
             Issue_year_close_frequency,
@@ -95,7 +97,7 @@ export default function DashboardApp() {
             visible ? (
                 <Container maxWidth="xl">
                     <Box sx={{ pb: 5, display: "flex", justifyContent: "space-between" }}>
-                        <Typography variant="h4">Compare To {compareRepo}</Typography>
+                        <Typography variant="h4">{owner}/{name} Compare To {compareRepo}</Typography>
                         <Button
                             variant="contained" sx={{ mr: "0%" }}
                             onClick={() => {
@@ -105,7 +107,8 @@ export default function DashboardApp() {
                             Report
                         </Button>
                     </Box>
-                    <Compare compareRepo={compareRepo} />
+                    {/* //TODO 传compareId即可 */}
+                    <Compare compareRepo={compareRepo} compareId={compareId} currentId={id} />
                 </Container>
 
             )
@@ -130,6 +133,7 @@ export default function DashboardApp() {
                                                         <MenuItem
                                                             value={repo.owner + "/" + repo.name}
                                                             key={repo.owner + "/" + repo.name}
+                                                            onClick={() => { setCompareId(repo['_id']) }}
                                                         >
                                                             {repo.owner + "/" + repo.name}
                                                         </MenuItem>
@@ -226,8 +230,10 @@ export default function DashboardApp() {
                         <Box sx={{ height: 520, width: '100%' }}>
                             <Contribute {...coreContributorByYear} />
                         </Box>
+                        <CompanyBubbleChart repoOwner={owner} repoName={name} coreContributorByYear={coreContributorByYear} />
+
                         <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
-                            <Typography variant="h4">Issue closed and Issue response</Typography>
+                            <Typography variant="h4">Issue response</Typography>
                         </Box>
                         <Box>
                             <Grid container spacing={3}>
@@ -243,14 +249,20 @@ export default function DashboardApp() {
                         </Box>
 
 
-                        
+
                         <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
                             <Typography variant="h4">Design</Typography>
                         </Box>
                         <Box>
-                            {/* TODO: 设计相关模块 */}
+                            <Grid container spacing={3}>
+                                <Grid item xs={12} sm={12} md={12}>
+                                    <HeatMap />
+                                </Grid>
+
+                            </Grid>
                         </Box>
-                    </Container>
+
+                    </Container >
                 )
 
         );

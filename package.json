@@ -20,7 +20,13 @@
     "axios": "^1.2.1",
     "echarts": "^5.4.1",
     "echarts-for-react": "^3.0.2",
+    "fetch-jsonp": "^1.2.3",
+    "highcharts": "^10.3.2",
+    "highcharts-react-official": "^3.1.0",
+    "lodash.clonedeep": "^4.5.0",
+    "lodash.omit": "^4.5.0",
     "react-apexcharts": "^1.4.0",
     "redis": "^4.5.1"
-  }
+  },
+  "proxy": "http://beet.asia:9200/doublec_pytorch/_search"
 }

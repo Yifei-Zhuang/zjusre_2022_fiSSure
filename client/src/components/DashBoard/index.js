@@ -15,6 +15,7 @@ import PullFrequency from "./PullFrequency"
 import PullerFrequency from "./PullerFrequency"
 import Compare from "./Compare";
 import HeatMap from "./HeatMap";
+import CompanyBubbleChart from './CompanyBubbleChart'
 export {
   CommitNumber,
   IssueNumber,
@@ -32,5 +33,6 @@ export {
   PullFrequency,
   PullerFrequency,
   Compare,
-  HeatMap
+  HeatMap,
+  CompanyBubbleChart
 };

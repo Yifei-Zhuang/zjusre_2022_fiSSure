@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"b7f5cdea81004302a3fd55906a7fb767","collectionName":"commityears","type":"collection"}

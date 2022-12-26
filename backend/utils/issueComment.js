@@ -2,9 +2,9 @@ const IssueCommentSchema = require('../models/issue-comment');
 const IssueSchema = require('../models/issue');
 const issueCommentsCacheSchema = require('../models/issue-comment-cache');
 const config = require('../config');
-const {default: mongoose} = require('mongoose');
-const {Octokit} = require('@octokit/core');
-const {Mutex} = require('async-mutex');
+const { default: mongoose } = require('mongoose');
+const { Octokit } = require('@octokit/core');
+const { Mutex } = require('async-mutex');
 const octokit = new Octokit({
   auth: process.env.GITHUB_ACCESS_TOKEN || config.GITHUB_ACCESS_TOKEN,
 });
@@ -90,7 +90,7 @@ const AsyncFetchCommentInfo = async (
                 repo: repo,
                 issue_number: issue.number,
                 page: 1,
-                per_page: 20,
+                per_page: 40,
               },
             );
           } catch (e) {
@@ -100,7 +100,7 @@ const AsyncFetchCommentInfo = async (
           // 只插入最早的comment
           let index = 0;
           for (index = 0; index < commentsResponse.data.length; index++) {
-            if (commentsResponse.data[index].user.type === 'User') {
+            if (commentsResponse.data[index].user.type === 'User' && !commentsResponse.data[index].body.includes('merge') && !commentsResponse.data[index].user.login.includes('bot') && !commentsResponse.data[index].user.login.includes('github-actions') && !commentsResponse.data[index].body.includes('@pytorchbot') && !commentsResponse.data[index].body.includes('@pytorchmergebot')) {
               break;
             }
             index++;
@@ -161,7 +161,7 @@ const getFirstResponseTimeMap = async (owner, repo) => {
   const issues = await IssueSchema.find({
     repo_owner: owner,
     repo_name: repo,
-    created_at: {$gt: maxMonth},
+    created_at: { $gt: maxMonth },
   }).sort([['created_at', -1]]);
   const issueCommentsCache = await IssueCommentSchema.find({
     repo_owner: owner,

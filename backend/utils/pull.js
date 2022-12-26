@@ -23,10 +23,13 @@ const {
 } = require('./index');
 const { Mutex } = require('async-mutex');
 let PageMutex = new Mutex();
+// 最终交付的时候，只搜索最近20000条
+const UPDATE_THRESHOLD = 200;
+let _PAGE_NUM = 0;
 const GetPageNum = async () => {
   let release = await PageMutex.acquire();
-  let returnVal = PAGE_NUM;
-  PAGE_NUM++;
+  let returnVal = _PAGE_NUM;
+  _PAGE_NUM++;
   release();
   return returnVal;
 };
@@ -40,6 +43,10 @@ const AsyncFetchPullInfo = async (owner, repo) => {
 
   while (1) {
     const page_num = await GetPageNum();
+    if (page_num >= UPDATE_THRESHOLD) {
+      console.log(`fetch pull msg finish! total ${page_num} pages`);
+      break;
+    }
     let pullMessage = null;
     try {
       console.log(page_num)
@@ -49,15 +56,12 @@ const AsyncFetchPullInfo = async (owner, repo) => {
         state: 'all',
         page: page_num,
         per_page: per_page,
-        since: new Date(
-          new Date().getTime() - 365 * 24 * 60 * 60 * 1000,
-        ).toString(),
       });
     } catch (e) {
       console.log(e);
-      throw e;
+      throw e
     }
-    if (pullMessage.data.length == 0 || page_num >= 300) {
+    if (pullMessage.data.length == 0) {
       console.log(`fetch pull msg finish! total ${page_num} pages`);
       break;
     }
@@ -744,7 +748,8 @@ const GetPullersCountInRange = async (owner, repo) => {
         } else {
           key = `${i}-${j}-01`;
         }
-        arr[key] = arr[Object.keys(arr)[Object.keys(arr).length - 1]] + count;
+        if (!arr[key])
+          arr[key] = arr[Object.keys(arr)[Object.keys(arr).length - 1]] + count;
       }
     }
     delete arr.base;
@@ -753,9 +758,9 @@ const GetPullersCountInRange = async (owner, repo) => {
     delete copy[lastMonth]
     if (cache) {
       cache.puller_count = copy;
-      cache.save();
+      await cache.save();
     } else {
-      PullerCacheSchema.create({
+      await PullerCacheSchema.create({
         puller_count: copy,
         repo_name: repo,
         repo_owner: owner

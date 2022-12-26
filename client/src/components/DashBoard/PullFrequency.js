@@ -18,8 +18,7 @@ const PullFrequency = data => {
         'pull_year_update_frequency',
         'pull_month_create_frequency',
         'pull_month_close_frequency',
-        'pull_month_update_frequency',
-        'puller_count',
+        'pull_month_update_frequency'
     ]
     const [currentType, setCurrentType] = useState(issueDataTypes[0]);
     const listItems = issueDataTypes.map((type) => {
@@ -43,6 +42,7 @@ const PullFrequency = data => {
     ];
     const chartOptions = merge(BaseOptionChart(), {
         chart: {
+            id: 'chartPullFrequency',
             type: 'area',
             stacked: false,
             zoom: {
@@ -63,6 +63,31 @@ const PullFrequency = data => {
                 ...labels
             ]
         },
+        yaxis: [{
+            min: 0,
+            axisTicks: {
+                show: true,
+            },
+            axisBorder: {
+                show: true,
+                color: '#008FFB'
+            },
+            labels: {
+                style: {
+                    colors: '#008FFB',
+                }
+            },
+            title: {
+                text: currentType.split('_').map(i => i.toUpperCase()).join(' '),
+                style: {
+                    color: '#008FFB',
+                }
+            },
+            tooltip: {
+                enabled: true
+            }
+        },
+        ],
         tooltip: {
             shared: true,
             intersect: false,
@@ -75,6 +100,51 @@ const PullFrequency = data => {
                 },
             },
         },
+    });
+    const bottomChartOptions = merge(BaseOptionChart(), {
+        chart: {
+            id: "_chartPullFrequency",
+            height: 130,
+            type: "bar",
+            foreColor: "#ccc",
+            brush: {
+                target: "chartPullFrequency",
+                enabled: true
+            },
+            selection: {
+                enabled: true,
+                fill: {
+                    color: "#fff",
+                    opacity: 0.4
+                },
+            }
+        },
+        colors: ["#FF0080"],
+        series: [
+            {
+                data: data
+            }
+        ],
+        stroke: {
+            width: 2
+        },
+        grid: {
+            borderColor: "#444"
+        },
+        markers: {
+            size: 0
+        },
+        xaxis: {
+            categories: [
+                ...labels
+            ],
+            tooltip: {
+                enabled: false
+            }
+        },
+        yaxis: {
+            tickAmount: 2
+        }
     });
     return (
         <Box position={'relative'}>
@@ -112,6 +182,11 @@ const PullFrequency = data => {
                         series={CHART_DATA}
                         options={chartOptions}
                         height={364}
+                    />
+                    <ReactApexChart
+                        series={CHART_DATA}
+                        options={bottomChartOptions}
+                        height={200}
                     />
                 </Box>
             </Card>
