@@ -14,6 +14,7 @@ this part is inclued in INSTALL.md
 ### how to use
 after install, you can run `npm run server` and `npm run client` to start the project. Then you can visit `localhost:3000` to see the project.
 
+
 ### example snapshot
 **If you have any doubts about functionality, please  check requirement_management.pdf in the document/requirement_management folder**
 - analyse commiter number monthly and total changes.

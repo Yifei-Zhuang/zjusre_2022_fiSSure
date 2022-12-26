@@ -1,3 +1,4 @@
+//for test only
 const detail = {
     "_id": "638b7100972ff3d56ba3be96",
     "name": "pytorch",
