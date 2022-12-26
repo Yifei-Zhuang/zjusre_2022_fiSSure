@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"c2552b2660524d4481e44276237721e7","collectionName":"commiter-caches","type":"collection"}
