@@ -52,10 +52,7 @@ const AsyncFetchIssueInfo = async (owner, repo) => {
         repo: repo,
         state: 'all',
         page: page_num,
-        per_page: 100,
-        since: new Date(
-          new Date().getTime() - 365 * 24 * 60 * 60 * 1000,
-        ).toString(),
+        per_page: per_page,
       });
     } catch (e) {
       console.log(e);
@@ -68,6 +65,11 @@ const AsyncFetchIssueInfo = async (owner, repo) => {
     }
 
     for (const issue of issueMessage.data) {
+      const arr = issue.html_url.split('/');
+      const type = arr[arr.length - 2];
+      if (type === 'pull') {
+        continue;
+      }
       let issueObject;
       try {
         issueObject = await IssueSchema.findOne({

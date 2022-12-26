@@ -49,7 +49,8 @@ const AppProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const authFetch = axios.create({
-    baseURL: "http://120.26.195.57:4538/",
+    // baseURL: "http://120.26.195.57:4538/",
+    baseURL: "http://localhost:4538/",
   });
 
   const displayAlert = () => {

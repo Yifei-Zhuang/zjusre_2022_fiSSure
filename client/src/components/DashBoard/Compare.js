@@ -23,7 +23,7 @@ const Compare = (compareRepo) => {
         const f = async () => {
             // TODO 使用统一的baseURL
             let { data } = await axios({
-                url: "http://120.26.195.57:4538/dashboard",
+                url: "http://localhost:4538/dashboard",
                 method: "post",
                 data: {
                     id: compareId
@@ -31,7 +31,7 @@ const Compare = (compareRepo) => {
             })
             setAnotherRepoDetail(data);
             const cdata = await axios({
-                url: "http://120.26.195.57:4538/dashboard",
+                url: "http://localhost:4538/dashboard",
                 method: "post",
                 data: {
                     id: currentId
@@ -68,11 +68,15 @@ const Compare = (compareRepo) => {
                 ]
             },
         ];
-        const maxValue = Math.max(...CHART_DATA[0].data.concat(CHART_DATA[1].data))
+        const maxValue = Math.max(...CHART_DATA[0].data) + Math.max(...CHART_DATA[1].data)
 
         const chartOptions = {
             chart: {
-                stacked: true
+                type: 'bar',
+                stacked: true,
+                toolbar: {
+                    show: false
+                }
             },
             colors: ['#008FFB', '#FF4560'],
             plotOptions: {
@@ -97,11 +101,16 @@ const Compare = (compareRepo) => {
                 }
             },
             yaxis: {
-                min: -1 * maxValue,
+                // min: -1 * maxValue,
+                min: 0,
                 max: maxValue,
                 title: {
                     text: 'Data Type',
                 },
+                labels: {
+                    show: true,
+                    trim: false
+                }
             },
             tooltip: {
                 shared: false,

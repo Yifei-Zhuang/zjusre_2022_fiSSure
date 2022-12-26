@@ -18,8 +18,7 @@ const PullFrequency = data => {
         'pull_year_update_frequency',
         'pull_month_create_frequency',
         'pull_month_close_frequency',
-        'pull_month_update_frequency',
-        'puller_count',
+        'pull_month_update_frequency'
     ]
     const [currentType, setCurrentType] = useState(issueDataTypes[0]);
     const listItems = issueDataTypes.map((type) => {

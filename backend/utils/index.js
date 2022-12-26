@@ -1,4 +1,4 @@
-const {prependOnceListener} = require('../models/issue');
+const { prependOnceListener } = require('../models/issue');
 
 const YearCounter = async (input, property, begin, tail, map) => {
   try {
@@ -155,22 +155,22 @@ const DayCounter = async (input, property, begin, tail) => {
                 ? `${i}-0${j}-0${p}T00:00:00.00Z`
                 : `${i}-${j}-${p}T00:00:00.00Z`
               : j < 10
-              ? `${i}-0${j}-${p}T00:00:00.00Z`
-              : `${i}-${j}-${p}T00:00:00.00Z`;
+                ? `${i}-0${j}-${p}T00:00:00.00Z`
+                : `${i}-${j}-${p}T00:00:00.00Z`;
           let nextDay =
             p == daysOfMonth[j - 1]
               ? j == 12
                 ? `${i + 1}-01-01T00:00:00.00Z`
                 : j >= 9
-                ? `${i}-${j + 1}-01T00:00:00.00Z`
-                : `${i}-0${j + 1}-01T00:00:00.00Z`
+                  ? `${i}-${j + 1}-01T00:00:00.00Z`
+                  : `${i}-0${j + 1}-01T00:00:00.00Z`
               : p >= 9
-              ? j < 10
-                ? `${i}-0${j}-${p + 1}T00:00:00.00Z`
-                : `${i}-${j}-${p + 1}T00:00:00.00Z`
-              : j < 10
-              ? `${i}-0${j}-0${p + 1}T00:00:00.00Z`
-              : `${i}-${j}-0${p + 1}T00:00:00.00Z`;
+                ? j < 10
+                  ? `${i}-0${j}-${p + 1}T00:00:00.00Z`
+                  : `${i}-${j}-${p + 1}T00:00:00.00Z`
+                : j < 10
+                  ? `${i}-0${j}-0${p + 1}T00:00:00.00Z`
+                  : `${i}-${j}-0${p + 1}T00:00:00.00Z`;
           let count = 0;
           for (let x = pre; x < input.length; x++) {
             const item = input[x];
@@ -226,9 +226,9 @@ const AsyncFunctionWrapper = async (fn, ...props) => {
     fn(...props),
     fn(...props),
     fn(...props),
-    // fn(...props),
-    // fn(...props),
-    // fn(...props),
+    fn(...props),
+    fn(...props),
+    fn(...props),
     // fn(...props),
     // fn(...props),
     // fn(...props),

@@ -233,7 +233,7 @@ export default function DashboardApp() {
                         <CompanyBubbleChart repoOwner={owner} repoName={name} coreContributorByYear={coreContributorByYear} />
 
                         <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
-                            <Typography variant="h4">Issue closed and Issue response</Typography>
+                            <Typography variant="h4">Issue response</Typography>
                         </Box>
                         <Box>
                             <Grid container spacing={3}>
@@ -251,7 +251,7 @@ export default function DashboardApp() {
 
 
                         <Box sx={{ paddingTop: 3, paddingBottom: 1 }}>
-                            <Typography variant="h4">Desigh</Typography>
+                            <Typography variant="h4">Design</Typography>
                         </Box>
                         <Box>
                             <Grid container spacing={3}>
